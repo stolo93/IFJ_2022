@@ -57,7 +57,7 @@ tokenType firstState ( int character )
 {
     if ( character == '$') return identOfVar;
     else if ( isalpha( character ) || character == '_') return identifier;
-    else if ( character == '?' ) return identOfType;
+    else if ( character == '?' ) return identOfTypeN;
     else if ( isdigit( character ) ) return integer;
     else if ( character == '"' ) return string;
     else if ( character == '/' ) return lineComment;
@@ -84,6 +84,7 @@ tokenType firstState ( int character )
 token* getToken()
 {
     bool endState = false;
+    bool noRepeat = true ;
     int character = 0;
     int counter = 1 ;
     unsigned int size = DEFAULT_SIZE;
@@ -102,6 +103,7 @@ token* getToken()
 
     if( character == EOF )
     {
+        free(info);
         newToken->discriminant = endOfFile;
         newToken->info.integer = -1 ;
 
@@ -121,7 +123,7 @@ token* getToken()
     {
         character = fgetc(stdin);
 
-        //TODO check if char is EOF and send current token away if possible
+        //NOTTODO check if char is EOF and send current token away if possible
 
         switch ( state )
         {
@@ -183,9 +185,35 @@ token* getToken()
 
                             return newToken;
 
-                            
+            case identOfTypeN :
+                            if ( counter == 1 && noRepeat )
+                            {
+                                counter-- ;
+                                noRepeat = false ;
+                                if ( character == '>') 
+                                {
+                                    state == endOfFile;
+                                }
+                            }
+                            if ( islower ( character ) )
+                            {
+                                info [ counter ] = character ;
+                                counter++ ;
+                                break ;
+                            }
 
-            case identOfType :
+                            
+                            if (  !finalResize( &info ) || (checkForKeyword ( info ) != identOfType) )
+                            {
+                                free( info ) ; 
+                                free( newToken ) ;
+                                return NULL ; //TODO that error thing 
+                            }
+
+                            newToken->info.string = info ;
+
+                            return newToken ; 
+
             case integer :
             case string :
             case lineComment :
@@ -202,6 +230,18 @@ token* getToken()
             case openSetParen :
             case closeParen :
             case closeSetParen :
+            case endOfFile :
+                            free ( info ) ;
+                            if ( character == EOF )
+                            {
+                                newToken->info.integer = -1;
+
+                                return newToken;
+                            }
+                            free ( newToken );
+
+                            return NULL; //TODO that error thing 
+
             default: break;
         }
 
