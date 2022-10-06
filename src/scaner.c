@@ -20,8 +20,23 @@ bool resizeString ( char** string , unsigned int* size)
     return true;
 }
 
+bool finalResize ( char** string)
+{
+    unsigned int size = strlen ( *string );
 
-tokenType firstState( int character )
+    char* temp = ( char* ) realloc ( *string , size + 1 );
+
+    if ( temp == NULL )
+    {
+        return false;
+    }
+    *string = temp;
+
+    return true;
+}
+
+
+tokenType firstState ( int character )
 {
     if ( character == '$') return identOfVar;
     else if ( isalpha( character ) || character == '_') return identifier;
@@ -91,8 +106,8 @@ token* getToken()
 
         //TODO check if char is EOF and send current token away if possible
 
-        switch ( state ){
-
+        switch ( state )
+        {
             case identOfVar :
                             if ( counter == 1 && ( isalpha( character ) || character == '_'))
                             {
@@ -110,8 +125,21 @@ token* getToken()
 
                             if ( endState )
                             {
+                                if ( finalResize( &info ) )
+                                {
+                                    free( info );
+                                    free( newToken );
+                                    return NULL; //TODO thet error thing
+                                }
+                                ungetc ( character , stdin );
+                                newToken->info.string = info;
 
+                                return newToken;
                             }
+
+                            free(info);
+                            free(newToken);
+                            return NULL ; // TODO that error thing 
 
             case identifier :
             case identOfType :
@@ -131,7 +159,7 @@ token* getToken()
             case openSetParen :
             case closeParen :
             case closeSetParen :
-            default :
+            default: break;
         }
 
         if ( counter == size )
