@@ -35,6 +35,23 @@ bool finalResize ( char** string)
     return true;
 }
 
+tokenType checkForKeyword ( char* string ){
+
+    const char * kWords [] = { "else" , "function" , "if"  , "null" , "return" , "void" , " while" };
+    const char * dTypes [] = { "float" ,  "int" , "string" } ; 
+
+    for ( unsigned int counter = 0 ; counter < NUM_OF_KWORDS ; counter++ )
+    {
+        if ( ! strcmp ( kWords [ counter ] , string ) ) return keyword;
+    }
+    for ( unsigned int counter = 0 ; counter < NUM_OF_DTYPES ; counter++ )
+    {
+        if ( ! strcmp ( dTypes [ counter ] , string ) ) return identOfType ;
+    }
+
+    return identifier ;
+
+}
 
 tokenType firstState ( int character )
 {
@@ -102,7 +119,7 @@ token* getToken()
 
     while( true )
     {
-        character == getc( stdin );
+        character = fgetc(stdin);
 
         //TODO check if char is EOF and send current token away if possible
 
@@ -112,6 +129,7 @@ token* getToken()
                             if ( counter == 1 && ( isalpha( character ) || character == '_'))
                             {
                                 info [ counter ] = character;
+                                endState = true;   // TODO check if it should be here
                                 counter++;
                                 break;
                             }
@@ -125,11 +143,11 @@ token* getToken()
 
                             if ( endState )
                             {
-                                if ( finalResize( &info ) )
+                                if ( !finalResize( &info ) )
                                 {
                                     free( info );
                                     free( newToken );
-                                    return NULL; //TODO thet error thing
+                                    return NULL; //TODO that error thing
                                 }
                                 ungetc ( character , stdin );
                                 newToken->info.string = info;
@@ -142,6 +160,31 @@ token* getToken()
                             return NULL ; // TODO that error thing 
 
             case identifier :
+                            endState = true ;
+
+                            if ( isalnum ( character ) || character == '_' )
+                            {
+                                info [ counter ] = character;    
+                                counter++ ;
+                                break ;
+                            }
+
+                            ungetc ( character , stdin ) ;
+
+                            if ( !finalResize( &info ) )
+                            {
+                                free (info ) ;
+                                free( newToken ) ;
+                                return NULL ; //TODO that error thing
+                            }
+
+                            newToken->discriminant = checkForKeyword ( info );
+                            newToken->info.string = info ;
+
+                            return newToken;
+
+                            
+
             case identOfType :
             case integer :
             case string :
@@ -164,7 +207,7 @@ token* getToken()
 
         if ( counter == size )
         {
-            if( resizeString ( &info , &size ) )
+            if( !resizeString ( &info , &size ) )
             {
                 free(info);
                 free(newToken);

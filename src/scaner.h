@@ -1,5 +1,8 @@
 #include <stdbool.h>
+
 #define DEFAULT_SIZE 20
+#define NUM_OF_KWORDS 7
+#define NUM_OF_DTYPES 3
 
 typedef enum tokenType { def , keyword , identifier , identOfVar , identOfType , 
              integer , decNum , string , lineComment , multiLineComm ,
