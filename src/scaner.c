@@ -8,10 +8,30 @@
 
 
 
-
 tokenType firstState(int character )
 {
-    // if else chain
+    if ( character == '$') return identOfVar;
+    else if ( isalpha( character ) || character == '_') return identifier;
+    else if ( character == '?' ) return identOfType;
+    else if ( isdigit( character ) ) return Integer;
+    else if ( character == '"' ) return string;
+    else if ( character == '/' ) return lineComment;
+    else if ( character == '+' ) return plusSign;
+    else if ( character == '-' ) return minusSign;
+    else if ( character == '*' ) return multiply;
+    else if ( character == '.' ) return concatenation;
+    else if ( character == '<' ) return lessOper;
+    else if ( character == '>' ) return moreOper;
+    else if ( character == '=' ) return EqOper;
+    else if ( character == ':' ) return colon;
+    else if ( character == ';' ) return semicolon;
+    else if ( character == ',' ) return comma;
+    else if ( character == '(' ) return openParen;
+    else if ( character == ')' ) return closeParen;
+    else if ( character == '{' ) return openSetParen;
+    else if ( character == '}' ) return closeSetParen;
+    else return def;
+    
 }
 
 
@@ -41,5 +61,5 @@ token* getToken()
     }
 
     
-
+    state = firstState( character );
 }
