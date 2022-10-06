@@ -1,21 +1,30 @@
-
+#include <stdbool.h>
 #define DEFAULT_SIZE 20
+
+typedef enum tokenType { def , keyword , identifier , identOfVar , identOfType , 
+             Integer , decNum , string , lineComment , multiLineComm ,
+             plusSign, minusSign , multiply , devide , concatenation ,
+             lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
+             EqOper, assigment , openParen , closeParen , openSetParen , 
+             closeSetParen , comma , semicolon , colon , endOfFile } tokenType;
 
 typedef struct token
 {
 
-    unsigned int discriminant;
+    tokenType discriminant;
     union information 
     {
         int integer;
         double decNuber;
         char* string;
-    };
+    } info;
 
-}token;
+} token ;
 
-token* getToken();
+tokenType firstState( int character );
 
-void returnToken(token* retToken);
+token* getToken ();
 
-bool checkProlog();
+void returnToken ( token* retToken ) ;
+
+bool checkProlog () ;
