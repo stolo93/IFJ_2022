@@ -2,7 +2,7 @@
 #define DEFAULT_SIZE 20
 
 typedef enum tokenType { def , keyword , identifier , identOfVar , identOfType , 
-             Integer , decNum , string , lineComment , multiLineComm ,
+             integer , decNum , string , lineComment , multiLineComm ,
              plusSign, minusSign , multiply , devide , concatenation ,
              lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
              EqOper, assigment , openParen , closeParen , openSetParen , 
