@@ -101,7 +101,7 @@ tokenType firstState ( int character )
     else if ( character == '?' ) return identOfTypeN;
     else if ( isdigit( character ) ) return integer;
     else if ( character == '"' ) return string;
-    else if ( character == '/' ) return lineComment;
+    else if ( character == '/' ) return devide;
     else if ( character == '+' ) return plusSign;
     else if ( character == '-' ) return minusSign;
     else if ( character == '*' ) return multiply;
@@ -116,6 +116,7 @@ tokenType firstState ( int character )
     else if ( character == ')' ) return closeParen;
     else if ( character == '{' ) return openSetParen;
     else if ( character == '}' ) return closeSetParen;
+    else if ( character == '!' ) return notEqOper ;
     else return def;
 
 }
@@ -200,7 +201,7 @@ token* getToken()
 
                                 return newToken;
                             }
-
+                            ungetc(character , stdin );
                             free(info);
                             free(newToken);
                             return NULL ; // TODO that error thing 
@@ -302,21 +303,187 @@ token* getToken()
                             return newToken ;
                           
             case decNum:
-            case string :
+            case string : 
+                            if ( character == '$' || character < ' ' )
+                            {
+                                free ( info ) ;
+                                free ( newToken );
+                                return NULL ; 
+                            }
+
+                            if ( character == '"' )
+                            {
+                                info [ counter ] = character;
+                                if( ! finalResize( &info ) )
+                                {
+                                    free ( info );
+                                    free ( newToken );
+
+                                    return NULL;
+                                }
+
+                                newToken->info.string = info ;
+                                return newToken;
+                            }
+
+                            info [ counter ] = character;
+
+                            counter++;
+                            break;
+
+            case devide :
+                            if( character != '/' && character != '*' )
+                            {
+                                ungetc( character , stdin ) ;
+                                
+                                if( ! finalResize( &info ) )
+                                {
+                                    free( info );
+                                    free ( newToken );
+                                    return NULL ;
+                                }
+                                newToken->discriminant = devide;
+                                newToken->info.string = info;
+
+                                return newToken;
+                            }
+                            else if( character == '/' )
+                            {
+                                state = lineComment ;
+                                break;
+                            }
+                            else if( character == '*' )
+                            {
+                                state = multiLineComm;
+                                break;
+                            }
             case lineComment :
+                            if( character == '\n' )
+                            {
+                                free( info );
+                                free( newToken );
+
+                                return getToken();
+                            }   
+                            break; 
+            case multiLineComm:
+                            if( character == EOF )
+                            {
+                                free( info );
+                                free( newToken);
+                                return NULL;
+                            }
+                            //continue here         
             case plusSign :
-            case minusSign :
-            case concatenation :
-            case lessOper :
-            case moreOper :
-            case EqOper :
+            case minusSign : 
+            case multiply : 
             case colon :
             case semicolon :
             case comma : 
             case openParen :
             case openSetParen :
             case closeParen :
-            case closeSetParen :
+            case closeSetParen :   
+            case concatenation :
+                            ungetc( character , stdin ) ;
+                            
+                            if ( ! finalResize( &info ) )
+                            {
+                                free( info );
+                                free( newToken );
+                                return NULL;
+                            }
+                            newToken->info.string = info;
+
+                            return newToken;
+            case lessOper :
+                            if ( character == '=' ){
+
+                                newToken->discriminant = lessOrEqOper ;
+                                info [ counter ] = character;
+
+                            }
+                            else
+                            {
+                                ungetc( character , stdin );
+                            } 
+                            if( ! finalResize( &info ) )
+                            {
+                                free( info ) ;
+                                free( newToken ) ;
+                                return NULL;
+                            }
+
+                            newToken->info.string = info ;
+                            return newToken;
+        
+            case moreOper :
+                            if ( character == '=' ){
+
+                                newToken->discriminant = moreOrEqOper ;
+                                info [ counter ] = character;
+
+                            }
+                            else
+                            {
+                                ungetc( character , stdin );
+                            } 
+                            if( ! finalResize( &info ) )
+                            {
+                                free( info ) ;
+                                free( newToken ) ;
+                                return NULL;
+                            }
+
+                            newToken->info.string = info ;
+                            return newToken;
+            case EqOper :
+                        if ( counter == 1 && character != '=' )
+                        {
+                            ungetc( character , stdin ) ;
+
+                            newToken->discriminant = assigment ;
+
+                            if ( ! finalResize( &info ) )
+                            {
+                                free( info );
+                                free( newToken );
+
+                                return NULL;
+                            }
+                            newToken->info.string = info ;
+
+                            return newToken ;
+                        }
+                        else if ( counter == 1 && character == '=' )
+                        {
+                            info [ counter ] = character ;
+                            counter++ ;
+                            break;
+                        }
+                        if ( counter == 2 && character == '=' )
+                        {
+                            info [ counter ] = character ;
+
+                            if ( ! finalResize ( &info ) )
+                            {
+                                free( info );
+                                free( newToken );
+                                return NULL ;
+                            }
+
+                            newToken->info.string = info ;
+
+                            return newToken ; 
+                        }
+                        
+                        free( info );
+                        free( newToken );
+
+                        return NULL;
+            
+
+            case notEqOper:
             case endOfFile :
                             free ( info ) ;
                             if ( character == EOF )
