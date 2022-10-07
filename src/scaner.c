@@ -64,7 +64,7 @@ token* convertNum ( token* newToken , char* info , unsigned int lenght )
     }
     
 
-    if (  (strchr ( info , '.' )) != NULL ){
+    if ( (strchr ( info , '.' )) ){
         decN == true ;
     }
     if ( E != NULL )
