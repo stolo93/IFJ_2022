@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
 #include "scaner.h"
 
 
@@ -25,7 +26,6 @@ bool finalResize ( char** string)
     unsigned int size = strlen ( *string );
 
     char* temp = ( char* ) realloc ( *string , size + 1 );
-
     if ( temp == NULL )
     {
         return false;
@@ -52,6 +52,47 @@ tokenType checkForKeyword ( char* string ){
     return identifier ;
 
 }
+token* convertNum ( token* newToken , char* info , unsigned int lenght )
+{ 
+    
+    bool decN = false ;
+    
+    char * E = strchr( info , 'E' ) ;
+    if ( E == NULL )
+    {
+        E = strchr( info , 'e' ) ;
+    }
+    
+
+    if (  (strchr ( info , '.' )) != NULL ){
+        decN == true ;
+    }
+    if ( E != NULL )
+    {
+        if ( E [ 1 ] == '-' )
+        {
+            decN = true;
+        }
+    }
+
+    if ( !decN ){
+
+        
+        newToken->discriminant = integer;
+        newToken->info.integer = atoi ( info ) * pow(10 ,  atoi( E + 1));
+
+        
+        return newToken;
+    }
+    else if ( decN )
+    {
+        newToken->discriminant = decNum;
+        newToken->info.decNuber = atof( info );
+        return newToken;
+    }
+    
+}
+
 
 tokenType firstState ( int character )
 {
@@ -85,6 +126,9 @@ token* getToken()
 {
     bool endState = false;
     bool noRepeat = true ;
+    bool dot = true;
+    bool exp = true;
+    bool sign = true ; 
     int character = 0;
     int counter = 1 ;
     unsigned int size = DEFAULT_SIZE;
@@ -202,7 +246,7 @@ token* getToken()
                                 break ;
                             }
 
-                            
+                            ungetc ( character , stdin );
                             if (  !finalResize( &info ) || (checkForKeyword ( info ) != identOfType) )
                             {
                                 free( info ) ; 
@@ -215,6 +259,49 @@ token* getToken()
                             return newToken ; 
 
             case integer :
+                            
+                            if ( isdigit( character ) )
+                            {
+                                info [ counter ] = character ;
+                                counter++ ;
+                                break ;
+                            }
+                            if ( character == '.' && dot)
+                            {
+                                dot = false;
+                                info [ counter ] = character ;
+                                counter++ ;
+                                break; 
+                            }
+                            else if ( ( character == 'e' || character == 'E' ) && exp )
+                            {
+                                exp = false;
+                                info [ counter ] = character ;
+                                counter++ ;
+                                break ;
+                            }
+                            else if ( ( character == '+' || character == '-' ) && sign )
+                            {
+                                sign = false;
+                                info [ counter ] = character ;
+                                counter++ ;
+
+                                break;  
+                            }
+                            if ( isalpha( character ))
+                            {
+                                free( info );
+                                free( newToken );
+                                return NULL; // plus that error thing
+                            }
+                            ungetc( character , stdin );
+
+                            newToken = convertNum( newToken , info , counter );
+                            free ( info );
+
+                            return newToken ;
+                          
+            case decNum:
             case string :
             case lineComment :
             case plusSign :
