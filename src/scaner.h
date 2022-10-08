@@ -9,7 +9,8 @@ typedef enum tokenType { def , keyword , identifier , identOfVar , identOfType ,
              plusSign, minusSign , multiply , devide , concatenation ,
              lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
              EqOper , notEqOper, assigment , openParen , closeParen , openSetParen , 
-             closeSetParen , comma , semicolon , colon , endOfFile , identOfTypeN } tokenType;
+             closeSetParen , comma , semicolon , colon , endOfFile , identOfTypeN ,
+             multiLineCommPE } tokenType;
 
 typedef struct token
 {

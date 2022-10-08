@@ -35,6 +35,16 @@ bool finalResize ( char** string)
     return true;
 }
 
+char * findDot( char* info )
+{
+    for(int counter = 0 ; counter < strlen( info ) ; counter++ )
+    {
+        if( info [ counter ] == '.') return info + counter ;
+    }
+
+    return NULL;
+}
+
 tokenType checkForKeyword ( char* string ){
 
     const char * kWords [] = { "else" , "function" , "if"  , "null" , "return" , "void" , " while" };
@@ -63,10 +73,8 @@ token* convertNum ( token* newToken , char* info , unsigned int lenght )
         E = strchr( info , 'e' ) ;
     }
     
+    decN = findDot( info );
 
-    if ( (strchr ( info , '.' )) ){
-        decN == true ;
-    }
     if ( E != NULL )
     {
         if ( E [ 1 ] == '-' )
@@ -79,17 +87,18 @@ token* convertNum ( token* newToken , char* info , unsigned int lenght )
 
         
         newToken->discriminant = integer;
-        newToken->info.integer = atoi ( info ) * pow(10 ,  atoi( E + 1));
+        if ( E != NULL ) newToken->info.integer = atoi ( info ) * pow(10 ,  atoi( E + 1));
+        else newToken->info.integer = atoi( info );
 
         
         return newToken;
     }
-    else if ( decN )
-    {
+    
+    
         newToken->discriminant = decNum;
         newToken->info.decNuber = atof( info );
         return newToken;
-    }
+    
     
 }
 
@@ -149,6 +158,7 @@ token* getToken()
     if( character == EOF )
     {
         free(info);
+        ungetc( character , stdin );
         newToken->discriminant = endOfFile;
         newToken->info.integer = -1 ;
 
@@ -235,9 +245,10 @@ token* getToken()
                             {
                                 counter-- ;
                                 noRepeat = false ;
-                                if ( character == '>') 
-                                {
-                                    state == endOfFile;
+                                
+                                if ( character == '>' ){
+                                    state = endOfFile;
+                                    break; 
                                 }
                             }
                             if ( islower ( character ) )
@@ -373,7 +384,30 @@ token* getToken()
                                 free( newToken);
                                 return NULL;
                             }
-                            //continue here         
+                            if ( character == '*' )
+                            {
+                                state = multiLineCommPE;
+                            }
+            case multiLineCommPE :
+                            if(character == '/' )
+                            {
+                                free ( info ) ;
+                                free ( newToken ) ;
+                                return getToken() ;
+                            }
+                            else if( character == EOF )
+                            {
+                                free( info );
+                                free( newToken);
+                                return NULL;
+                            }
+                            if( character == '*' )
+                            {
+                                break;
+                            }
+                            state = multiLineComm;
+                            break; 
+
             case plusSign :
             case minusSign : 
             case multiply : 
@@ -484,12 +518,37 @@ token* getToken()
             
 
             case notEqOper:
+                            if ( counter == 1 && character == '=' )
+                            {
+                                info [ counter ] = character ;
+                                counter++;
+                                break;
+                            }
+                            if ( counter == 2 && character == '=' )
+                            {
+                                info [ counter ] = character ;
+
+                                if ( ! finalResize( &info ))
+                                {
+                                    free( info );
+                                    free( newToken );
+                                    return NULL;
+                                }
+                                newToken->info.string = info;
+
+                                return newToken;
+                            }
+
+                            free( info );
+                            free( newToken );
+
+                            return NULL;
             case endOfFile :
                             free ( info ) ;
                             if ( character == EOF )
                             {
                                 newToken->info.integer = -1;
-
+                                newToken->discriminant = endOfFile;
                                 return newToken;
                             }
                             free ( newToken );
