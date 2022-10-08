@@ -1,3 +1,9 @@
+/****************************************************************
+ * @name scanner.h
+ * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #include <stdbool.h>
 
 #define DEFAULT_SIZE 20

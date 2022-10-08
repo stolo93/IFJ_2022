@@ -1,3 +1,9 @@
+/****************************************************************
+ * @name scanner.c
+ * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -158,10 +164,10 @@ tokenType firstState ( int character )
 }
 
 
-/** Function which reads toke nand sends it to caller
+/** Function which reads token and sends it to caller
  *
  *  
- *  @return token
+ *  @return token or NULL pionter if error occured
  ***/
 token* getToken()
 {
