@@ -10,7 +10,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <math.h>
-#include "scaner.h"
+#include "../headers/scaner.h"
 
 /** Function for resizing strings
  *
@@ -67,7 +67,8 @@ char * findDot( char* info )
  *  @param string which will be checked for keyword
  *  @return state indicating type of keyword
  ***/
-tokenType checkForKeyword ( char* string ){
+tokenType checkForKeyword ( char* string )
+{
 
     const char * kWords [] = { "else" , "function" , "if"  , "null" , "return" , "void" , " while" };
     const char * dTypes [] = { "float" ,  "int" , "string" } ; 
@@ -660,4 +661,63 @@ bool returnToken( token * retToken)
     free( retToken->info.string );
     free( retToken );
     return true ;
+}
+
+
+bool checkProlog () 
+{
+    int character = 0;
+    char string [ 5 ] ;
+    bool endLine = false;
+    tokenType state = plusSign ;
+
+    for( unsigned int counter = 0 ; counter < 5 ; counter ++)
+    {
+        character = getc( stdin ) ;
+        string [ counter ] = character ;
+    }
+
+    if ( ! strcmp ( string , "<?php" ) ) return false;
+
+    while( ( character = getc( stdin ) ) != EOF )
+    {
+        switch( state )
+        {
+            case plusSign: 
+                        if ( character == '/')
+                        {
+                            state = lineComment;
+                        }
+                        else if( character == '\n')
+                        {
+                            endLine = true ; 
+                            break;
+                        }
+                        else if( ! isspace( character ) )
+                        {
+                            return false;
+                        }
+                        break;
+            case lineComment:
+                        if ( character == '/' )
+                        {
+                            state = identifier;
+                            break;
+                        }
+                        return false;
+            case identifier:
+                        if ( character == '\n' )
+                        {
+                            endLine = true;
+                            break;
+                        }
+            default: return false ;
+
+        };
+        if( endLine )
+        {
+            break;
+        }
+    }
+    
 }

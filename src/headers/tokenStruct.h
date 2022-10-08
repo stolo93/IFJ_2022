@@ -1,14 +1,9 @@
 /****************************************************************
- * @name scanner.h
+ * @name tokenStruct.h
  * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
-#include <stdbool.h>
-
-#define DEFAULT_SIZE 20
-#define NUM_OF_KWORDS 7
-#define NUM_OF_DTYPES 3
 
 typedef enum tokenType { def , keyword , identifier , identOfVar , identOfType , 
              integer , decNum , string , lineComment , multiLineComm ,
@@ -30,11 +25,3 @@ typedef struct token
     } info;
 
 } token ;
-
-tokenType firstState( int character );
-
-token* getToken ();
-
-bool returnToken ( token* retToken ) ;
-
-bool checkProlog () ;
