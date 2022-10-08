@@ -20,6 +20,9 @@ enum error_kinds {
     INVALID_VAL
 };
 
+const char* error_kind_name(enum error_kinds kind);
+const char* error_kind_message(enum error_kinds kind);
+int error_kind_exit_code(enum error_kinds kind);
 
 typedef struct ERR_INFO_ {
     int _line;
@@ -33,12 +36,12 @@ typedef struct ERR_INFO_ {
  *
  * @param type The type which this error contains as a valid value
  */
-#define error(type) typedef struct { bool _is_err; union { ERR_INFO_ _err; __typeof__(type) _value; }; } error_ ## type ## _; error_ ## type ## _
+#define define_error(type) typedef struct { bool _is_err; union { ERR_INFO_ _err; __typeof__(type) _value; }; } error_ ## type ## _;
 
 /**
  * Returns a usable error type of \p type after it's been define with error()
  */
-#define defined_error(type) __typeof__(error_ ## type ## _)
+#define error(type) __typeof__(error_ ## type ## _)
 
 /**
  * Checks if /p error_obj is an error
@@ -59,7 +62,7 @@ typedef struct ERR_INFO_ {
  * @param return_error_type the type of value the error object this function returns can hold
  *
  */
-#define return_error(error_kind, return_error_type) do {defined_error(return_error_type) ERROR___RETURN_VALUE___ = {._is_err = true, ._err = {._line = __LINE__, ._file = __FILE__, ._func = __func__, ._kind = (error_kind)}}; return ERROR___RETURN_VALUE___;} while(0)
+#define return_error(error_kind, return_error_type) do {error(return_error_type) ERROR___RETURN_VALUE___ = {._is_err = true, ._err = {._line = __LINE__, ._file = __FILE__, ._func = __func__, ._kind = (error_kind)}}; return ERROR___RETURN_VALUE___;} while(0)
 
 /**
  * Returns an error object containing the /p value
@@ -68,12 +71,12 @@ typedef struct ERR_INFO_ {
  * @param return_error_type the type of /p value
  */
 // We define a temporary variable, so we don't call error_obj multiple times
-#define return_value(value, return_error_type) do {defined_error(return_error_type) ERROR___RETURN_VALUE___ = {._is_err = false, ._value = {value}}; return ERROR___RETURN_VALUE___;} while(0)
+#define return_value(value, return_error_type) do {error(return_error_type) ERROR___RETURN_VALUE___ = {._is_err = false, ._value = {value}}; return ERROR___RETURN_VALUE___;} while(0)
 
 /**
  * Returns an error object of type none containing an value
  */
-#define return_none() do {defined_error(none) ERROR___RETURN_VALUE___ = {._is_err = false, ._value = {}}; return ERROR___RETURN_VALUE___;} while(0)
+#define return_none() do {error(none) ERROR___RETURN_VALUE___ = {._is_err = false, ._value = {}}; return ERROR___RETURN_VALUE___;} while(0)
 
 /**
  * Takes an existing /p error_obj that holds an error and returns it
@@ -105,5 +108,32 @@ typedef struct ERR_INFO_ {
  * error(void) doesn't produce a valid type so use error(none) instead
  */
 typedef struct none {} none;
+
+typedef long long long_long;
+typedef unsigned char unsigned_char;
+typedef unsigned short unsigned_short;
+typedef unsigned int unsigned_int;
+typedef unsigned long unsigned_long;
+typedef unsigned long long unsigned_long_long;
+
+define_error(char )
+define_error(unsigned_char)
+
+define_error(short)
+define_error(unsigned_short)
+
+define_error(int)
+define_error(unsigned_int)
+
+define_error(long)
+define_error(unsigned_long)
+
+define_error(long_long)
+define_error(unsigned_long_long)
+
+define_error(float)
+define_error(double)
+
+define_error(none)
 
 #endif //IFJ_2022_ERROR_H
