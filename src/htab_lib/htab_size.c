@@ -9,6 +9,11 @@
 #include "htab.h"
 #include "htab_struct.h"
 
+/** Function which returns size of table 
+ *
+ *  @param t table whose size we want
+ *  @return size of table or -1 if t is invalid pointer
+ ***/
 size_t htab_size(const htab_t * t){
 
     if(!t){
@@ -19,6 +24,11 @@ size_t htab_size(const htab_t * t){
     return t->size;
 }
 
+/** Function which returns bucket count of table 
+ *
+ *  @param t table whose bucket count we want
+ *  @return bucket count of table or -1 if t is invalid pointer
+ ***/
 size_t htab_bucket_count(const htab_t * t){
 
     if(!t){

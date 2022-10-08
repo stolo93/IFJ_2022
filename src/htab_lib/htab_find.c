@@ -12,6 +12,12 @@
 #include "htab_struct.h"
 
 //funkcia ktorá nájde záznam s klúčom key a vráti ukazateľ naň
+/** Function for finding record 
+ *
+ *  @param t table where we want to find entry
+ *  @param key identifier of entry
+ *  @return pointer to the entry or NULL pointer if entry don't exists
+ ***/
 htab_pair_t * htab_find(htab_t * t, htab_key_t key){
 
     if(!t || !key){

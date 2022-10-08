@@ -15,6 +15,12 @@
 #define AVG_LEN_MAX 150
 
 //funkcia ktorá vytvorí nový záznam do zoznamu ktorý bude identifikovaný klúčom key
+
+/** Function which creates new intem for hash table
+ *
+ *  @param key identifier of entry
+ *  @return pointer to the new item or NULL pointer if internal error occurs
+ ***/
 struct htab_item* create_new_item(htab_key_t key){
 
     struct htab_item* new_item = (struct htab_item* ) malloc(sizeof(struct htab_item));
@@ -43,6 +49,13 @@ struct htab_item* create_new_item(htab_key_t key){
 //funkcia ktorá vyhľadá záznam s hodnotou klúč a inkrementuje jeho hodnotu
 //ak nenájde hľadaný záznam tak ho vytvorí a pripojí ho na koniec zoznamu
 //v prípade ak priemerná dĺžka zoznamov prekročí AVG_LEN_MAX tak sa počet zoznamov zdvojnásobi
+
+/** Function which finds entry and increments counter or if it fails it creates new entry 
+ *
+ *  @param t table where we want increment or find new entry
+ *  @param key identifier of entry
+ *  @return pointer to the entry or NULL if internal error occurs
+ ***/
 htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key){
 
     if(!t || !key){

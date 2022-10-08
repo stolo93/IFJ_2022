@@ -11,6 +11,12 @@
 #include "htab_struct.h"
 
 //funkcia ktorá nad všetkými záznamamy vykoná funkciu f
+/** Function which executes function on all entries from table
+ *
+ *  @param t table where we want execute function 
+ *  @param f pointer to function which will be executed on all entries.
+ *           This function can't alter any information in entry
+ ***/
 void htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
 
     if(!t){

@@ -10,7 +10,11 @@
 #include "htab.h"
 #include "htab_struct.h"
 
-//funkcia ktorá uvolní všetky záznamy z tabuľky
+/** Function which clears all records from table
+ *
+ *  @param t table from which we want to erase all records
+ *  
+ ***/
 void htab_clear(htab_t * t){
 
     if(!t){

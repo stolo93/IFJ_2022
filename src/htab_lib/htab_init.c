@@ -11,6 +11,11 @@
 #include "htab_struct.h"
 
 //funkcia ktorá vytvorí a inicializuje novú tabuľku s počtom zoznamov num
+/** Function which initialize hash table  
+ *
+ *  @param num number of lists which we want create
+ *  @return pointer to the hash table or NULL if initialization fails
+ ***/
 htab_t* htab_init(size_t num){
 
     if(num <= 0){

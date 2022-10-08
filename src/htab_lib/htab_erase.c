@@ -16,6 +16,13 @@
 
 //funkcia ktorá vymaže záznam v tabuľke s klúčom key
 //ak priemerná dĺžka záznamov klesne pod AVG_LEN_MIN tak sa zmenší počet zoznamov na polovicu
+
+/** Function for erasing one entry from table and changes size of table if neccesary
+ *
+ *  @param t table from which we want to erase entry
+ *  @param key identifier of record
+ *  @return succes of erasing
+ ***/
 bool htab_erase(htab_t * t, htab_key_t key){
 
     if(!t || !key){

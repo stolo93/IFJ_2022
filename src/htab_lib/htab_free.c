@@ -12,6 +12,11 @@
 #include "htab_struct.h"
 
 //funkcia ktorá uvoľní celú tabuľku
+/** Function which frees whole table 
+ *
+ *  @param t table which we want to free
+ *  
+ ***/
 void htab_free(htab_t * t){
 
     if(!t){

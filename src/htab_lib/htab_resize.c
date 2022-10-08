@@ -11,6 +11,12 @@
 
 
 //funkcia ktorá zmení počet zoznamov na hodnotu newn
+
+/** Function which will resize number of lists 
+ *
+ *  @param newn count of new lists 
+ *  @param t table which we want to resize
+ ***/
 void htab_resize(htab_t* t, size_t newn){
 
     if(!t || newn <= 0){
