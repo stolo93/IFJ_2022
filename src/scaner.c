@@ -6,7 +6,12 @@
 #include <math.h>
 #include "scaner.h"
 
-
+/** Function for resizing strings
+ *
+ *  @param string which will be resized
+ *  @param size current size of string
+ *  @return succes of resizing
+ ***/
 bool resizeString ( char** string , unsigned int* size)
 {
     *size *= 2;
@@ -20,7 +25,11 @@ bool resizeString ( char** string , unsigned int* size)
     *string = temp;
     return true;
 }
-
+/** Function for resizing string before being passed to token
+ *
+ *  @param string which will be resized
+ *  @return succes of resizing
+ ***/
 bool finalResize ( char** string)
 {
     unsigned int size = strlen ( *string );
@@ -34,7 +43,10 @@ bool finalResize ( char** string)
 
     return true;
 }
-
+/** Function for finding dot in string
+ *  @param info string with number which may contain dot
+ *  @return pointer pointing at dot in string
+ ***/
 char * findDot( char* info )
 {
     for(int counter = 0 ; counter < strlen( info ) ; counter++ )
@@ -44,7 +56,11 @@ char * findDot( char* info )
 
     return NULL;
 }
-
+/** Function which checks identifiers for keywords
+ *
+ *  @param string which will be checked for keyword
+ *  @return state indicating type of keyword
+ ***/
 tokenType checkForKeyword ( char* string ){
 
     const char * kWords [] = { "else" , "function" , "if"  , "null" , "return" , "void" , " while" };
@@ -62,7 +78,14 @@ tokenType checkForKeyword ( char* string ){
     return identifier ;
 
 }
-token* convertNum ( token* newToken , char* info , unsigned int lenght )
+/** Function which converts string to number and stores it in token
+ *
+ *  @param newToken token to which number will be passed
+ *  @param info string containing number
+ *
+ *  @return token with stored number
+ ***/
+token* convertNum ( token* newToken , char* info )
 { 
     
     bool decN = false ;
@@ -102,7 +125,11 @@ token* convertNum ( token* newToken , char* info , unsigned int lenght )
     
 }
 
-
+/** Function for determinig first state 
+ *
+ *  @param character 
+ *  @return first state
+ ***/
 tokenType firstState ( int character )
 {
     if ( character == '$') return identOfVar;
@@ -131,7 +158,11 @@ tokenType firstState ( int character )
 }
 
 
-
+/** Function which reads toke nand sends it to caller
+ *
+ *  
+ *  @return token
+ ***/
 token* getToken()
 {
     bool endState = false;
@@ -308,7 +339,7 @@ token* getToken()
                             }
                             ungetc( character , stdin );
 
-                            newToken = convertNum( newToken , info , counter );
+                            newToken = convertNum( newToken , info );
                             free ( info );
 
                             return newToken ;
@@ -570,4 +601,57 @@ token* getToken()
 
     }
 
+}
+
+/** Function which returns token to stdin and frees it
+ *
+ *  @param retToken token which will be returned to stdin
+ *  @return success of returning token
+ ***/
+bool returnToken( token * retToken)
+{
+    if( retToken->discriminant == integer || retToken->discriminant == decNum )
+    {
+        char* string = ( char * ) calloc ( 100 , sizeof( char )) ;
+
+        if( string == NULL )
+        {
+            free( retToken );
+            return false;
+        }
+        if( retToken->discriminant == integer )
+        {
+            sprintf( string , "%d" , retToken->info.integer );
+        }
+        else
+        {
+            sprintf( string , "%lf" , retToken->info.decNuber );
+        }
+        if( ! finalResize( &string ) )
+        {
+            free( string );
+            free( retToken );
+            return false ;
+        }
+        int counter = strlen( string ) - 1;
+
+        for(; counter >= 0; counter-- )
+        {
+            ungetc( (int) string [ counter ] , stdin );
+        }
+        free( string );
+        free( retToken );
+        return true;
+    }
+    printf("%s\n" , retToken->info.string);
+    int counter = strlen( retToken->info.string ) - 1;
+
+    for( ; counter >= 0 ; counter-- )
+    {
+        ungetc( (int) retToken->info.string [ counter ] , stdin );
+    } 
+
+    free( retToken->info.string );
+    free( retToken );
+    return true ;
 }

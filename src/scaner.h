@@ -29,6 +29,6 @@ tokenType firstState( int character );
 
 token* getToken ();
 
-void returnToken ( token* retToken ) ;
+bool returnToken ( token* retToken ) ;
 
 bool checkProlog () ;
