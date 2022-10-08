@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "htab.h"
-#include "htab_struct.h"
+#include "../headers/htab.h"
+#include "../headers/htab_struct.h"
 
 //funkcia ktorá nájde záznam s klúčom key a vráti ukazateľ naň
 /** Function for finding record 

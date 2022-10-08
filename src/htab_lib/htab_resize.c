@@ -6,8 +6,8 @@
 ****************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#include "htab.h"
-#include "htab_struct.h"
+#include "../headers/htab.h"
+#include "../headers/htab_struct.h"
 
 
 //funkcia ktorá zmení počet zoznamov na hodnotu newn

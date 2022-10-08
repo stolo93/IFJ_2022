@@ -8,8 +8,8 @@
 #include <stdlib.h>
 
 
-#include "htab.h"
-#include "htab_struct.h"
+#include "../headers/htab.h"
+#include "../headers/htab_struct.h"
 
 //funkcia ktorá uvoľní celú tabuľku
 /** Function which frees whole table 

@@ -7,8 +7,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "htab.h"
-#include "htab_struct.h"
+#include "../headers/htab.h"
+#include "../headers/htab_struct.h"
 
 //funkcia ktorá nad všetkými záznamamy vykoná funkciu f
 /** Function which executes function on all entries from table

@@ -7,8 +7,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include "htab.h"
-#include "htab_struct.h"
+#include "../headers/htab.h"
+#include "../headers/htab_struct.h"
 
 //funkcia ktorá vytvorí a inicializuje novú tabuľku s počtom zoznamov num
 /** Function which initialize hash table  

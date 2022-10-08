@@ -8,8 +8,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "htab.h"
-#include "htab_struct.h"
+#include "../headers/htab.h"
+#include "../headers/htab_struct.h"
 
 
 #define AVG_LEN_MIN 40
