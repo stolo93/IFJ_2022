@@ -23,7 +23,7 @@
  *  @param key identifier of record
  *  @return succes of erasing
  ***/
-bool htab_erase(htab_t * t, htab_key_t key){
+bool htab_erase(htab_t * t, char* key){
 
     if(!t || !key){
         fprintf(stderr,"Table or key is invalid pointer\n");
@@ -40,6 +40,10 @@ bool htab_erase(htab_t * t, htab_key_t key){
         if(!strcmp(tmp->pair.key,key)){
 
             free((char*)tmp->pair.key);
+            if ( tmp->pair.symType == variable && tmp->pair.type == string )
+            {
+                free( tmp->pair.info.string ) ; // if there will be anything which takes string it shuold be freed here
+            }
             
             if(tmp == t->ptrs[index]){
 

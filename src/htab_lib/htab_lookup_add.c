@@ -29,7 +29,7 @@ struct htab_item* create_new_item(htab_key_t key){
         return NULL;
     }
 
-    htab_key_t new_key = (htab_key_t) malloc(sizeof(char) * strlen(key)+1);
+    char* new_key = (char*) malloc(sizeof(char) * strlen(key)+1);
 
     if(!new_key){
         fprintf(stderr,"Malloc failed to allocate memory\n");
@@ -39,7 +39,10 @@ struct htab_item* create_new_item(htab_key_t key){
 
     memcpy((char*)new_key,(char*)key,strlen(key)+1);  //prekopírovanie klúča do záznamu
     new_item->pair.key = new_key;                     //ukazatele treba počas kopýrovania pretypovať              
-    new_item->pair.value = 1;
+    new_item->pair.val = 1;
+    new_item->pair.type = notDefined;
+    new_item->pair.symType = function;
+    new_item->pair.info.integer = 0;         //OVERHERE i changed initialization
     new_item->next = NULL;
 
     return new_item;
@@ -74,7 +77,7 @@ htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key){
 
         if(!strcmp(tmp->pair.key,key)){  //nájdenie záznamu
 
-            tmp->pair.value++;   
+            tmp->pair.val++;   
             return &tmp->pair;
         }
         trailing = tmp;    

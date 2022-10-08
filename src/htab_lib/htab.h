@@ -10,6 +10,9 @@
 #include <string.h>     // size_t
 #include <stdbool.h>    // bool
 
+typedef enum dataType { integer , floating , string , notDefined , noType } dType ;
+typedef enum symbolType { function , variable } sType ;
+
 // Tabulka:
 struct htab;    // neúplná deklarace struktury - uživatel nevidí obsah
 typedef struct htab htab_t;     // typedef podle zadání
@@ -20,9 +23,17 @@ typedef int htab_value_t;               // typ hodnoty
 
 // Dvojice dat v tabulce:
 typedef struct htab_pair {
-    htab_key_t    key;          // klíč
-    htab_value_t  value;        // asociovaná hodnota
-} htab_pair_t;                  // typedef podle zadání
+    dType type ;          //data type variable
+    char * key ;         //name of symbol
+    union information     //what is inside variable
+    {
+        char* string ;
+        int integer ;
+        double decNumber ;
+    } info ;
+    sType symType;    //type of symbol
+    int val;      
+} htab_pair_t;                 // typedef podle zadání
 
 
 
@@ -38,7 +49,7 @@ void htab_resize(htab_t *t, size_t newn);
 htab_pair_t * htab_find(htab_t * t, htab_key_t key); 
 htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key);
 
-bool htab_erase(htab_t * t, htab_key_t key);    
+bool htab_erase(htab_t * t, char* key);    
 
 
 

@@ -31,6 +31,10 @@ void htab_clear(htab_t * t){
             struct htab_item * to_erase = tmp;
             tmp = tmp->next;
             free((char*)to_erase->pair.key);
+            if ( to_erase->pair.symType == variable && to_erase->pair.type == string )
+            {
+                free( to_erase->pair.info.string ) ; // if there will be anything which takes string it shuold be freed here
+            }
             free(to_erase);
         }
     }
