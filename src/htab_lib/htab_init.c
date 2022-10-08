@@ -1,9 +1,9 @@
-//htab_init.c                                                                  
-//Riešenie IJC-DU2, príklad b), 19.4.2022
-//Autor: Jozef Michal Bukas, FIT
-//Preložené: gcc (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0
-//Popis: Súbor v ktorom sa nachádza funkcia htab_init pre úlohu b)
-// 
+/****************************************************************
+ * @name htab_init.c
+ * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
