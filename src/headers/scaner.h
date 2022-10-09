@@ -8,8 +8,8 @@
 #include "tokenStruct.h"
 
 #define DEFAULT_SIZE 20
-#define NUM_OF_KWORDS 7
-#define NUM_OF_DTYPES 3
+#define NUM_OF_KWORDS 11
+
 
 bool resizeString(char** string , unsigned int* size ) ;
 

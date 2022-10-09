@@ -5,7 +5,8 @@
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
 
-typedef enum tokenType { def , keyword , identifier , identOfVar , identOfType , 
+typedef enum tokenType { def , elseT, floatT , functionT , ifT , intT , nullT , returnT , 
+             stringT , voidT , whileT , identifier , identOfVar , identOfType , 
              integer , decNum , string , lineComment , multiLineComm ,
              plusSign, minusSign , multiply , devide , concatenation ,
              lessOper , lessOrEqOper , moreOper , moreOrEqOper ,

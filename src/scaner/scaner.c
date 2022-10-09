@@ -70,16 +70,13 @@ char * findDot( char* info )
 tokenType checkForKeyword ( char* string )
 {
 
-    const char * kWords [] = { "else" , "function" , "if"  , "null" , "return" , "void" , " while" };
-    const char * dTypes [] = { "float" ,  "int" , "string" } ; 
+    const char * kWords [] = { "" , "else" , "float" , "function" , "if" ,  "int" , "null" 
+                                  ,"return" , "string"  , "void" , "while"  };
+    
 
     for ( unsigned int counter = 0 ; counter < NUM_OF_KWORDS ; counter++ )
     {
-        if ( ! strcmp ( kWords [ counter ] , string ) ) return keyword;
-    }
-    for ( unsigned int counter = 0 ; counter < NUM_OF_DTYPES ; counter++ )
-    {
-        if ( ! strcmp ( dTypes [ counter ] , string ) ) return identOfType ;
+        if ( ! strcmp ( kWords [ counter ] , string ) ) return counter ;
     }
 
     return identifier ;
@@ -678,10 +675,11 @@ bool checkProlog ()
         string [ counter ] = character ;
     }
 
-    if ( ! strcmp ( string , "<?php" ) ) return false;
+    if ( strcmp ( string , "<?php" )) return false;
 
     while( ( character = getc( stdin ) ) != EOF )
     {
+        
         switch( state )
         {
             case plusSign: 
@@ -714,9 +712,11 @@ bool checkProlog ()
             case identifier:
                         if ( character == '\n' )
                         {
+                            printf("vyjeb si \n ");
                             endLine = true;
                             break;
                         }
+                        break;
             case multiLineComm :
                         if ( character == '\n' )
                         {
@@ -728,6 +728,7 @@ bool checkProlog ()
                             state = multiLineCommPE;
                             break;
                         }
+                        break;
             case multiLineCommPE : 
                         if ( character == '/' && endLineComm == true )
                         {
@@ -744,14 +745,22 @@ bool checkProlog ()
             default: return false ;
 
         };
+ 
         if( endLine )
         {
+            
             break;
         }
         
     }
+    if( character == EOF && endLine == false )
+    {
+        return false; 
+
+    }
     while ( (character = getc ( stdin )) != EOF && isspace( character )) ;
 
-    if( character );
     
+    
+    return true;
 }
