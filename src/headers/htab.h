@@ -55,6 +55,6 @@ bool htab_erase(htab_t * t, char* key);
 
 void htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data));
 
-void htab_clear(htab_t * t);    
+bool htab_clear(htab_t * t);    
 void htab_free(htab_t * t);     
 #endif // __HTAB_H__

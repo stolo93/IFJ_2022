@@ -15,11 +15,11 @@
  *  @param t table from which we want to erase all records
  *  
  ***/
-void htab_clear(htab_t * t){
+bool htab_clear(htab_t * t){
 
     if(!t){
         fprintf(stderr,"Table is invalid pointer\n");
-        return;
+        return false;
     }
 
     for(size_t counter = 0; counter < t->arr_size; counter++){  //prechod hlavičkami zoznamov
@@ -42,5 +42,5 @@ void htab_clear(htab_t * t){
     t->ptrs = NULL;
     t->size = 0;
     t->arr_size = 0;
-    return;
+    return true ;
 }

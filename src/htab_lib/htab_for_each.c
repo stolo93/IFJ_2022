@@ -30,6 +30,10 @@ void htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
         while(tmp){
             htab_key_t control_key = tmp->pair.key;
             htab_key_t text = (htab_key_t) malloc(sizeof(char) * strlen(tmp->pair.key)+1);  //vytváranie zálohy ak by funkcia zmenila klúč
+            if ( text == NULL )
+            {
+                return ;
+            }
 
             memcpy((char*)text,tmp->pair.key,strlen(tmp->pair.key)+1);
 
