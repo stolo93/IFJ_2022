@@ -353,7 +353,7 @@ token* getToken()
                           
             case decNum:
             case string : 
-                            if ( character == '$' || character < ' ' )
+                            if ( ( character == '$' && info [ counter - 1 ] != '\\' ) || character < ' ' )
                             {
                                 free ( info ) ;
                                 free ( newToken );
@@ -650,7 +650,7 @@ bool returnToken( token * retToken)
         free( retToken );
         return true;
     }
-    printf("%s\n" , retToken->info.string);
+    
     int counter = strlen( retToken->info.string ) - 1;
 
     for( ; counter >= 0 ; counter-- )
@@ -669,6 +669,7 @@ bool checkProlog ()
     int character = 0;
     char string [ 5 ] ;
     bool endLine = false;
+    bool endLineComm = false;
     tokenType state = plusSign ;
 
     for( unsigned int counter = 0 ; counter < 5 ; counter ++)
@@ -704,6 +705,11 @@ bool checkProlog ()
                             state = identifier;
                             break;
                         }
+                        else if ( character == '*' )
+                        {
+                            state = multiLineComm ;
+                            break ; 
+                        }
                         return false;
             case identifier:
                         if ( character == '\n' )
@@ -711,6 +717,30 @@ bool checkProlog ()
                             endLine = true;
                             break;
                         }
+            case multiLineComm :
+                        if ( character == '\n' )
+                        {
+                            endLineComm = true ;
+                            break;
+                        }
+                        if ( character == '*' )
+                        {
+                            state = multiLineCommPE;
+                            break;
+                        }
+            case multiLineCommPE : 
+                        if ( character == '/' && endLineComm == true )
+                        {
+                            endLine = true ;
+                            break;
+                        }
+                        if( character == '/' && endLineComm == false )
+                        {
+                            state = plusSign ;
+                            break; 
+                        }
+                        state = lineComment ;
+                        break ;
             default: return false ;
 
         };
@@ -718,6 +748,10 @@ bool checkProlog ()
         {
             break;
         }
+        
     }
+    while ( (character = getc ( stdin )) != EOF && isspace( character )) ;
+
+    if( character );
     
 }
