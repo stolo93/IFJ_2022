@@ -4,15 +4,15 @@
 <PROG> -> <ST_LIST> endOfFile
 
 ###### Statements
-<ST_LIST> -> <STAT> <STLIST>
+<ST_LIST> -> <STATEMENT> <STLIST>
 <ST_LIST> ->''
 
-<STAT> -> if (<RVAL>) {<ST_LIST>} else {<ST_LIST>}
-<STAT> -> while (<RVAL>) {<ST_LIST>}
-<STAT> -> <RVAL>;
-<STAT> -> identOfVar = <RVAL>;
-<STAT> -> return <RET_VAL>
-<STAT> -> <FUN_DEF>
+<STATEMENT> -> if (<RVAL>) {<ST_LIST>} else {<ST_LIST>}
+<STATEMENT> -> while (<RVAL>) {<ST_LIST>}
+<STATEMENT> -> <RVAL>;
+<STATEMENT> -> identOfVar = <RVAL>;
+<STATEMENT> -> return <RET_VAL>;
+<STATEMENT> -> <FUN_DEF>
 
 ###### Functions
 <FCAL> -> identOfFunc(<ARGS>)
