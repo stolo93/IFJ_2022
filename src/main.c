@@ -1,4 +1,4 @@
-#include "headers/error.h"
+#include "headers/IFJ_2022.h"
 #include "headers/error_infrastructure.h"
 
 // All code that would go into main goes here

@@ -7,7 +7,7 @@ all: dependencies main
 
 main: $(OBJS)
 
-dependencies
+dependencies:
 	gcc -MM src/*.c > deps
 
 -include deps
