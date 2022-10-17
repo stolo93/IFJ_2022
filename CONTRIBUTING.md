@@ -33,11 +33,13 @@ To build this project just run ```make```. We have no external dependencies.
 Before pushing your branch upstream it needs to be rebased onto the newest upstream commits.
 First sync your local main with the upstream main
 > git checkout main
+> 
 > git pull upstream main
 
 Now as your repository is in sync with upstream rebase your branch onto main.
 Use the interactive mode to clean up your branch and solve any merge conflicts.
 > git checkout *feature_branch*
+> 
 > git rebase --interactive main
 
 Now, as the rebase is finished, it is time to push the branch into origin
@@ -48,6 +50,7 @@ Wait for the reviewers and fix any mistakes
 
 When the Pull Request gets approved it's time to sync the local main with the upstream main
 > git checkout main
+> 
 > git pull upstream main
 
 If any issues pop up the --force flag should help
