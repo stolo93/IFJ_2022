@@ -53,7 +53,7 @@ typedef struct ERR_INFO_ {
  *
  * It is undefined behaviour to extract a value from an /p error_obj which contains an error
  */
-#define get_value_unchecked(variable_type, variable_name, error_obj) __typeof__(variable_type) variable_name = error_obj._value
+#define get_value_unchecked(variable_type, variable_name, error_obj) __typeof__(variable_type) variable_name = (error_obj)._value
 
 /**
  * Returns an error object containing the /p error_kind
@@ -71,7 +71,7 @@ typedef struct ERR_INFO_ {
  * @param return_error_type the type of /p value
  */
 // We define a temporary variable, so we don't call error_obj multiple times
-#define return_value(value, return_error_type) do {error(return_error_type) ERROR___RETURN_VALUE___ = {._is_err = false, ._value = {value}}; return ERROR___RETURN_VALUE___;} while(0)
+#define return_value(value, return_error_type) do {error(return_error_type) ERROR___RETURN_VALUE___ = {._is_err = false, ._value = (value)}; return ERROR___RETURN_VALUE___;} while(0)
 
 /**
  * Returns an error object of type none containing an value
@@ -100,7 +100,7 @@ typedef struct ERR_INFO_ {
  * @param return_error_type the type of value the error object this function returns can hold
  *
  */
-#define get_value(variable_type, variable_name, error_obj, return_error_type) if (is_error(error_obj)) {forward_error(error_obj, return_error_type);}; get_value_unchecked(variable_type, variable_name, error_obj)
+#define get_value(variable_type, variable_name, error_obj, return_error_type) error(variable_type) TEMPORARY_ERROR_OBJECT_ ## variable_name ## _ = (error_obj); if (is_error(TEMPORARY_ERROR_OBJECT_ ## variable_name ## _)) {forward_error(TEMPORARY_ERROR_OBJECT_ ## variable_name ## _, return_error_type);}; get_value_unchecked(variable_type, variable_name, TEMPORARY_ERROR_OBJECT_ ## variable_name ## _)
 
 /**
  * A type representing void but valid as a complete type (can be used in struct definitions)
