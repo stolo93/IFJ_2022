@@ -66,5 +66,9 @@ If any issues pop up the --force flag should help
 If you don't have a mergetool setup for your git workflow one of our team members recommends Meld
 > git config --global mergetool.meld
 
+###### DEFINE_VECTOR_PROTOTYPES complains
+If you use DEFINE_VECTOR_PROTOTYPES for a new type, you need typedef a type_ptr for your type.
+I.E  `DEFINE_VECTOR_PROTOTYPES(int, int)` requires `typedef int* int_ptr`
+
 ###### Threats of violence
 If you fuck anything up we reserve the right to threaten you with violence!!!
