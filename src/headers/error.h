@@ -35,7 +35,16 @@ enum error_kinds {
     ERROR_HTAB_INIT ,
 
     /* Function was called with NULL pointer or newn was less then 1 */
-    ERROR_HTAB_RESZ
+    ERROR_HTAB_RESZ,
+
+    /* Vector was empty */
+    VECTOR_EMPTY_ERROR,
+
+    /* Attempted to index out of bounds of a vector */
+    VECTOR_INDEX_BOUNDS_ERROR,
+
+    /* Vector failed to reallocate */
+    VECTOR_REALLOC_ERROR,
 };
 
 const char* error_kind_name(enum error_kinds kind);

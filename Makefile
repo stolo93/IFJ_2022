@@ -1,6 +1,6 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -Werror -g 
-OBJS = main.o error.o error_infrastructure.o htab.o
+CFLAGS = -Wall -Wextra -Werror -g
+OBJS = main.o error.o error_infrastructure.o htab.o vector.o
 SOURCES = src/*.c src/htab_lib/*.c
 HEADERS = src/headers/*.h
 LINTER_CHECKS = clang-analyzer-*,-clang-analyzer-cplusplus*,bugprone-*,
@@ -25,4 +25,4 @@ lint_pedantic:
 clean:
 	rm *.o main deps
 
-.PHONY: clean dependencies lint lint_pedantic
+.PHONY: clean dependencies
