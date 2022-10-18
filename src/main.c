@@ -4,7 +4,10 @@
 // All code that would go into main goes here
 // Please change the name to a better one
 error(none) real_main(int argc, char** argv) {
+    (void) argc;
+    (void) argv;
 
+    return_none();
 }
 
 int main(int argc, char** argv) {
