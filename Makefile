@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g 
-OBJS = main.o
+OBJS = main.o error.o error_infrastructure.o
 VPATH = src:
 
 all: dependencies main
@@ -8,7 +8,7 @@ all: dependencies main
 main: $(OBJS)
 
 dependencies:
-	gcc -MM src/*.c > deps
+	$(CC) -MM src/*.c > deps
 
 -include deps
 
