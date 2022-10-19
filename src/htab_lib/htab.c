@@ -1,24 +1,17 @@
 /****************************************************************
- * @name htab_struct.c
+ * @name htab.c
  * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
 
-#ifndef __HTAB_H_T__
-#define __HTAB_H_T__
-
-#include "htab.h"
-
-struct htab{
-    size_t size;
-    size_t arr_size;
-    struct htab_item** ptrs;
-};
-
-struct htab_item{
-    htab_pair_t pair;
-    struct htab_item* next;
-};
-
-#endif 
+#include "htab_clear.c"
+#include "htab_erase.c"
+#include "htab_find.c"
+#include "htab_for_each.c"
+#include "htab_free.c"
+#include "htab_hash_function.c"
+#include "htab_init.c"
+#include "htab_lookup_add.c"
+#include "htab_resize.c"
+#include "htab_size.c"

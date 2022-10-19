@@ -17,7 +17,25 @@ enum error_kinds {
     UNKNOWN,
 
     /* Generic invalid value error */
-    INVALID_VAL
+    INVALID_VAL,
+
+    /* Malloc failed to alocate memory*/
+    ERROR_MAL,
+
+    /* Function was called with NULL pointer */
+    ERROR_HTAB_INVPTR,
+
+    /* Function didn't find entry with matching key */
+    ERROR_HTAB_NKEY,
+
+    /* Table has invalid bucket pointer */
+    ERROR_HTAB_INVBPTR,
+
+    /* Parameter num must be greater or equal to 1 */
+    ERROR_HTAB_INIT ,
+
+    /* Function was called with NULL pointer or newn was less then 1 */
+    ERROR_HTAB_RESZ
 };
 
 const char* error_kind_name(enum error_kinds kind);

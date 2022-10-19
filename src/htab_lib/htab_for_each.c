@@ -7,21 +7,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #include "../headers/htab.h"
 #include "../headers/htab_struct.h"
 
-//funkcia ktorá nad všetkými záznamamy vykoná funkciu f
 /** Function which executes function on all entries from table
  *
  *  @param t table where we want execute function 
  *  @param f pointer to function which will be executed on all entries.
  *           This function can't alter any information in entry
  ***/
-void htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
+error(_Bool ) htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
 
     if(!t){
-        fprintf(stderr,"Table is null pointer\n");
-        return;
+        
+        return_error( ERROR_HTAB_INVPTR , bool );
     }
     for(size_t counter = 0; counter < t->arr_size; counter++){
 
@@ -29,33 +29,35 @@ void htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
 
         while(tmp){
             htab_key_t control_key = tmp->pair.key;
-            htab_key_t text = (htab_key_t) malloc(sizeof(char) * strlen(tmp->pair.key)+1);  //vytváranie zálohy ak by funkcia zmenila klúč
+            htab_key_t text = (htab_key_t) malloc(sizeof(char) * strlen(tmp->pair.key)+1);  //creating copy of key if function tampers with it
+            if ( text == NULL )
+            {
+                return_error( ERROR_MAL , bool );
+            }
 
             memcpy((char*)text,tmp->pair.key,strlen(tmp->pair.key)+1);
 
             (*f)(&tmp->pair);
 
-            if(control_key != tmp->pair.key){         //kontrola zmeny adresy klúča
+            if(control_key != tmp->pair.key){         //check if key address is different
 
-                fprintf(stderr,"Function tried relocate or erase key\n");
+                if(tmp->pair.key) free((char*)tmp->pair.key);     //free unwanted address
                 
-                if(tmp->pair.key) free((char*)tmp->pair.key);     //uvoľnenie novej nežiadúcej adresy
-                
-                tmp->pair.key = control_key;     //uloženie zálohy do zoznamu
+                tmp->pair.key = (char*)control_key;     //copy into table
                 free((char*)text);
-                return;
+                return_value(false , bool );
 
             }else if(strcmp(text,tmp->pair.key)){
 
                 free((char*)tmp->pair.key);
-                tmp->pair.key = text;       //zámena za pôvodný klúč
+                tmp->pair.key = (char*)text;       //restoring right key
                 
-                fprintf(stderr,"Function tried to tamper with key\nAddres of key has changed but value of key is still same\n");
-                return;
+                
+                return_value(false , bool );
             }
             free((char*)text);
             tmp = tmp->next;
         }
     }
-    return;
+    return_value(true , bool );
 }

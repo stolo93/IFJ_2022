@@ -17,13 +17,12 @@
  *  @param t table which we want to free
  *  
  ***/
-void htab_free(htab_t * t){
+error(none ) htab_free(htab_t * t){
 
     if(!t){
-        fprintf(stderr,"Table is invalid pointer\n");
-        return;
+        return_error( ERROR_HTAB_INVPTR , none );
     }
-    htab_clear(t);  //uvoľnenie všetkých záznamov
-    free(t);        //uvoľnenie tabuľky
-    return;
+    htab_clear(t);  
+    free(t);        
+    return_none();
 }

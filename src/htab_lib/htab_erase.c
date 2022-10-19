@@ -23,50 +23,50 @@
  *  @param key identifier of record
  *  @return succes of erasing
  ***/
-bool htab_erase(htab_t * t, char* key){
+error(_Bool ) htab_erase(htab_t * t, char* key){
 
     if(!t || !key){
-        fprintf(stderr,"Table or key is invalid pointer\n");
-        return false;
+        
+        return_error( ERROR_HTAB_INVPTR , bool);
     }
 
     size_t index = htab_hash_function(key) % t->arr_size;
 
     struct htab_item* tmp = t->ptrs[index];            
-    struct htab_item* trailing = t->ptrs[index];      //o jeden krok pozadu za tmp okrem prvého kroku, to rieši stav vymazania prvého a jediného záznamu
+    struct htab_item* trailing = t->ptrs[index];      //one step behind tmp pointer , edgecase of deleting first entry
 
     while(tmp){
 
         if(!strcmp(tmp->pair.key,key)){
 
             free((char*)tmp->pair.key);
-            if ( tmp->pair.symType == variable && tmp->pair.type == string )
+            if ( tmp->pair.symType == variable && tmp->pair.diff.var.dataType == string )
             {
-                free( tmp->pair.info.string ) ; // if there will be anything which takes string it shuold be freed here
+                free( tmp->pair.diff.var.info.string ) ; // if there will be anything which takes string it shuold be freed here
             }
             
             if(tmp == t->ptrs[index]){
 
-                struct htab_item* to_be_erased = trailing;  // prípad vymazania prvého prvku
+                struct htab_item* to_be_erased = trailing;  // deleting first entry
                 t->ptrs[index] = NULL;
                 free(to_be_erased);
                 t->size--;
-                if(AVG_LEN_MIN > (t->size / t->arr_size)){    //kontrola priemernej dĺžky zoznamov
+                if(AVG_LEN_MIN > (t->size / t->arr_size)){    //checking average size of lists
                     htab_resize(t,(size_t)(t->arr_size/2));
                 }
-                return true;
+                return_value( true , bool );
             }
-            struct htab_item* to_be_erased = trailing->next;  // vybratie pointeru na uvoľnenie
-            trailing->next = tmp->next;                      //nové prepojenie
+            struct htab_item* to_be_erased = trailing->next;  
+            trailing->next = tmp->next;                      //new connection
             free(to_be_erased);
             t->size--;
-            if(AVG_LEN_MIN > (t->size / t->arr_size)){   //kontrola priemernej dĺžky zoznamov
+            if(AVG_LEN_MIN > (t->size / t->arr_size)){   //checking average size of lists
                 htab_resize(t,(size_t)(t->arr_size/2));
             }
-            return true;
+            return_value( true , bool );
         }
         trailing = tmp;
         tmp = tmp->next;
     }
-    return false;
+    return_value( false , bool );   
 }

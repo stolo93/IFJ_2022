@@ -10,6 +10,16 @@ const char* error_kind_name(enum error_kinds kind) {
             s(UNKNOWN)
         case INVALID_VAL:
             s(INVALID_VAL)
+        case ERROR_MAL:
+            s(ERROR_MAL);
+        case ERROR_HTAB_INVPTR:
+            s(ERROR_HTAB_INVPTR);
+        case ERROR_HTAB_INVBPTR:
+            s(ERROR_HTAB_INVBPTR);
+        case ERROR_HTAB_INIT:
+            s(ERROR_HTAB_INIT);
+        case ERROR_HTAB_RESZ:
+            s(ERROR_HTAB_RESZ);
         default:
             return "ERROR KIND WAS NOT GIVEN A NAME PLEASE CHANGE";
     }
@@ -22,6 +32,16 @@ const char* error_kind_message(enum error_kinds kind) {
             return "An unknown condition occurred";
         case INVALID_VAL:
             return "An invalid value was encountered";
+        case ERROR_MAL:
+            return "Malloc failed to alocate memory";
+        case ERROR_HTAB_INVPTR:
+            return "Htab: Function was called with NULL pointer";
+        case ERROR_HTAB_INVBPTR:
+            return "Htab: Table has invalid bucket pointer";
+        case ERROR_HTAB_INIT:
+            return "Htab: Parameter num must be greater or equal to 1";
+        case ERROR_HTAB_RESZ:
+            return "Htab: Function was called with NULL pointer or newn was less then 1";
         default:
             return "KIND WAS NOT GIVEN A ERROR MESSAGE!!!";
     }
@@ -34,6 +54,13 @@ int error_kind_exit_code(enum error_kinds kind) {
         case UNKNOWN:
             return 99;
         case INVALID_VAL:
+            return 99;
+        case ERROR_MAL:
+            return 99;
+        case ERROR_HTAB_INVPTR:
+        case ERROR_HTAB_INVBPTR:
+        case ERROR_HTAB_INIT:
+        case ERROR_HTAB_RESZ:
             return 99;
         default:
             return 99;
