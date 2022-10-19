@@ -31,7 +31,7 @@ error(none) htab_clear(htab_t * t){
             struct htab_item * to_erase = tmp;
             tmp = tmp->next;
             free((char*)to_erase->pair.key);
-            if ( to_erase->pair.symType == variable && to_erase->pair.diff.var.dataType == string )
+            if ( to_erase->pair.symType == variable && to_erase->pair.diff.var.dataType == stringT )
             {
                 free( to_erase->pair.diff.var.info.string ) ; // if there will be anything which takes string it should be freed here
             }

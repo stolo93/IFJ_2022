@@ -24,6 +24,9 @@ enum error_kinds {
 
     /* Function was called with NULL pointer */
     ERROR_HTAB_INVPTR,
+ 
+    /* Scaner encountered invalid token */
+    ERROR_LEX, 
 
     /* Function didn't find entry with matching key */
     ERROR_HTAB_NKEY,
@@ -45,6 +48,29 @@ enum error_kinds {
 
     /* Vector failed to reallocate */
     VECTOR_REALLOC_ERROR,
+
+    /* Following character after '$' was number */
+    ERROR_LEX_VAR,
+
+    /* Following character after '?' wasn't identificator of data type */
+    ERROR_LEX_DTYPE,
+
+    /* Scaner encoutered letter right after number */
+    ERROR_LEX_ALPHNUM,
+
+    /* Invalid character in string */
+    ERROR_LEX_INVSTR,
+
+    /* Unterminated multiline comment */
+    ERROR_LEX_EOFCOMM,
+
+    /* Invalid prolog */
+    ERROR_LEX_PROLOG,
+
+    /* Character after EOF token */
+    ERROR_LEX_EOFCHAR,
+
+    ERROR_LEX_NOTABLE
 };
 
 const char* error_kind_name(enum error_kinds kind);

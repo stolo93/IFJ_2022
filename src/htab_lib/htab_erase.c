@@ -40,7 +40,7 @@ error(_Bool ) htab_erase(htab_t * t, char* key){
         if(!strcmp(tmp->pair.key,key)){
 
             free((char*)tmp->pair.key);
-            if ( tmp->pair.symType == variable && tmp->pair.diff.var.dataType == string )
+            if ( tmp->pair.symType == variable && tmp->pair.diff.var.dataType == stringT )
             {
                 free( tmp->pair.diff.var.info.string ) ; // if there will be anything which takes string it shuold be freed here
             }

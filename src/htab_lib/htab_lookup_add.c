@@ -63,7 +63,7 @@ struct htab_item* _create_new_item(htab_key_t key , sType type ){
  *
  *  @param t table where we want increment or find new entry
  *  @param key identifier of entry
- *  @return pointer to the entry or NULL if internal error occurs
+ *  @return pointer to the entry or error if internal error occurs
  ***/
 error( htab_pair_t_ptr ) htab_lookup_add(htab_t * t, htab_key_t key , sType type ){
 

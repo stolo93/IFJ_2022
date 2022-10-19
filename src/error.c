@@ -26,6 +26,24 @@ const char* error_kind_name(enum error_kinds kind) {
             s(VECTOR_REALLOC_ERROR)
         case VECTOR_INDEX_BOUNDS_ERROR:
             s(VECTOR_INDEX_BOUNDS_ERROR)
+        case ERROR_LEX: //
+            s(ERROR_LEX)
+        case ERROR_LEX_VAR:
+            s(ERROR_LEX_VAR);
+        case ERROR_LEX_DTYPE:
+            s(ERROR_LEX_DTYPE);
+        case ERROR_LEX_ALPHNUM:
+            s(ERROR_LEX_ALPHNUM);
+        case ERROR_LEX_INVSTR:
+            s(ERROR_LEX_INVSTR);
+        case ERROR_LEX_EOFCOMM:
+            s(ERROR_LEX_EOFCOMM);
+        case ERROR_LEX_PROLOG:
+            s(ERROR_LEX_PROLOG);
+        case ERROR_LEX_EOFCHAR:
+            s(ERROR_LEX_EOFCHAR);
+        case ERROR_LEX_NOTABLE:
+            s(ERROR_LEX_NOTABLE);
         default:
             return "ERROR KIND WAS NOT GIVEN A NAME PLEASE CHANGE";
     }
@@ -54,6 +72,24 @@ const char* error_kind_message(enum error_kinds kind) {
             return "Failed to reallocate a vector's inner buffer";
         case VECTOR_INDEX_BOUNDS_ERROR:
             return "Attempted to access a value out of bounds of the vector";
+        case ERROR_LEX:
+            return "Scaner encountered invalid sequence of characters";
+        case ERROR_LEX_VAR:
+            return "Scaner: Following character after '$' is number";
+        case ERROR_LEX_DTYPE:
+            return "Scaner: Following character after '?' wasn't identificator of data type";
+        case ERROR_LEX_ALPHNUM:
+            return "Scaner: Scaner encoutered letter right after number";
+        case ERROR_LEX_INVSTR:
+            return "Scaner: Invalid character in string";
+        case ERROR_LEX_EOFCOMM:
+            return "Scaner: Unterminated multiline commnet";
+        case ERROR_LEX_PROLOG:
+            return "Scaner: Invalid prolog format";
+        case ERROR_LEX_EOFCHAR:
+            return "Scanner: Scaner found character after \"?>\" token";
+        case ERROR_LEX_NOTABLE:
+            return "Scanner: Table is NULL pointer";
         default:
             return "KIND WAS NOT GIVEN A ERROR MESSAGE!!!";
     }
@@ -77,6 +113,16 @@ int error_kind_exit_code(enum error_kinds kind) {
         case VECTOR_REALLOC_ERROR:
         case VECTOR_INDEX_BOUNDS_ERROR:
             return 99;
+        case ERROR_LEX_VAR:
+        case ERROR_LEX_DTYPE:
+        case ERROR_LEX_ALPHNUM:
+        case ERROR_LEX_EOFCOMM:
+        case ERROR_LEX_INVSTR:
+        case ERROR_LEX_PROLOG:
+        case ERROR_LEX_EOFCHAR:
+        case ERROR_LEX_NOTABLE:
+        case ERROR_LEX:
+            return 1;
         default:
             return 99;
     }
