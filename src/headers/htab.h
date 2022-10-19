@@ -9,52 +9,76 @@
 
 #include <string.h>     // size_t
 #include <stdbool.h>    // bool
+#include "error.h"
+#include "IFJ_2022.h"
 
 typedef enum dataType { integer , floating , string , notDefined , noType } dType ;
 typedef enum symbolType { function , variable } sType ;
 
-// Tabulka:
-struct htab;    // neúplná deklarace struktury - uživatel nevidí obsah
-typedef struct htab htab_t;     // typedef podle zadání
+// Table
+struct htab;    // user cann't access this struct
+typedef struct htab htab_t;     
 
 // Typy:
-typedef const char * htab_key_t;        // typ klíče
-typedef int htab_value_t;               // typ hodnoty
+typedef const char * htab_key_t;        // key type
+typedef int htab_value_t;
 
-// Dvojice dat v tabulce:
-typedef struct htab_pair {
-    dType type ;          //data type variable
-    char * key ;         //name of symbol
-    union information     //what is inside variable
+typedef struct struct_var
+{
+    dType dataType;
+    union dInformation     //what is inside variable
     {
         char* string ;
         int integer ;
-        double decNumber ;
-    } info ;
+        double  floating;
+        
+    } info ;   
+} structVar;
+
+typedef struct struct_func
+{
+    dType outType;
+    //TODO vector of in variables
+} structFunc;
+
+// Dvojice dat v tabulce:
+typedef struct htab_pair {
+    
     sType symType;    //type of symbol
-    int val;      
-} htab_pair_t;                 // typedef podle zadání
+    char * key ;         //name of symbol
+    union information
+    {
+        structVar var;
+        structFunc func;
+        
+    } diff;
+     
+} htab_pair_t;                 
+
+typedef htab_pair_t* htab_pair_t_ptr;
+typedef htab_t* htab_t_ptr; 
+
+define_error(htab_pair_t_ptr);
+define_error( htab_t_ptr );
+define_error(_Bool ); //must use _Bool because otherwise it woudln't work
+
+unsigned long htab_hash_function(htab_key_t str);
 
 
-
-size_t htab_hash_function(htab_key_t str);
-
-
-htab_t *htab_init(size_t n);                    
-size_t htab_size(const htab_t * t);             
-size_t htab_bucket_count(const htab_t * t);     
-void htab_resize(htab_t *t, size_t newn);       
+error( htab_t_ptr ) htab_init(size_t n);                    
+error(unsigned_long_long ) htab_size(const htab_t * t);             
+error(unsigned_long_long ) htab_bucket_count(const htab_t * t);     
+error(none ) htab_resize(htab_t *t, size_t newn);       
                                                 
 
-htab_pair_t * htab_find(htab_t * t, htab_key_t key); 
-htab_pair_t * htab_lookup_add(htab_t * t, htab_key_t key);
+error(htab_pair_t_ptr) htab_find(htab_t * t, htab_key_t key); 
+error(htab_pair_t_ptr) htab_lookup_add(htab_t * t, htab_key_t key , sType type);
 
-bool htab_erase(htab_t * t, char* key);    
+error(_Bool ) htab_erase(htab_t * t, char* key);    
 
 
+error(_Bool ) htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data));
 
-void htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data));
-
-void htab_clear(htab_t * t);    
-void htab_free(htab_t * t);     
+error(none) htab_clear(htab_t * t);    
+error(none) htab_free(htab_t * t);     
 #endif // __HTAB_H__

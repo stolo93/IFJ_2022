@@ -10,18 +10,18 @@
 #include "../headers/htab_struct.h"
 
 
-//funkcia ktorá zmení počet zoznamov na hodnotu newn
+
 
 /** Function which will resize number of lists 
  *
  *  @param newn count of new lists 
  *  @param t table which we want to resize
  ***/
-void htab_resize(htab_t* t, size_t newn){
+error(none ) htab_resize(htab_t* t, size_t newn){
 
-    if(!t || newn <= 0){
-        fprintf(stderr,"table is null or newn is less then 1\n");
-        return;
+    if(!t || newn == 0){
+        
+        return_error( ERROR_HTAB_RESZ , none );
     }
 
     size_t old_size = t->arr_size;
@@ -30,45 +30,46 @@ void htab_resize(htab_t* t, size_t newn){
     t->arr_size = newn;
     t->ptrs = (struct htab_item**) calloc(sizeof(struct htab_item*),newn);
     
-    if(!t->ptrs){                 //ak alokácia zlyhá tak sa všetko vráti do stavu pred volaním funkcie
-        t->arr_size = old_size;   //funkcia o tomto zlyhaní zamlčí
+    if(!t->ptrs){                 //if allocation fails nothing happens and function is quiet about this fail
+        t->arr_size = old_size;   
         t->ptrs = old_ptrs;
-        return;
+        
+        return_none();
     }
 
     for(size_t counter = 0;counter < old_size; counter++){
 
-        struct htab_item* tmp = old_ptrs[counter];           //priradím jeden ukazateľ z prveho usporiadania
+        struct htab_item* tmp = old_ptrs[counter];           //one pointer from previous order of elements
 
         while(tmp){
 
-            htab_key_t key = tmp->pair.key;                 // uložím si klúč aktuálnej dvojice
-            struct htab_item* next = tmp->next;             //uložím si ukazateľ na ďalší prvok
+            htab_key_t key = tmp->pair.key;                 // storing key for further use
+            struct htab_item* next = tmp->next;             //pointer on next element of table
 
-            size_t index = htab_hash_function(key) % t->arr_size;     //vyrátam nový index
+            unsigned long index = htab_hash_function(key) % t->arr_size;     //calculating new index
 
-            if(!t->ptrs[index]){              //ak na tom indexe ešte nič nieje uložené tak tam uložím záznam
+            if(!t->ptrs[index]){              //first entry on given index
                 t->ptrs[index] = tmp;
-                t->ptrs[index]->next = NULL;      //uzemnenie aby neukazoval na starý prvok
+                t->ptrs[index]->next = NULL;      //grounding so it won't point to previous next element
             } else {
 
-                struct htab_item* tmp2 = t->ptrs[index];      //prechod novým usporiadaním
+                struct htab_item* tmp2 = t->ptrs[index];      //going through new list
                 while(tmp2){
 
-                    if(tmp2->next == NULL){       //keď je next null tak tam uložím záznam
-                        tmp->next = NULL;        //uzemnenie
+                    if(tmp2->next == NULL){       //if next is null I will store new entry
+                        tmp->next = NULL;        //grounding
                         tmp2->next = tmp;
 
                         break;
                     }
-                    tmp2 = tmp2->next;      //predávanie ukazateľa
+                    tmp2 = tmp2->next;      //passing to next entry in new list
                 }
             }
-            tmp = next;   //prechod na dalšiu dvojicu
+            tmp = next;   //passing to next entery in old list
         }
 
     }
 
     free(old_ptrs);
-    return;
+    return_none();
 }

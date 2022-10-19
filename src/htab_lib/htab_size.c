@@ -14,14 +14,14 @@
  *  @param t table whose size we want
  *  @return size of table or -1 if t is invalid pointer
  ***/
-size_t htab_size(const htab_t * t){
+error(unsigned_long_long ) htab_size(const htab_t * t){
 
     if(!t){
-        fprintf(stderr,"Table isn't valid pointer\n");
-        return -1;
+        
+        return_error( ERROR_HTAB_INVPTR , unsigned_long_long);
     }
 
-    return t->size;
+    return_value( t->size , unsigned_long_long);
 }
 
 /** Function which returns bucket count of table 
@@ -29,11 +29,11 @@ size_t htab_size(const htab_t * t){
  *  @param t table whose bucket count we want
  *  @return bucket count of table or -1 if t is invalid pointer
  ***/
-size_t htab_bucket_count(const htab_t * t){
+error(unsigned_long_long ) htab_bucket_count(const htab_t * t){
 
     if(!t){
-        fprintf(stderr,"Table isn't valid pointer\n");
-        return -1;
+        
+        return_error( ERROR_HTAB_INVPTR , unsigned_long_long);
     }
-    return t->arr_size;
+    return_value( t->arr_size , unsigned_long_long );
 }

@@ -16,11 +16,21 @@
  *  @param str key from entry
  *  @return Hash. Hash modulo arr_size will return index into hash table
  ***/
-size_t htab_hash_function(const char *str) {
+unsigned long  htab_hash_function(const char *str) {
           
-    uint32_t h=0;     // musí mít 32 bitů
+    /*uint32_t h=0;     // must have 32 bits
     const unsigned char *p;
     for(p=(const unsigned char*)str; *p!='\0'; p++)
         h = 65599*h + *p;
-    return h;
+    return h;*/
+
+    unsigned long hash =  5381 ;
+    int c;
+
+    while( (c = *str++ ))
+    {
+        hash = ((hash << 5) + hash ) + c;
+    }
+
+    return hash;
 }

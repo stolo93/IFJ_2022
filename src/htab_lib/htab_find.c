@@ -7,38 +7,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include "../headers/htab.h"
 #include "../headers/htab_struct.h"
 
-//funkcia ktorá nájde záznam s klúčom key a vráti ukazateľ naň
 /** Function for finding record 
  *
  *  @param t table where we want to find entry
  *  @param key identifier of entry
  *  @return pointer to the entry or NULL pointer if entry don't exists
  ***/
-htab_pair_t * htab_find(htab_t * t, htab_key_t key){
+error(htab_pair_t_ptr) htab_find(htab_t * t, htab_key_t key){
 
     if(!t || !key){
-        fprintf(stderr,"Key or table is NULL pointer\n");
-        return NULL;
+        
+        return_error( ERROR_HTAB_INVPTR , htab_pair_t_ptr);
     }
     if(!t->ptrs){
-        fprintf(stderr,"Bucket doesn't exist\n");
-        return NULL;
+       
+        return_error( ERROR_HTAB_INVBPTR , htab_pair_t_ptr);
     }
 
-    size_t index = htab_hash_function(key) % t->arr_size; //nájdenie indexu zoznamu v ktorom by sa mal nachádzať daný záznam
+    size_t index = htab_hash_function(key) % t->arr_size; 
     
     struct htab_item * tmp = t->ptrs[index];
 
     while(tmp){
 
-        if(!strcmp(tmp->pair.key,key)) return &tmp->pair;
+        if( !strcmp(tmp->pair.key,key) ) return_value( &tmp->pair , htab_pair_t_ptr );
                 
         tmp = tmp->next;
     }
 
-    return NULL;
+    return_value( NULL , htab_pair_t_ptr );//return_error(ERROR_HTAB_NKEY , htab_pair_t_ptr );
 }

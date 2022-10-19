@@ -15,32 +15,32 @@
  *  @param t table from which we want to erase all records
  *  
  ***/
-void htab_clear(htab_t * t){
+error(none) htab_clear(htab_t * t){
 
     if(!t){
-        fprintf(stderr,"Table is invalid pointer\n");
-        return;
+        
+        return_error(ERROR_HTAB_INVPTR, none);
     }
 
-    for(size_t counter = 0; counter < t->arr_size; counter++){  //prechod hlavičkami zoznamov
+    for(size_t counter = 0; counter < t->arr_size; counter++){  
 
         struct htab_item * tmp = t->ptrs[counter];
 
-        while(tmp){   //prechod zoznamom a vymazávanie všetkých záznamov v ňom
+        while(tmp){   
             
             struct htab_item * to_erase = tmp;
             tmp = tmp->next;
             free((char*)to_erase->pair.key);
-            if ( to_erase->pair.symType == variable && to_erase->pair.type == string )
+            if ( to_erase->pair.symType == variable && to_erase->pair.diff.var.dataType == string )
             {
-                free( to_erase->pair.info.string ) ; // if there will be anything which takes string it shuold be freed here
+                free( to_erase->pair.diff.var.info.string ) ; // if there will be anything which takes string it should be freed here
             }
             free(to_erase);
         }
     }
-    free(t->ptrs);   //uvedenie tabuľky to počiatočného stavu
+    free(t->ptrs);   
     t->ptrs = NULL;
     t->size = 0;
     t->arr_size = 0;
-    return;
+    return_none();
 }
