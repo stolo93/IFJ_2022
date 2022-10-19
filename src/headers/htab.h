@@ -12,7 +12,7 @@
 #include "error.h"
 #include "IFJ_2022.h"
 
-typedef enum dataType { integer , floating , string , notDefined , noType } dType ;
+typedef enum dataType { integerT , floatingT , stringT , notDefined , noType } dType ;
 typedef enum symbolType { function , variable } sType ;
 
 // Table
@@ -46,7 +46,7 @@ typedef struct htab_pair {
     
     sType symType;    //type of symbol
     char * key ;         //name of symbol
-    union information
+    union tInformation
     {
         structVar var;
         structFunc func;

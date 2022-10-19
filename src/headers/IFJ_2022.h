@@ -74,4 +74,32 @@ DEFINE_VEC_PROTOTYPES(unsigned_long_long, unsigned_long_long);
 DEFINE_VEC_PROTOTYPES(float, float);
 DEFINE_VEC_PROTOTYPES(double, double);
 
+
+
+
+//enum of all token types even internal , do NOT change order of elements between def and identOfFunct
+typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ nullT , returnT , 
+             /*stringT ,*/ voidT , whileT , identOfFunct , identOfVar , identOfType , 
+             integer , decNum , string , lineComment , multiLineComm ,
+             plusSign, minusSign , multiply , division , concatenation ,
+             lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
+             EqOper , notEqOper, assigment , openParen , closeParen , openSetParen , 
+             closeSetParen , comma , semicolon , colon , endOfFile , identOfTypeN ,
+             multiLineCommPE, prolog } tokenType;
+
+typedef struct token
+{
+    tokenType discriminant;
+    union information 
+    {
+        int integer;
+        double decNuber;
+        char* string;
+    } info;
+} token_t ;
+
+typedef token_t* token_ptr;
+
+define_error(token_ptr);
+
 #endif // IFJ_2022_IFJ_2022_H
