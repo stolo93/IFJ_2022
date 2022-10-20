@@ -34,6 +34,7 @@ error(type) vec_ ## suffix ## _pop_back(vec_ ## suffix * vec);                  
 error(type ## _ptr) vec_ ## suffix ## _get(vec_ ## suffix * vec, size_t index);    \
 error(none) vec_ ## suffix ## _set(vec_ ## suffix * vec, size_t index, type item); \
 error(none) vec_ ## suffix ## _remove(vec_ ## suffix * vec, size_t index);         \
+error(none) vec_ ## suffix ##_insert(vec_ ##suffix * vec, size_t index, type item); \
 size_t vec_ ## suffix ## _len(vec_ ## suffix * vec);                               \
 size_t vec_ ## suffix ## _capacity(vec_ ## suffix * vec);                          \
 void vec_ ## suffix ## _destroy (vec_ ## suffix * vec);                            \
@@ -76,6 +77,25 @@ error(none) vec_ ## suffix ## _set(vec_ ## suffix * vec, size_t index, type item
                                                                                         \
     vec->data[index] = item;                                                            \
     return_none();                                                                      \
+}                                                                                       \
+                                                                                        \
+error(none) vec_ ## suffix ##_insert(vec_ ##suffix * vec, size_t index, type item)  {   \
+    if (index > (vec)->len__) {                                                         \
+        return_error(VECTOR_INDEX_BOUNDS_ERROR, none);                                  \
+    }                                                                                   \
+                                                                                        \
+    if ((vec)->len__ >= (vec)->capacity__) {                                            \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__);         \
+        if (is_error(result)) {                                                         \
+            return result;                                                              \
+        }                                                                               \
+    }                                                                                   \
+                                                                                        \
+    for (size_t i = (vec)->len__; i > index; i--) {                                     \
+        (vec) -> data[i] = (vec) -> data[i - 1];                                        \
+    }                                                                                   \
+                                                                                        \
+    vec->data[index] = item;                                                            \
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _remove(vec_ ## suffix * vec, size_t index) {             \
@@ -208,6 +228,25 @@ error(none) vec_ ## suffix ## _set(vec_ ## suffix * vec, size_t index, type item
                                                                                         \
     vec->data[index] = item;                                                            \
     return_none();                                                                      \
+}                                                                                       \
+                                                                                        \
+error(none) vec_ ## suffix ##_insert(vec_ ##suffix * vec, size_t index, type item)  {   \
+    if (index > (vec)->len__) {                                                         \
+        return_error(VECTOR_INDEX_BOUNDS_ERROR, none);                                  \
+    }                                                                                   \
+                                                                                        \
+    if ((vec)->len__ >= (vec)->capacity__) {                                            \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__);         \
+        if (is_error(result)) {                                                         \
+            return result;                                                              \
+        }                                                                               \
+    }                                                                                   \
+                                                                                        \
+    for (size_t i = (vec)->len__; i > index; i--) {                                     \
+        (vec) -> data[i] = (vec) -> data[i - 1];                                        \
+    }                                                                                   \
+                                                                                        \
+    vec->data[index] = item;                                                            \
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _remove(vec_ ## suffix * vec, size_t index) {             \

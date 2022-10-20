@@ -3,6 +3,7 @@
 
 #include "error.h"
 #include "vector.h"
+#include "vector_ord.h"
 
 typedef long long long_long;
 typedef unsigned char unsigned_char;
@@ -57,19 +58,31 @@ define_error(double_ptr)
 define_error(none)
 
 DEFINE_VEC_PROTOTYPES(char, char);
+DEFINE_VEC_ORD_PROTOTYPES(char, char);
 DEFINE_VEC_PROTOTYPES(unsigned_char, unsigned_char);
+DEFINE_VEC_ORD_PROTOTYPES(unsigned_char, unsigned_char);
 
 DEFINE_VEC_PROTOTYPES(short, short);
+DEFINE_VEC_ORD_PROTOTYPES(short, short);
 DEFINE_VEC_PROTOTYPES(unsigned_short, unsigned_short);
+DEFINE_VEC_ORD_PROTOTYPES(unsigned_short, unsigned_short);
+
 
 DEFINE_VEC_PROTOTYPES(int, int);
+DEFINE_VEC_ORD_PROTOTYPES(int, int);
+
 DEFINE_VEC_PROTOTYPES(unsigned_int, unsigned_int);
+DEFINE_VEC_ORD_PROTOTYPES(unsigned_int, unsigned_int);
 
 DEFINE_VEC_PROTOTYPES(long, long)
+DEFINE_VEC_ORD_PROTOTYPES(long, long)
 DEFINE_VEC_PROTOTYPES(unsigned_long, unsigned_long);
+DEFINE_VEC_ORD_PROTOTYPES(unsigned_long, unsigned_long);
 
 DEFINE_VEC_PROTOTYPES(long_long, long_long);
+DEFINE_VEC_ORD_PROTOTYPES(long_long, long_long);
 DEFINE_VEC_PROTOTYPES(unsigned_long_long, unsigned_long_long);
+DEFINE_VEC_ORD_PROTOTYPES(unsigned_long_long, unsigned_long_long);
 
 DEFINE_VEC_PROTOTYPES(float, float);
 DEFINE_VEC_PROTOTYPES(double, double);
