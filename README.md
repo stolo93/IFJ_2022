@@ -1,4 +1,5 @@
 # IFJ 2022
+[![Makefile CI](https://github.com/stolo93/IFJ_2022/actions/workflows/compile.yml/badge.svg)](https://github.com/stolo93/IFJ_2022/actions/workflows/compile.yml)\
 This is a project for Formal Languages and Compilers class at **FIT BUT**.
 ---
 

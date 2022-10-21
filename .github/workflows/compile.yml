@@ -14,5 +14,8 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       
-    - name: Compile
+    - name: Compile with gcc
       run: make
+
+    - name: Compile with clang
+      run: make clean && make CC=clang

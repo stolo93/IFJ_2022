@@ -1,0 +1,24 @@
+name: Code lint
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install clang-tidy
+        run: sudo apt-get install -y clang-tidy
+
+
+      - name: Lint
+        run: make lint
+
+      - name: Lint Pedantic
+        run: make lint_pedantic
