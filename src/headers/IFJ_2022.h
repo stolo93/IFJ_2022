@@ -75,6 +75,16 @@ DEFINE_VEC_PROTOTYPES(float, float);
 DEFINE_VEC_PROTOTYPES(double, double);
 
 
+/**
+ * @brief Listing of all non-terminal symbols used in the grammar describing IFJ2022 language
+ *
+ */
+typedef enum
+{   PROLOG, PROG, ST_LIST, STATEMENT,
+    FCAL, FDEF, RVAL, RET_VAL, ARGS,
+    ARGS_NEXT, PARAMS, PARAMS_NEXT,
+    TYPE, TERM, EXPR, N_VLD
+} nonTerminal_t;
 
 
 //enum of all token types even internal , do NOT change order of elements between def and identOfFunct
