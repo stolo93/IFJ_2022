@@ -6,7 +6,7 @@
 ****************************************************************/
 #include <stdio.h>
 #include <stdlib.h>
-#include "../headers/htab.h"
+#include "../headers/symtable.h"
 #include "../headers/htab_struct.h"
 
 

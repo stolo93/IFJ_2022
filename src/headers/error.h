@@ -35,7 +35,7 @@ enum error_kinds {
     ERROR_HTAB_INVBPTR,
 
     /* Parameter num must be greater or equal to 1 */
-    ERROR_HTAB_INIT ,
+    ERROR_HTAB_INIT,
 
     /* Function was called with NULL pointer or newn was less then 1 */
     ERROR_HTAB_RESZ,
@@ -72,7 +72,34 @@ enum error_kinds {
 
     ERROR_LEX_NOTABLE,
 
-    ERROR_SYNTAX
+    ERROR_SYNTAX,
+
+    /* Undefined function */
+    ERROR_SEM_UNDEF_FUNC,
+
+    /* Redefined function */
+    ERROR_SEM_REDEF_FUNC,
+
+    /* Invalid function call argument count */
+    ERROR_SEM_FUNC_ARGCNT_CNT,
+
+    /* Invalid function call argument type*/
+    ERROR_SEM_FUNC_ARGCNT_TYPE,
+
+    /* Invalid function return value type */
+    ERROR_SEM_FUNC_RET_TYPE,
+
+    /* Usage of undefined variable */
+    ERROR_SEM_UNDEF_VAR,
+
+    /* Invalid return value expression count */
+    ERROR_SEM_RETVAL_EXPR,
+
+    /* Type compatibility in expression error */
+    ERROR_SEM_TYPE_EXPR,
+
+    /* Other semantic errors */
+    ERROR_SEM
 };
 
 const char* error_kind_name(enum error_kinds kind);

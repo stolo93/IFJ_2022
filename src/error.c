@@ -46,6 +46,25 @@ const char* error_kind_name(enum error_kinds kind) {
             s(ERROR_LEX_NOTABLE);
         case ERROR_SYNTAX:
             s(ERROR_SYNTAX);
+        case ERROR_SEM_UNDEF_FUNC:
+            s(ERROR_SEM_UNDEF_FUNC);
+        case ERROR_SEM_REDEF_FUNC:
+            s(ERROR_SEM_REDEF_FUNC);
+        case ERROR_SEM_FUNC_ARGCNT_CNT:
+            s(ERROR_SEM_FUNC_ARGCNT_CNT);
+        case ERROR_SEM_FUNC_ARGCNT_TYPE:
+            s(ERROR_SEM_FUNC_ARGCNT_TYPE);
+        case ERROR_SEM_FUNC_RET_TYPE:
+            s(ERROR_SEM_FUNC_RET_TYPE);
+        case ERROR_SEM_UNDEF_VAR:
+            s(ERROR_SEM_UNDEF_VAR);
+        case ERROR_SEM_RETVAL_EXPR:
+            s(ERROR_SEM_RETVAL_EXPR);
+        case ERROR_SEM_TYPE_EXPR:
+            s(ERROR_SEM_TYPE_EXPR);
+        case ERROR_SEM:
+            s(ERROR_SEM);
+        /* Undefined function */
         default:
             return "ERROR KIND WAS NOT GIVEN A NAME PLEASE CHANGE";
     }
@@ -94,6 +113,24 @@ const char* error_kind_message(enum error_kinds kind) {
             return "Scanner: Table is NULL pointer";
         case ERROR_SYNTAX:
             return "Syntax error";
+        case ERROR_SEM_UNDEF_FUNC:
+            return "SEM: Undefined function";
+        case ERROR_SEM_REDEF_FUNC:
+            return "SEM: Redefined function";
+        case ERROR_SEM_FUNC_ARGCNT_CNT:
+            return "SEM: Invalid function call argument count";
+        case ERROR_SEM_FUNC_ARGCNT_TYPE:
+            return "SEM: Invalid function call argument type";
+        case ERROR_SEM_FUNC_RET_TYPE:
+            return "SEM: Invalid function return value";
+        case ERROR_SEM_UNDEF_VAR:
+            return "SEM: Undefined variable";
+        case ERROR_SEM_RETVAL_EXPR:
+            return "SEM:";
+        case ERROR_SEM_TYPE_EXPR:
+            return "SEM: Invalid type compatibility in aritmetic, string or relational expression";
+        case ERROR_SEM:
+            return "SEM: Other semantic errors";
         default:
             return "KIND WAS NOT GIVEN A ERROR MESSAGE!!!";
     }
@@ -129,6 +166,21 @@ int error_kind_exit_code(enum error_kinds kind) {
         case ERROR_LEX_NOTABLE:
         case ERROR_LEX:
             return 1;
+        case ERROR_SEM_UNDEF_FUNC:
+        case ERROR_SEM_REDEF_FUNC:
+            return 3;
+        case ERROR_SEM_FUNC_ARGCNT_CNT:
+        case ERROR_SEM_FUNC_ARGCNT_TYPE:
+        case ERROR_SEM_FUNC_RET_TYPE:
+            return 4;
+        case ERROR_SEM_UNDEF_VAR:
+            return 5;
+        case ERROR_SEM_RETVAL_EXPR:
+            return 6;
+        case ERROR_SEM_TYPE_EXPR:
+            return 7;
+        case ERROR_SEM:
+            return 8;
         default:
             return 99;
     }

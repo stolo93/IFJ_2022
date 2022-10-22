@@ -8,7 +8,7 @@
 #include <stdlib.h>
 
 
-#include "../headers/htab.h"
+#include "../headers/symtable.h"
 #include "../headers/htab_struct.h"
 
 /** Function which executes function on all entries from table

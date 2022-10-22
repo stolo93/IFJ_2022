@@ -8,7 +8,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
-#include "../headers/htab.h"
+#include "../headers/symtable.h"
 #include "../headers/htab_struct.h"
 #include "../headers/interner.h"
 

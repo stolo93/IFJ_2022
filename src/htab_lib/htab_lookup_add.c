@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../headers/htab.h"
+#include "../headers/symtable.h"
 #include "../headers/htab_struct.h"
 
 #define AVG_LEN_MAX 150
