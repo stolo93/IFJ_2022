@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "../headers/htab.h"
+#include "../headers/symtable.h"
 #include "../headers/htab_struct.h"
 
 /** Hash function which is used by table
