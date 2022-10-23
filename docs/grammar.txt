@@ -1,0 +1,50 @@
+<PROLOG> -> prolog <PROG>
+<PROG> -> endOfFile
+
+<PROG> -> function identOfFunc ( <PARAMS> ) : <TYPE> { <ST_LIST> } <PROG>
+<PROG> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> } <PROG>
+<PROG> -> while ( <ARG_TYPE> ) { <BODY> } <PROG>
+<PROG> -> <RVAL> ; <PROG>
+<PROG> -> identOfVar = <RVAL> ; <PROG>
+<PROG> -> return <RET_VAL> ; <PROG>
+
+<BODY> -> <STATEMENT> <BODY>
+<BODY> -> ''
+
+<STATEMENT> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> }
+<STATEMENT> -> while ( <ARG_TYPE> ) { <BODY> }
+<STATEMENT> -> <RVAL> ;
+<STATEMENT> -> identOfVar = <RVAL> ;
+<STATEMENT> -> return <RET_VAL> ;
+
+<PARAMS> -> <TYPE> identOfVar <PARAMS_NEXT>
+<PARAMS> ->''
+
+<PARAMS_NEXT> ->, <TYPE> identOfVar <PARAMS_NEXT>
+<PARAMS_NEXT> ->''
+
+<ARGS> -> <ARG_TYPE> <ARGS_NEXT>
+<ARGS> ->''
+
+<ARGS_NEXT> ->, <ARG_TYPE> <ARGS_NEXT>
+<ARGS_NEXT> ->''
+
+<ARG_TYPE> -> <TERM>
+<ARG_TYPE> -> identOfVar
+
+
+<RVAL> -> <TERM>
+<RVAL> -> identOfFunc ( <ARGS> )
+<RVAL> -> <EXPR>
+
+<RET_VAL> -> <RVAL>
+<RET_VAL> ->''
+
+<TERM> -> null
+<TERM> -> float_lit
+<TERM> -> int_lit
+<TERM> -> string_lit
+
+
+<TYPE> -> identOfType
+<TYPE> -> identOfTypeN
