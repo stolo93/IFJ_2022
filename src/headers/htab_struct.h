@@ -21,4 +21,6 @@ struct htab_item{
     struct htab_item* next;
 };
 
+typedef struct htab_item * htab_item_ptr;
+define_error( htab_item_ptr );
 #endif 

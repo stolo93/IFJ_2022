@@ -13,34 +13,32 @@
 
 #define AVG_LEN_MAX 150
 
-
-
 /** Function which creates new intem for hash table identified by key
  *
  *  @param key identifier of entry
  *  @return pointer to the new item or NULL internal error occurs
  ***/
-struct htab_item* _create_new_item(htab_key_t key , sType type ){
+error( htab_item_ptr ) _create_new_item(htab_key_t key , sType type ){
 
     struct htab_item* new_item = (struct htab_item* ) malloc(sizeof(struct htab_item));
     
     if(!new_item){
        
-        return NULL;
+        return_error( ERROR_MAL , htab_item_ptr);
     }
 
-    char* new_key = (char*) malloc(sizeof(char) * strlen(key)+1); //this may be gone doue to using same pointer for same string !!!
+    /*char* new_key = (char*) malloc(sizeof(char) * strlen(key)+1); //this may be gone due to using same pointer for same string !!!
 
     if(!new_key){
         
         free(new_item);
-        return NULL;
-    }
+        return_error( ERROR_MAL , htab_item_ptr );
+    }*/
 
-    memcpy((char*)new_key,(char*)key,strlen(key)+1);  //copying key into new entry
-    new_item->pair.key = new_key;                                   
+    //memcpy((char*)new_key,(char*)key,strlen(key)+1);  //copying key into new entry
+    new_item->pair.key = (char* )key;                                   
     new_item->pair.symType = type;
-            
+    new_item->pair.redefined = false;     
     if( type == variable )
     {
         new_item->pair.diff.var.dataType = notDefined;
@@ -49,11 +47,13 @@ struct htab_item* _create_new_item(htab_key_t key , sType type ){
     else
     {
         new_item->pair.diff.func.outType = notDefined;
-        //plus that vector
+        
+        get_value( vec_structFuncParam , newVec , new_vec_structFuncParam_with_capacity( 3 ) , htab_item_ptr);
+        new_item->pair.diff.func.inParams = newVec;
     }
     new_item->next = NULL;
 
-    return new_item;
+    return_value( new_item , htab_item_ptr );
 }
 
 
@@ -82,20 +82,17 @@ error( htab_pair_t_ptr ) htab_lookup_add(htab_t * t, htab_key_t key , sType type
 
     while(tmp){
 
-        if(!strcmp(tmp->pair.key,key)){  // tmp->pair.key == key !
+        if( tmp->pair.key == key){  // tmp->pair.key == key !
 
-              
+            tmp->pair.redefined = true; 
             return_value( &tmp->pair , htab_pair_t_ptr );
         }
         trailing = tmp;    
         tmp = tmp->next;
     }
 
-    struct htab_item * new_item = _create_new_item(key , type ); //creating new entry
-    if(!new_item){
-        return_error( ERROR_MAL , htab_pair_t_ptr );
-    }
-
+    get_value( htab_item_ptr , new_item , _create_new_item( key , type) , htab_pair_t_ptr );
+    
     if(!trailing){        //creating connection
 
         t->ptrs[index] = new_item;

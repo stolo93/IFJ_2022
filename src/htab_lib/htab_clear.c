@@ -30,10 +30,15 @@ error(none) htab_clear(htab_t * t){
             
             struct htab_item * to_erase = tmp;
             tmp = tmp->next;
-            free((char*)to_erase->pair.key);
+            /*free((char*)to_erase->pair.key);
             if ( to_erase->pair.symType == variable && to_erase->pair.diff.var.dataType == stringT )
             {
                 free( to_erase->pair.diff.var.info.string ) ; // if there will be anything which takes string it should be freed here
+            }
+            else*/ 
+            if ( to_erase->pair.symType == function )
+            {
+                vec_structFuncParam_destroy( &to_erase->pair.diff.func.inParams );
             }
             free(to_erase);
         }

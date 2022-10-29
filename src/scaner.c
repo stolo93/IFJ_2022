@@ -550,7 +550,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 free( info );
                                 free( newToken );
 
-                                return getToken( interner_ptr ); 
+                                return getToken(); 
                             }   
                             break; 
             case multiLineComm:
@@ -571,7 +571,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 free ( info ) ;
                                 free ( newToken ) ; // free everything and call recursively getToken to get token  
                                 
-                                return getToken( interner_ptr ); 
+                                return getToken(); 
                     
                             }
                             else if( character == EOF ) //unterminated ml comment
