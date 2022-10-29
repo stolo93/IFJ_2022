@@ -89,7 +89,12 @@ error(none) vec_ ## suffix ## _remove(vec_ ## suffix * vec, size_t index) {     
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _push_front(vec_ ## suffix * vec, type item) {            \
-    if (vec -> capacity__ <= (vec -> len__)) {                                          \
+    if (vec -> capacity__ == 0) {                                                       \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,1);                       \
+        if (is_error(result)) {                                                         \
+            forward_error(result, none);                                                \
+        }                                                                               \
+    } else if (vec -> capacity__ <= (vec -> len__)) {                                   \
         error(none) result = vec_ ## suffix ## _resize((vec) ,(vec) -> capacity__ * 2); \
         if (is_error(result)) {                                                         \
             forward_error(result, none);                                                \
@@ -102,7 +107,12 @@ error(none) vec_ ## suffix ## _push_front(vec_ ## suffix * vec, type item) {    
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _push_back(vec_ ## suffix * vec, type item) {             \
-    if (vec -> capacity__ <= (vec -> len__)) {                                          \
+    if (vec -> capacity__ == 0) {                                                       \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,1);                       \
+        if (is_error(result)) {                                                         \
+            forward_error(result, none);                                                \
+        }                                                                               \
+    } else if (vec -> capacity__ <= (vec -> len__)) {                                   \
         error(none) result = vec_ ## suffix ## _resize((vec) ,(vec) -> capacity__ * 2); \
         if (is_error(result)) {                                                         \
             forward_error(result, none);                                                \
@@ -208,7 +218,12 @@ error(none) vec_ ## suffix ## _remove(vec_ ## suffix * vec, size_t index) {     
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _push_front(vec_ ## suffix * vec, type item) {            \
-    if (vec -> capacity__ <= (vec -> len__)) {                                          \
+    if (vec -> capacity__ == 0) {                                                       \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,1);                       \
+        if (is_error(result)) {                                                         \
+            forward_error(result, none);                                                \
+        }                                                                               \
+    } else if (vec -> capacity__ <= (vec -> len__)) {                                   \
         error(none) result = vec_ ## suffix ## _resize((vec) ,(vec) -> capacity__ * 2); \
         if (is_error(result)) {                                                         \
             forward_error(result, none);                                                \
@@ -221,7 +236,12 @@ error(none) vec_ ## suffix ## _push_front(vec_ ## suffix * vec, type item) {    
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _push_back(vec_ ## suffix * vec, type item) {             \
-    if (vec -> capacity__ <= (vec -> len__)) {                                          \
+    if (vec -> capacity__ == 0) {                                                       \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,1);                       \
+        if (is_error(result)) {                                                         \
+            forward_error(result, none);                                                \
+        }                                                                               \
+    } else if (vec -> capacity__ <= (vec -> len__)) {                                   \
         error(none) result = vec_ ## suffix ## _resize((vec) ,(vec) -> capacity__ * 2); \
         if (is_error(result)) {                                                         \
             forward_error(result, none);                                                \
