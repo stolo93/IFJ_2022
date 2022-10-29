@@ -10,6 +10,7 @@
 #include <string.h>     // size_t
 #include <stdbool.h>    // bool
 #include "error.h"
+#include "vector.h"
 #include "IFJ_2022.h"
 
 typedef enum dataType { integerT , floatingT , stringT , notDefined , noType } dType ;
@@ -19,7 +20,7 @@ typedef enum symbolType { function , variable } sType ;
 struct htab;    // user cann't access this struct
 typedef struct htab htab_t;     
 
-// Typy:
+// Type:
 typedef const char * htab_key_t;        // key type
 typedef int htab_value_t;
 
@@ -35,10 +36,28 @@ typedef struct struct_var
     } info ;   
 } structVar;
 
+typedef struct struct_func_param
+{
+    dType inType;
+    char* inIdent;
+
+} structFuncParam;
+
+
+
+typedef structFuncParam* structFuncParam_ptr;
+//typedef structFuncParam** structFuncParam_ptr_ptr;
+//define_error( structFuncParam_ptr_ptr );
+define_error( structFuncParam_ptr) ;
+define_error( structFuncParam );
+///DEFINE_VEC_PROTOTYPES( structFuncParam_ptr , structFuncParam_ptr );
+DEFINE_VEC_PROTOTYPES( structFuncParam , structFuncParam );
+
 typedef struct struct_func
 {
     dType outType;
-    //TODO vector of in variables
+    
+    vec_structFuncParam inParams;
 } structFunc;
 
 // Dvojice dat v tabulce:
@@ -52,6 +71,7 @@ typedef struct htab_pair {
         structFunc func;
         
     } diff;
+    bool redefined;
      
 } htab_pair_t;                 
 

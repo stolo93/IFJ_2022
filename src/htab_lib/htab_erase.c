@@ -44,7 +44,11 @@ error(_Bool ) htab_erase(htab_t * t, char* key){
             {
                 free( tmp->pair.diff.var.info.string ) ; // if there will be anything which takes string it shuold be freed here
             }
-            
+            else if ( tmp->pair.symType ==  function )
+            {
+               
+                vec_structFuncParam_destroy( &tmp->pair.diff.func.inParams );
+            }
             if(tmp == t->ptrs[index]){
 
                 struct htab_item* to_be_erased = trailing;  // deleting first entry

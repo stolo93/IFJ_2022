@@ -8,6 +8,7 @@
 #define __SCANNER_H__
 
 #include <stdbool.h>
+#include "htab.h"
 #include "IFJ_2022.h"
 #include "error.h"
 
@@ -35,7 +36,7 @@ token_t* convertNum ( token_t* newToken , char* info ) ;
 
 tokenType firstState( int character ) ;
 
-error(token_ptr) getToken () ;
+error(token_ptr) getToken ( htab_t_ptr table ) ;
 
 error(none) returnToken ( token_ptr retToken ) ;
 

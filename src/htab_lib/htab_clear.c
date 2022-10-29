@@ -35,6 +35,11 @@ error(none) htab_clear(htab_t * t){
             {
                 free( to_erase->pair.diff.var.info.string ) ; // if there will be anything which takes string it should be freed here
             }
+            else if ( to_erase->pair.symType == function )
+            {
+                
+                vec_structFuncParam_destroy( &to_erase->pair.diff.func.inParams );
+            }
             free(to_erase);
         }
     }
