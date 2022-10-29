@@ -33,7 +33,7 @@ error(htab_pair_t_ptr) htab_find(htab_t * t, htab_key_t key){
 
     while(tmp){
 
-        if( !strcmp(tmp->pair.key,key) ) return_value( &tmp->pair , htab_pair_t_ptr );
+        if( tmp->pair.key == key ) return_value( &tmp->pair , htab_pair_t_ptr );
                 
         tmp = tmp->next;
     }

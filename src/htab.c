@@ -15,3 +15,4 @@
 #include "./htab_lib/htab_lookup_add.c"
 #include "./htab_lib/htab_resize.c"
 #include "./htab_lib/htab_size.c"
+#include "./htab_lib/htab_vec_functions.c"
