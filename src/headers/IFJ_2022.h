@@ -52,6 +52,8 @@ define_error(unsigned_long_long)
 define_error(long_long_ptr)
 define_error(unsigned_long_long_ptr)
 
+define_error(_Bool)
+
 define_error(float)
 define_error(double)
 define_error(float_ptr)
@@ -95,27 +97,28 @@ DEFINE_VEC_PROTOTYPES(double, double);
  *
  */
 typedef enum
-{   PROLOG, PROG, ST_LIST, STATEMENT,
-    FCAL, FDEF, RVAL, RET_VAL, ARGS,
-    ARGS_NEXT, PARAMS, PARAMS_NEXT,
-    TYPE, TERM, EXPR, N_VLD
+{
+    PROLOG, PROG, BODY, TYPE,
+    PARAMS, PARAMS_NEXT, ARGS,
+    ARG_TYPE, ARGS_NEXT, TERM,
+    RET_VAL, STATEMENT, EXPR, RVAL
 } nonTerminal_t;
 
 
 //enum of all token types even internal , do NOT change order of elements between def and identOfFunct
-typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ nullT , returnT , 
-             /*stringT ,*/ voidT , whileT , identOfFunct , identOfVar , identOfType , 
+typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ nullT , returnT ,
+             /*stringT ,*/ voidT , whileT , identOfFunct , identOfVar , identOfType ,
              integer , decNum , string , lineComment , multiLineComm ,
              plusSign, minusSign , multiply , division , concatenation ,
              lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
-             EqOper , notEqOper, assigment , openParen , closeParen , openSetParen , 
+             EqOper , notEqOper, assigment , openParen , closeParen , openSetParen ,
              closeSetParen , comma , semicolon , colon , endOfFile , identOfTypeN ,
-             multiLineCommPE, prolog } tokenType;
+             multiLineCommPE, prolog , N_VLD } tokenType;
 
 typedef struct token
 {
     tokenType discriminant;
-    union information 
+    union information
     {
         int integer;
         double decNuber;
@@ -124,7 +127,11 @@ typedef struct token
 } token_t ;
 
 typedef token_t* token_ptr;
+typedef token_ptr * token_ptr_ptr;
 
-define_error(token_ptr);
+define_error(token_ptr)
+define_error(token_ptr_ptr);
+
+DEFINE_VEC_PROTOTYPES(token_ptr, token_ptr);
 
 #endif // IFJ_2022_IFJ_2022_H

@@ -70,7 +70,9 @@ enum error_kinds {
     /* Character after EOF token */
     ERROR_LEX_EOFCHAR,
 
-    ERROR_LEX_NOTABLE
+    ERROR_LEX_NOTABLE,
+
+    ERROR_SYNTAX
 };
 
 const char* error_kind_name(enum error_kinds kind);

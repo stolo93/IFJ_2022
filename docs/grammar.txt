@@ -1,23 +1,26 @@
 <PROLOG> -> prolog <PROG>
 <PROG> -> endOfFile
 
-<PROG> -> function identOfFunc ( <PARAMS> ) : <TYPE> { <ST_LIST> } <PROG>
-<PROG> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> } <PROG>
-<PROG> -> while ( <ARG_TYPE> ) { <BODY> } <PROG>
+<PROG> -> function identOfFunc ( <PARAMS> ) : <TYPE> { <BODY> } <PROG>
+<PROG> -> if ( <EXPR> ) { <BODY> } else { <BODY> } <PROG>
+<PROG> -> while ( <EXPR> ) { <BODY> } <PROG>
 <PROG> -> <EXPR> ; <PROG>
 <PROG> -> identOfFunc ( <ARGS> ) ; <PROG>
-<PROG> -> identOfVar = <EXPR> ; <PROG>
+<PROG> -> identOfVar = <RVAL> ; <PROG>
 <PROG> -> return <RET_VAL> ; <PROG>
 
 <BODY> -> <STATEMENT> <BODY>
 <BODY> -> ''
 
-<STATEMENT> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> }
-<STATEMENT> -> while ( <ARG_TYPE> ) { <BODY> }
+<STATEMENT> -> if ( <EXPR> ) { <BODY> } else { <BODY> }
+<STATEMENT> -> while ( <EXPR> ) { <BODY> }
 <STATEMENT> -> <EXPR> ;
 <STATEMENT> -> identOfFunc ( <ARGS> ) ;
-<STATEMENT> -> identOfVar = <EXPR> ;
+<STATEMENT> -> identOfVar = <RVAL> ;
 <STATEMENT> -> return <RET_VAL> ;
+
+<RVAL> -> <EXPR>
+<RVAL> -> identOfFunc ( <ARGS> )
 
 <PARAMS> -> <TYPE> identOfVar <PARAMS_NEXT>
 <PARAMS> ->''
@@ -28,11 +31,11 @@
 <ARGS> -> <ARG_TYPE> <ARGS_NEXT>
 <ARGS> ->''
 
+<ARG_TYPE> -> identOfVar
+<ARG_TYPE> -> <TERM>
+
 <ARGS_NEXT> ->, <ARG_TYPE> <ARGS_NEXT>
 <ARGS_NEXT> ->''
-
-<ARG_TYPE> -> <TERM>
-<ARG_TYPE> -> identOfVar
 
 
 <RET_VAL> -> <EXPR>
