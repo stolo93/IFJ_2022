@@ -97,7 +97,7 @@ typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ 
              lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
              EqOper , notEqOper, assigment , openParen , closeParen , openSetParen ,
              closeSetParen , comma , semicolon , colon , endOfFile , identOfTypeN ,
-             multiLineCommPE, prolog } tokenType;
+             multiLineCommPE, prolog , N_VLD } tokenType;
 
 typedef struct token
 {
