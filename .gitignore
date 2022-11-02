@@ -11,6 +11,8 @@
 *.obj
 *.elf
 
+# Dependency file
+deps
 # Linker output
 *.ilk
 *.map
