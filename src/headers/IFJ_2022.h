@@ -49,6 +49,8 @@ define_error(unsigned_long_long)
 define_error(long_long_ptr)
 define_error(unsigned_long_long_ptr)
 
+define_error(_Bool)
+
 define_error(float)
 define_error(double)
 define_error(float_ptr)
