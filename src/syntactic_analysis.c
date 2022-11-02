@@ -9,10 +9,32 @@
 
 #include "./headers/IFJ_2022.h"
 #include "./headers/syntactic_analysis.h"
+#include "./headers/scaner.h"
+
+#include <stdbool.h>
 
 error( _Bool ) SA_Prolog ( token_t * Token)
 {
+    if ( Token == NULL ){ return_error( INVALID_VAL, _Bool ); }
 
+    bool Correct = false;
+
+    //Simulate rule <PROLOG> -> prolog <PROG>
+    if ( Token->discriminant == prolog )
+    {
+        error(token_ptr) tmp_token = getToken();
+	get_value(token_ptr, cur_token, tmp_token, _Bool);
+
+	//TODO insert cur_token into prog tree
+
+	error(_Bool) tmp_result = SA_Prog(cur_token);
+	free(cur_token); //TODO delete this, when inserted into progTree
+	get_value(bool, res_sa_prog, tmp_result, _Bool);
+
+		Correct = res_sa_prog;
+	}
+
+    return_value(Correct, _Bool);
 }
 
 error( _Bool ) SA_Prog ( token_t * Token )
@@ -25,27 +47,7 @@ error( _Bool ) SA_Body ( token_t * Token )
 
 }
 
-error( _Bool ) SA_ST_List ( token_t * Token )
-{
-
-}
-
 error( _Bool ) SA_Statement ( token_t * Token)
-{
-
-}
-
-error( _Bool ) SA_Fcal ( token_t * Token )
-{
-
-}
-
-error( _Bool ) SA_Fdef ( token_t * Token )
-{
-
-}
-
-error( _Bool ) SA_Rval ( token_t * Token )
 {
 
 }
@@ -96,7 +98,7 @@ error( _Bool ) SA_Expr ( token_t * Token )
 }
 
 
-bool isInTokens ( tokenType Token, tokenType * TokenList)
+bool isInTokens ( tokenType Token, const tokenType * TokenList)
 {
     if ( TokenList == NULL )
     {
@@ -115,7 +117,7 @@ bool isInTokens ( tokenType Token, tokenType * TokenList)
     return false;
 }
 
-error(none) skipExpr ( tokenType * which)
+error(none) skipExpr ( const tokenType * which )
 {
     if ( which == NULL ) {return_error(INVALID_VAL, none);}
 
