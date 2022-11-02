@@ -42,3 +42,6 @@ DEFINE_VEC_ORD_FUNCTIONS(unsigned_long_long, unsigned_long_long, SIMPLE_CMP);
 
 DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(float, float);
 DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(double, double);
+
+DEFINE_VEC_FUNCTIONS_WITH_DESTRUCTOR(token_ptr, token_ptr, free);
+

@@ -85,7 +85,6 @@ typedef htab_t* htab_t_ptr;
 
 define_error(htab_pair_t_ptr);
 define_error( htab_t_ptr );
-define_error(_Bool ); //must use _Bool because otherwise it woudln't work
 
 unsigned long htab_hash_function(htab_key_t str);
 

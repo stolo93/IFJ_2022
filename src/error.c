@@ -44,6 +44,8 @@ const char* error_kind_name(enum error_kinds kind) {
             s(ERROR_LEX_EOFCHAR);
         case ERROR_LEX_NOTABLE:
             s(ERROR_LEX_NOTABLE);
+        case ERROR_SYNTAX:
+            s(ERROR_SYNTAX);
         default:
             return "ERROR KIND WAS NOT GIVEN A NAME PLEASE CHANGE";
     }
@@ -90,6 +92,8 @@ const char* error_kind_message(enum error_kinds kind) {
             return "Scanner: Scaner found character after \"?>\" token";
         case ERROR_LEX_NOTABLE:
             return "Scanner: Table is NULL pointer";
+        case ERROR_SYNTAX:
+            return "Syntax error";
         default:
             return "KIND WAS NOT GIVEN A ERROR MESSAGE!!!";
     }
@@ -99,6 +103,8 @@ int error_kind_exit_code(enum error_kinds kind) {
     switch (kind) {
         case NOERR:
             return 0;
+        case ERROR_SYNTAX:
+            return 2;
         case UNKNOWN:
             return 99;
         case INVALID_VAL:
