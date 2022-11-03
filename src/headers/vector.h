@@ -40,8 +40,10 @@ void vec_ ## suffix ## _destroy (vec_ ## suffix * vec);                         
 error(none) vec_ ## suffix ## _resize (vec_ ## suffix  * vec, size_t new_size);    \
 error(none) vec_ ## suffix ## _shrink_to_fit(vec_ ## suffix * vec);
 
-#define VEC_SHIFT_ELEMENTS_FORWARD(vec, suffix) for (size_t i = (vec) -> len__ - 1; i > 1; i--) {(vec) -> data[i] = (vec) -> data[i - 1];}
-#define VEC_SHIFT_ELEMENTS_BACKWARDS(vec, suffix) for (size_t i = (vec) -> len__ - 1; i > 1; i--) {(vec) -> data[i - 1] = (vec) -> data[i];}
+// Assumes there's empty space in front of the used buffer
+#define VEC_SHIFT_ELEMENTS_FORWARD(vec, suffix) for (size_t i = (vec)->len__; i > 0; i--) {(vec) -> data[i] = (vec) -> data[i - 1];}
+
+#define VEC_SHIFT_ELEMENTS_BACKWARDS(vec, suffix) for (size_t i = 1; i < vec->len__; i++) {(vec) -> data[i - 1] = (vec) -> data[i];}
 
 #define DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(type, suffix)                                \
 vec_ ## suffix new_vec_ ## suffix () {                                                  \
@@ -51,7 +53,7 @@ vec_ ## suffix new_vec_ ## suffix () {                                          
                                                                                         \
 error(vec_ ## suffix) new_vec_ ## suffix ## _with_capacity(size_t capacity) {           \
     vec_ ## suffix empty = new_vec_ ## suffix ();                                       \
-    error(none) result = vec_ ## suffix ## _resize(&empty, sizeof(type) * capacity);    \
+    error(none) result = vec_ ## suffix ## _resize(&empty, capacity);                   \
     if (is_error(result)) {                                                             \
         forward_error(result, vec_ ## suffix);                                          \
     }                                                                                   \
@@ -118,8 +120,8 @@ error(none) vec_ ## suffix ## _push_back(vec_ ## suffix * vec, type item) {     
             forward_error(result, none);                                                \
         }                                                                               \
     }                                                                                   \
-    vec->len__ += 1;                                                                    \
     vec->data[vec -> len__] = item;                                                     \
+    vec->len__ += 1;                                                                    \
     return_none();                                                                      \
 }                                                                                       \
                                                                                         \
@@ -139,8 +141,8 @@ error(type) vec_ ## suffix ## _pop_back(vec_ ## suffix * vec) {                 
         return_error(VECTOR_EMPTY_ERROR, type);                                         \
     }                                                                                   \
                                                                                         \
-    type result_value = vec->data[vec->len__];                                          \
     vec -> len__ -= 1;                                                                  \
+    type result_value = vec->data[vec->len__];                                          \
     return_value(result_value, type);                                                   \
 }                                                                                       \
                                                                                         \
@@ -247,8 +249,8 @@ error(none) vec_ ## suffix ## _push_back(vec_ ## suffix * vec, type item) {     
             forward_error(result, none);                                                \
         }                                                                               \
     }                                                                                   \
-    vec->len__ += 1;                                                                    \
     vec->data[vec -> len__] = item;                                                     \
+    vec->len__ += 1;                                                                    \
     return_none();                                                                      \
 }                                                                                       \
                                                                                         \
@@ -268,8 +270,8 @@ error(type) vec_ ## suffix ## _pop_back(vec_ ## suffix * vec) {                 
         return_error(VECTOR_EMPTY_ERROR, type);                                         \
     }                                                                                   \
                                                                                         \
-    type result_value = vec->data[vec->len__];                                          \
     vec -> len__ -= 1;                                                                  \
+    type result_value = vec->data[vec->len__];                                          \
     return_value(result_value, type);                                                   \
 }                                                                                       \
                                                                                         \
@@ -316,7 +318,7 @@ error(none) vec_ ## suffix ## _resize (vec_ ## suffix * vec, size_t new_size) { 
     }                                                                                   \
                                                                                         \
     vec -> capacity__ = new_size;                                                       \
-                                                                                        \
+    return_none();                                                                      \
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _shrink_to_fit(vec_ ## suffix * vec) {                    \
