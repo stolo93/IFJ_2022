@@ -63,7 +63,7 @@ DEFINE_VEC_PROTOTYPES(short, short);
 DEFINE_VEC_PROTOTYPES(unsigned_short, unsigned_short);
 
 DEFINE_VEC_PROTOTYPES(int, int);
-DEFINE_VEC_PROTOTYPES(unsigned_int, unsigned_int);
+typedef struct vec_unsigned_int { unsigned_int * data; size_t len__; size_t capacity__; } vec_unsigned_int; define_error(vec_unsigned_int) vec_unsigned_int new_vec_unsigned_int (); error(vec_unsigned_int) new_vec_unsigned_int_with_capacity(size_t capacity); error(none) vec_unsigned_int_push_front(vec_unsigned_int * vec, unsigned_int item); error(none) vec_unsigned_int_push_back(vec_unsigned_int * vec, unsigned_int item); error(unsigned_int) vec_unsigned_int_pop_front(vec_unsigned_int * vec); error(unsigned_int) vec_unsigned_int_pop_back(vec_unsigned_int * vec); error(unsigned_int_ptr) vec_unsigned_int_get(vec_unsigned_int * vec, size_t index); error(none) vec_unsigned_int_set(vec_unsigned_int * vec, size_t index, unsigned_int item); error(none) vec_unsigned_int_remove(vec_unsigned_int * vec, size_t index); size_t vec_unsigned_int_len(vec_unsigned_int * vec); size_t vec_unsigned_int_capacity(vec_unsigned_int * vec); void vec_unsigned_int_destroy (vec_unsigned_int * vec); error(none) vec_unsigned_int_resize (vec_unsigned_int * vec, size_t new_size); error(none) vec_unsigned_int_shrink_to_fit(vec_unsigned_int * vec);;
 
 DEFINE_VEC_PROTOTYPES(long, long)
 DEFINE_VEC_PROTOTYPES(unsigned_long, unsigned_long);
@@ -88,19 +88,19 @@ typedef enum
 
 
 //enum of all token types even internal , do NOT change order of elements between def and identOfFunct
-typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ nullT , returnT , 
-             /*stringT ,*/ voidT , whileT , identOfFunct , identOfVar , identOfType , 
+typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ nullT , returnT ,
+             /*stringT ,*/ voidT , whileT , identOfFunct , identOfVar , identOfType ,
              integer , decNum , string , lineComment , multiLineComm ,
              plusSign, minusSign , multiply , division , concatenation ,
              lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
-             EqOper , notEqOper, assigment , openParen , closeParen , openSetParen , 
+             EqOper , notEqOper, assigment , openParen , closeParen , openSetParen ,
              closeSetParen , comma , semicolon , colon , endOfFile , identOfTypeN ,
              multiLineCommPE, prolog } tokenType;
 
 typedef struct token
 {
     tokenType discriminant;
-    union information 
+    union information
     {
         int integer;
         double decNuber;
@@ -109,7 +109,11 @@ typedef struct token
 } token_t ;
 
 typedef token_t* token_ptr;
+typedef token_ptr * token_ptr_ptr;
 
-define_error(token_ptr);
+define_error(token_ptr)
+define_error(token_ptr_ptr);
+
+DEFINE_VEC_PROTOTYPES(token_ptr, token_ptr);
 
 #endif // IFJ_2022_IFJ_2022_H
