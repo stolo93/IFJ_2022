@@ -103,19 +103,19 @@ typedef enum
 
 
 //enum of all token types even internal , do NOT change order of elements between def and identOfFunct
-typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ nullT , returnT , 
-             /*stringT ,*/ voidT , whileT , identOfFunct , identOfVar , identOfType , 
+typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ nullT , returnT ,
+             /*stringT ,*/ voidT , whileT , identOfFunct , identOfVar , identOfType ,
              integer , decNum , string , lineComment , multiLineComm ,
              plusSign, minusSign , multiply , division , concatenation ,
              lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
-             EqOper , notEqOper, assigment , openParen , closeParen , openSetParen , 
+             EqOper , notEqOper, assigment , openParen , closeParen , openSetParen ,
              closeSetParen , comma , semicolon , colon , endOfFile , identOfTypeN ,
              multiLineCommPE, prolog } tokenType;
 
 typedef struct token
 {
     tokenType discriminant;
-    union information 
+    union information
     {
         int integer;
         double decNuber;
@@ -124,7 +124,11 @@ typedef struct token
 } token_t ;
 
 typedef token_t* token_ptr;
+typedef token_ptr * token_ptr_ptr;
 
-define_error(token_ptr);
+define_error(token_ptr)
+define_error(token_ptr_ptr);
+
+DEFINE_VEC_PROTOTYPES(token_ptr, token_ptr);
 
 #endif // IFJ_2022_IFJ_2022_H
