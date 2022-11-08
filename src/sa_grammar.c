@@ -874,12 +874,17 @@ error( _Bool ) sa_rval_expr__()
 
 error( _Bool ) sa_retval__()
 {
+    //TODO <EXPR>
+    error(none) tmp = skipExpr(expr_tokens);
+    error_test(tmp, _Bool);
 
+    //Return true
+    return_value(true, _Bool);
 }
 
 error( _Bool ) sa_retval_empty__()
 {
-
+    return_value(true, _Bool);
 }
 
 

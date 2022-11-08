@@ -665,7 +665,32 @@ error( _Bool ) SA_Statement ( token_t * Token)
 
 error( _Bool ) SA_RetVal ( token_t * Token )
 {
+    if ( Token == NULL )
+    {
+        return_error(INVALID_VAL, _Bool);
+    }
 
+	bool Correct = false;
+    tokenType tokenList_eps[] = { semicolon, N_VLD };
+
+    // Epsilon rule
+    if ( isInTokens(Token->discriminant, tokenList_eps) )
+    {
+		Correct = true;
+		returnToken(Token);
+    }
+
+    // Expression
+    else if ( isInTokens(Token->discriminant, expr_tokens) )
+    {
+		error(_Bool) result = SA_Expr(Token);
+		get_value(bool, res_sa_expr, result, _Bool);
+		test_result(res_sa_expr);
+
+		Correct = true;
+    }
+
+    return_value(Correct, _Bool);
 }
 
 error( _Bool ) SA_Args ( token_t * Token )
