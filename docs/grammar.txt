@@ -4,8 +4,9 @@
 <PROG> -> function identOfFunc ( <PARAMS> ) : <TYPE> { <ST_LIST> } <PROG>
 <PROG> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> } <PROG>
 <PROG> -> while ( <ARG_TYPE> ) { <BODY> } <PROG>
-<PROG> -> <RVAL> ; <PROG>
-<PROG> -> identOfVar = <RVAL> ; <PROG>
+<PROG> -> <EXPR> ; <PROG>
+<PROG> -> identOfFunc ( <ARGS> ) ; <PROG>
+<PROG> -> identOfVar = <EXPR> ; <PROG>
 <PROG> -> return <RET_VAL> ; <PROG>
 
 <BODY> -> <STATEMENT> <BODY>
@@ -13,8 +14,9 @@
 
 <STATEMENT> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> }
 <STATEMENT> -> while ( <ARG_TYPE> ) { <BODY> }
-<STATEMENT> -> <RVAL> ;
-<STATEMENT> -> identOfVar = <RVAL> ;
+<STATEMENT> -> <EXPR> ;
+<STATEMENT> -> identOfFunc ( <ARGS> ) ;
+<STATEMENT> -> identOfVar = <EXPR> ;
 <STATEMENT> -> return <RET_VAL> ;
 
 <PARAMS> -> <TYPE> identOfVar <PARAMS_NEXT>
@@ -33,11 +35,7 @@
 <ARG_TYPE> -> identOfVar
 
 
-<RVAL> -> <TERM>
-<RVAL> -> identOfFunc ( <ARGS> )
-<RVAL> -> <EXPR>
-
-<RET_VAL> -> <RVAL>
+<RET_VAL> -> <EXPR>
 <RET_VAL> ->''
 
 <TERM> -> null
