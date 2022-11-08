@@ -399,6 +399,38 @@ error( _Bool ) SA_Prog ( token_t * Token )
 
 error( _Bool ) SA_Body ( token_t * Token )
 {
+    if ( Token == NULL )
+    {
+        return_error(INVALID_VAL, _Bool);
+    }
+
+	bool Correct = false;
+
+    const tokenType tokenList_statement[]   = { identOfFunct, ifT, whileT, identOfVar, returnT, N_VLD};
+    const tokenType tokenList_eps[]         = { closeSetParen , N_VLD};
+
+    //Epsilon rule
+    if ( isInTokens(Token->discriminant, tokenList_eps) )
+    {
+        Correct = true;
+		returnToken(Token);
+    }
+
+    //Statement
+    else if ( isInTokens(Token->discriminant, tokenList_statement) || isInTokens(Token->discriminant, expr_tokens))
+    {
+		error(_Bool) result = SA_Statement(Token);
+		get_value(bool, res_sa_statement, result, _Bool);
+		test_result(res_sa_statement);
+
+		Correct = true;
+    }
+
+    return_value(Correct, _Bool);
+}
+
+error( _Bool ) SA_ST_List ( token_t * Token )
+{
 
 }
 
