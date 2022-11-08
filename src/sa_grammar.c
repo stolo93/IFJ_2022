@@ -14,40 +14,452 @@
 
 #include <stdbool.h>
 
+#define push_token( vec, token ) do {vec_token_ptr_push_back((vec), (token));} while(0)
+#define error_test( er_obj, er_type ) do { if(is_error(er_obj)) {forward_error(er_obj, er_type);}} while(0)
+#define error_test_destroy( er_obj, er_type, vec ) do {if (is_error(er_obj)) { vec_token_ptr_destroy(vec); forward_error(er_obj, er_type); }} while(0)
+#define test_result(result) if ( ! result )                         \
+                            {                                       \
+                                vec_token_ptr_destroy(&m_tokens);   \
+                                return_value(false, _Bool);         \
+                            }                                       \
+
+
+const tokenType expr_tokens[] = { identOfVar, integer, decNum, string, plusSign, minusSign,
+                            multiply, division, concatenation, lessOper, lessOrEqOper,
+                            moreOper, moreOrEqOper, EqOper, notEqOper, openParen,
+                            closeParen, N_VLD };
+
 //Rules
 
 //<PROG>
 
 error( _Bool ) sa_prog_fdef__ ()
 {
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
 
+    // IdentOfFunc
+    result = sa_is_token__(identOfFunct);
+    error_test(result, _Bool);
+
+    if ( ! result._value )
+    {
+        return_value(false, _Bool);
+    }
+
+    // Open paren
+    result = sa_is_token__(openParen);
+    error_test(result, _Bool);
+
+    if ( ! result._value )
+    {
+        return_value(false, _Bool);
+    }
+
+    // <PARAMS>
+    cur_token = getToken();
+    error_test(cur_token, _Bool);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Params(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // Close paren
+    result = sa_is_token__(closeParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // Colon
+    result = sa_is_token__(colon);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // <TYPE>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Type(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // Open Set Paren
+    result = sa_is_token__(openSetParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // <ST_LIST>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_ST_List(cur_token._value);
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // Close set paren
+    result = sa_is_token__(closeSetParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // <PROG>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Prog(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    //TODO don't delete tokens in case they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    return_value(true, _Bool);
 }
 
 error( _Bool ) sa_prog_if__ ()
 {
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
 
+    // If token
+    result = sa_is_token__(ifT);
+    error_test(result, _Bool);
+
+    if ( ! result._value )
+    {
+        return_value(false, _Bool);
+    }
+
+    // open paren
+    result = sa_is_token__(openParen);
+    error_test(result, _Bool);
+
+    if ( ! result._value )
+    {
+        return_value(false, _Bool);
+    }
+
+    // <ARG_TYPE>
+    cur_token = getToken();
+    error_test(cur_token, _Bool);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_ARG_Type(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // close paren
+    result = sa_is_token__(closeParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // open set paren
+    result = sa_is_token__(openSetParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // <BODY>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Body(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // Close set paren
+    result = sa_is_token__(closeSetParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // else token
+    result = sa_is_token__(elseT);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // open set paren
+    result = sa_is_token__(openSetParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // <Body>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Body(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // close set paren
+    result = sa_is_token__(closeSetParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    // <PROG>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Prog(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+
+    test_result(result._value);
+
+    //TODO don't delete tokens in case they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    return_value(true, _Bool);
 }
 
 error( _Bool ) sa_prog_while__()
 {
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
 
+    // open paren
+    result = sa_is_token__(openParen);
+    error_test(result, _Bool);
+
+    if ( ! result._value )
+    {
+        return_value(false, _Bool);
+    }
+
+    // <ARG_TYPE>
+    cur_token = getToken();
+    error_test(cur_token, _Bool);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_ARG_Type(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // close paren
+    result = sa_is_token__(closeParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // open set paren
+    result = sa_is_token__(openSetParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // <BODY>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Body(cur_token._value);
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // close set paren
+    result = sa_is_token__(closeSetParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // <PROG>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Prog(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+
+    //TODO don't delete tokens in case they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    //Return true
+    return_value(true, _Bool);
 }
 
 error( _Bool ) sa_prog_assign__()
 {
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
 
+    // = token
+    result = sa_is_token__(EqOper);
+    error_test(result, _Bool);
+    if ( ! result._value )
+    {
+        return_value(false, _Bool);
+    }
+
+    // <EXPR>
+    //TODO expression analysis
+    skipExpr(expr_tokens);
+
+    // semicolon
+    result = sa_is_token__(semicolon);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // <PROG>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Prog(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+
+    //TODO don't delete tokens in case they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    //Return true
+    return_value(true, _Bool);
 }
 
 error( _Bool ) sa_prog_return__()
 {
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
 
+    // <RETVAL>
+    cur_token = getToken();
+    error_test(cur_token, _Bool);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_RetVal(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // semicolon
+    result = sa_is_token__(semicolon);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // <PROG>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Prog(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+
+    //TODO don't delete tokens in case they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    //Return true
+    return_value(true, _Bool);
 }
 
-error( _Bool ) sa_prog_rval__()
+error( _Bool ) sa_prog_fcall__()
 {
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
 
+    // open paren
+    result = sa_is_token__(openParen);
+    error_test(result, _Bool);
+    if ( ! result._value )
+    {
+        return_value(false, _Bool);
+    }
+
+    //<ARGS>
+    cur_token = getToken();
+    error_test(cur_token, _Bool);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Args(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // close paren
+    result = sa_is_token__(closeParen);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    //semicolon
+    result = sa_is_token__(semicolon);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // <PROG>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Prog(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+
+    //TODO don't delete tokens in case they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    //Return true
+    return_value(true, _Bool);
 }
 
+error( _Bool ) sa_prog_expr__()
+{
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
+
+    //TODO <EXPR>
+    error(none) tmp = skipExpr(expr_tokens);
+    error_test(tmp, _Bool);
+
+    // semicolon
+    result = sa_is_token__(semicolon);
+    error_test(result, _Bool);
+    if ( ! result._value )
+    {
+        return_value(false, _Bool);
+    }
+
+    // <PROG>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Prog(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+
+    //TODO don't delete tokens in case they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    //Return true
+    return_value(true, _Bool);
+
+}
 
 //<BODY>
 
