@@ -688,15 +688,9 @@ error( _Bool ) SA_RetVal ( token_t * Token )
     // Expression
     else if ( isInTokens(Token->discriminant, expr_tokens) )
     {
-<<<<<<< HEAD
 		error(_Bool) result = SA_Expr(Token);
 		get_value(bool, res_sa_expr, result, _Bool);
 		test_result(res_sa_expr);
-=======
-	error(_Bool) result = SA_Expr(Token);
-	get_value(bool, res_sa_expr, result, _Bool);
-	test_result(res_sa_expr);
->>>>>>> c5f476c (SA_Term fixup)
 
 		Correct = true;
     }
@@ -930,7 +924,22 @@ error( _Bool ) SA_Term ( token_t * Token )
 
 error( _Bool ) SA_Expr ( token_t * Token )
 {
+	if ( Token == NULL )
+	{
+		return_error(INVALID_VAL, _Bool);
+	}
 
+	bool Correct = false;
+
+	//TODO implement proper expression analysis
+	error(none) ret_val = skipTokens(expr_tokens);
+	if ( is_error(ret_val) )
+	{
+		forward_error(ret_val, _Bool);
+	}
+	Correct = true;
+
+	return_value(Correct, _Bool);
 }
 
 
@@ -953,7 +962,7 @@ bool isInTokens ( tokenType Token, const tokenType * TokenList)
     return false;
 }
 
-error(none) skipExpr ( const tokenType * which )
+error(none) skipTokens ( const tokenType * which )
 {
     if ( which == NULL ) {return_error(INVALID_VAL, none);}
 
