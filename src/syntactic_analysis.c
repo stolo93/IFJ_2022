@@ -809,6 +809,28 @@ error( _Bool ) SA_ARG_Type ( token_t * Token )
 
 error( _Bool ) SA_Params ( token_t * Token )
 {
+    	if ( Token == NULL )
+	{
+		return_error(INVALID_VAL, _Bool);
+	}
+
+	bool Correct = false;
+	const tokenType tokenList_type[] = { identOfType, identOfTypeN, N_VLD };
+
+	// EPS
+	if ( Token->discriminant == closeParen )
+	{
+		Correct = true;
+		returnToken(Token);
+	}
+
+	// <TYPE>...
+	else if ( isInTokens(Token->discriminant, tokenList_type) )
+	{
+		Correct = true;
+	}
+
+	return_value(Correct, _Bool);
 
 }
 
