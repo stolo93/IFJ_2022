@@ -893,12 +893,29 @@ error( _Bool ) sa_args_next_empty__()
 //<ARG_TYPE>
 error( _Bool ) sa_arg_type_term__()
 {
+    error(token_ptr) cur_token = getToken();
+    error_test(cur_token, _Bool);
+    bool result = false;
 
+    const tokenType tokenList_term[] = {nullT, decNum, integer, string, N_VLD};
+
+    if ( isInTokens(cur_token._value->discriminant, tokenList_term) )
+    {
+        result = true;
+    }
+
+    //TODO put token into prog tree instead
+    free(cur_token._value);
+
+    return_value(result, _Bool);
 }
 
 error( _Bool ) sa_arg_type_var__()
 {
+    error(_Bool) result = sa_is_token__(identOfVar);
+    error_test(result, _Bool);
 
+    return_value(result._value, _Bool);
 }
 
 

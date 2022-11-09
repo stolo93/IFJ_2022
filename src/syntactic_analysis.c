@@ -770,6 +770,9 @@ error( _Bool ) SA_ArgsNext ( token_t * Token )
 			Correct = true;
 			returnToken(Token);
             break;
+
+		default:
+			break;
     }
 
     return_value(Correct, _Bool);
@@ -777,7 +780,31 @@ error( _Bool ) SA_ArgsNext ( token_t * Token )
 
 error( _Bool ) SA_ARG_Type ( token_t * Token )
 {
+    if ( Token == NULL )
+    {
+        return_error(INVALID_VAL, _Bool);
+    }
 
+	bool Correct = false;
+    const tokenType tokenList_term[] = {nullT, decNum, integer, string, N_VLD};
+
+    // ID of variable
+    if ( Token->discriminant == identOfVar )
+    {
+        Correct = true;
+    }
+
+    // Literals
+    else if ( isInTokens(Token->discriminant, tokenList_term) )
+    {
+        error(_Bool) tmp_result = SA_Term(Token);
+		get_value(bool, res_sa_term, tmp_result, _Bool);
+		test_result(res_sa_term);
+
+		Correct = true;
+    }
+
+    return_value(Correct, _Bool);
 }
 
 error( _Bool ) SA_Params ( token_t * Token )
