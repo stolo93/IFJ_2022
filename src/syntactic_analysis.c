@@ -695,7 +695,44 @@ error( _Bool ) SA_RetVal ( token_t * Token )
 
 error( _Bool ) SA_Args ( token_t * Token )
 {
+    if ( Token == NULL )
+    {
+        return_error(INVALID_VAL, _Bool);
+    }
 
+	bool Correct = false;
+    const tokenType tokenList_arg_type[] = { identOfVar, nullT, decNum, integer, string, N_VLD };
+
+    // Epsilon
+    if ( Token->discriminant == closeParen )
+    {
+        Correct = true;
+    }
+
+    // <ARG_Type> <ARGS_NEXT>
+    else if ( isInTokens(Token->discriminant, tokenList_arg_type) )
+    {
+		error(_Bool) tmp_result;
+
+		//<ARGS_TYPE>
+		tmp_result = SA_ARG_Type(Token);
+		get_value(bool, res_sa_arg_type, tmp_result, _Bool);
+		test_result(res_sa_arg_type);
+
+		//<ARGS_NEXT>
+		error(token_ptr) tmp_token = getToken();
+		get_value(token_ptr, cur_token, tmp_token, _Bool);
+		//TODO insert cur_token into prog tree and delete the next free()
+
+		tmp_result = SA_ARG_Type(cur_token);
+		free(cur_token);
+		get_value(bool, res_sa_args_next, tmp_result, _Bool);
+		test_result(res_sa_args_next);
+
+		Correct = true;
+    }
+
+    return_value(Correct, _Bool);
 }
 
 error( _Bool ) SA_ArgsNext ( token_t * Token )
