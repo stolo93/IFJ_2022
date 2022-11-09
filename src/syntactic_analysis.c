@@ -836,7 +836,50 @@ error( _Bool ) SA_Params ( token_t * Token )
 
 error( _Bool ) SA_ParamsNext ( token_t * Token )
 {
+	if ( Token == NULL )
+	{
+		return_error(INVALID_VAL, _Bool);
+	}
 
+	bool Correct = false;
+
+	// EPS
+	if ( Token->discriminant == closeParen )
+	{
+		Correct = true;
+		returnToken(Token);
+	}
+
+	// , <TYPE>...
+	else if ( Token->discriminant == colon )
+	{
+		error(_Bool) tmp_result;
+		error(token_ptr) tmp_token;
+
+		// <TYPE>
+		tmp_result = SA_Type(Token);
+		get_value(bool, res_sa_type, tmp_result, _Bool);
+		test_result(res_sa_type);
+
+		// identOfVar
+		tmp_result = isNextToken(identOfVar);
+		get_value(bool, is_ident_of_var, tmp_result, _Bool);
+		test_result(is_ident_of_var);
+
+		// <PARAMS_NEXT>
+		tmp_token = getToken();
+		get_value(token_ptr, params_next_token, tmp_token, _Bool);
+		//TODO insert current token into prog tree and delete the next free()
+
+		tmp_result = SA_ParamsNext(params_next_token);
+		free(params_next_token);
+		get_value(bool, res_sa_params_next, tmp_result, _Bool);
+		test_result(res_sa_params_next);
+
+		Correct = true;
+	}
+
+	return_value(Correct, _Bool);
 }
 
 error( _Bool ) SA_Type ( token_t * Token )
