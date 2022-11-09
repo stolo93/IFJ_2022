@@ -78,6 +78,6 @@ error(_Bool) isNextToken( tokenType TokenName );
  * Used to skip expressions
  * @param which
  */
-error(none) skipExpr ( const tokenType * which );
+error(none) skipTokens ( const tokenType * which );
 
 #endif
