@@ -13,6 +13,16 @@
 
 #include <stdbool.h>
 
+#define test_result(result) do{ if( !result ) { return_value(false, _Bool); } } while(0)
+
+const tokenType expr_tokens[] = {
+								identOfVar, integer, decNum, string, plusSign, minusSign,
+								multiply, division, concatenation, lessOper, lessOrEqOper,
+								moreOper, moreOrEqOper, EqOper, notEqOper, openParen, closeParen,
+								N_VLD
+								};
+
+
 error( _Bool ) SA_Prolog ( token_t * Token)
 {
     if ( Token == NULL ) { return_error( INVALID_VAL, _Bool ); }
@@ -20,16 +30,16 @@ error( _Bool ) SA_Prolog ( token_t * Token)
     bool Correct = false;
 
     //Simulate rule <PROLOG> -> prolog <PROG>
-    if ( Token->discriminant == prolog )
-    {
-        error(token_ptr) tmp_token = getToken();
-	get_value(token_ptr, cur_token, tmp_token, _Bool);
+	if ( Token->discriminant == prolog )
+	{
+		error(token_ptr) tmp_token = getToken();
+		get_value(token_ptr, cur_token, tmp_token, _Bool);
 
-	//TODO insert cur_token into prog tree
+		//TODO insert cur_token into prog tree
 
-	error(_Bool) tmp_result = SA_Prog(cur_token);
-	free(cur_token); //TODO delete this, when inserted into progTree
-	get_value(bool, res_sa_prog, tmp_result, _Bool);
+		error(_Bool) tmp_result = SA_Prog(cur_token);
+		free(cur_token); //TODO delete this, when inserted into progTree
+		get_value(bool, res_sa_prog, tmp_result, _Bool);
 
 		Correct = res_sa_prog;
 	}
@@ -427,11 +437,6 @@ error( _Bool ) SA_Body ( token_t * Token )
     }
 
     return_value(Correct, _Bool);
-}
-
-error( _Bool ) SA_ST_List ( token_t * Token )
-{
-
 }
 
 error( _Bool ) SA_Statement ( token_t * Token)
@@ -884,7 +889,19 @@ error( _Bool ) SA_ParamsNext ( token_t * Token )
 
 error( _Bool ) SA_Type ( token_t * Token )
 {
+	if ( Token == NULL )
+	{
+		return_error(INVALID_VAL, _Bool);
+	}
 
+	bool Correct = false;
+
+	if ( Token->discriminant == identOfType || Token->discriminant == identOfTypeN )
+	{
+		Correct = true;
+	}
+
+	return_value(Correct, _Bool);
 }
 
 error( _Bool ) SA_Term ( token_t * Token )
