@@ -1032,12 +1032,12 @@ error( _Bool ) sa_term__()
 
 error( _Bool ) sa_type__()
 {
-
+    return_value(true, _Bool);
 }
 
 error( _Bool ) sa_type_n__()
 {
-
+    return_value(true,_Bool);
 }
 
 
