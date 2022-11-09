@@ -1023,7 +1023,7 @@ error( _Bool ) sa_retval_empty__()
 
 error( _Bool ) sa_term__()
 {
-
+    return_value(true, _Bool);
 }
 
 
