@@ -830,12 +830,43 @@ error( _Bool ) sa_params_empty__()
 
 error( _Bool ) sa_params_next__()
 {
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
+
+    // <TYPE>
+    cur_token = getToken();
+    error_test(cur_token, _Bool);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_Type(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // identofvar
+    result = sa_is_token__(identOfVar);
+    test_result(result._value);
+
+    // <PARAMS_NEXT>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_ParamsNext(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+
+    //TODO don't free tokens if they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    return_value(true, _Bool);
 
 }
 
 error( _Bool ) sa_params_next_empty__()
 {
-
+    return_value(true, _Bool);
 }
 
 
