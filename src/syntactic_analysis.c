@@ -737,7 +737,42 @@ error( _Bool ) SA_Args ( token_t * Token )
 
 error( _Bool ) SA_ArgsNext ( token_t * Token )
 {
+    if ( Token == NULL )
+    {
+        return_error(INVALID_VAL, _Bool);
+    }
 
+	bool Correct = false;
+
+    switch (Token->discriminant)
+    {
+
+        // , <ARG_TYPE> <ARGS_NEXT>
+        case comma:
+            error(_Bool) tmp_result;
+			error(token_ptr) tmp_token;
+
+			// <ARG_TYPE>
+			tmp_token = getToken();
+			get_value(token_ptr, token_arg_type, tmp_token, _Bool);
+			//TODO insert token into prog tree and delete the next free()
+
+			tmp_result = SA_ARG_Type(token_arg_type);
+			free(token_arg_type);
+			get_value(bool, res_sa_arg_type, tmp_result, _Bool);
+			test_result(res_sa_arg_type);
+
+			Correct = true;
+            break;
+
+		//EPSILON
+        case closeParen:
+			Correct = true;
+			returnToken(Token);
+            break;
+    }
+
+    return_value(Correct, _Bool);
 }
 
 error( _Bool ) SA_ARG_Type ( token_t * Token )

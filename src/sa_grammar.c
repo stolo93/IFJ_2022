@@ -854,12 +854,38 @@ error( _Bool ) sa_args_empty__()
 
 error( _Bool ) sa_args_next__()
 {
+    error(_Bool) result;
+    error(token_ptr) cur_token;
+    vec_token_ptr m_tokens = new_vec_token_ptr();
 
+    // <ARG_TYPE>
+    cur_token = getToken();
+    error_test(cur_token, _Bool);
+    push_token(&m_tokens, cur_token._value);
+
+    result= SA_ARG_Type(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    // <ARGS_NEXT>
+    cur_token = getToken();
+    error_test_destroy(cur_token, _Bool, &m_tokens);
+    push_token(&m_tokens, cur_token._value);
+
+    result = SA_ArgsNext(cur_token._value);
+    error_test_destroy(result, _Bool, &m_tokens);
+    test_result(result._value);
+
+    //TODO don't delete tokens in case they are in the prog tree
+    vec_token_ptr_destroy(&m_tokens);
+
+    //Return true
+    return_value(true, _Bool);
 }
 
 error( _Bool ) sa_args_next_empty__()
 {
-
+    return_value(true, _Bool);
 }
 
 
