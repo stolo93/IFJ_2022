@@ -1,11 +1,27 @@
-#include "headers/IFJ_2022.h"
-#include "headers/error_infrastructure.h"
+#include "./headers/IFJ_2022.h"
+#include "./headers/error_infrastructure.h"
+#include "./headers/syntactic_analysis.h"
+#include "./headers/scaner.h"
+
+#include <stdio.h>
 
 // All code that would go into main goes here
 // Please change the name to a better one
 error(none) real_main(int argc, char** argv) {
     (void) argc;
     (void) argv;
+
+    // Get the first token
+    error(token_ptr) tmp_token = getToken();
+    get_value(token_ptr, token, tmp_token, none);
+
+    // Syntactic analysis
+    error(_Bool) tmp_result = SA_Prolog(token);
+    free(token);
+    get_value(bool, result, tmp_result, none);
+
+    // Result
+    printf("%s\n", result ? "good" : "bad");
 
     return_none();
 }
