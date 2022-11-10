@@ -23,6 +23,17 @@ error(none) real_main(int argc, char** argv) {
     (void) interner_ptr;
     (void) init._value;
 
+    // Get the first token
+    error(token_ptr) tmp_token = getToken();
+    get_value(token_ptr, token, tmp_token, none);
+
+    // Syntactic analysis
+    error(_Bool) tmp_result = SA_Prolog(token);
+    free(token);
+    get_value(bool, result, tmp_result, none);
+
+    // Result
+    printf("%s\n", result ? "good" : "bad");
     return_none();
 }
 
