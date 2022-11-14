@@ -1,7 +1,3 @@
-//
-// Created by brezak on 10/18/22.
-//
-
 #ifndef IFJ_2022_VECTOR_H
 #define IFJ_2022_VECTOR_H
 
@@ -84,8 +80,13 @@ error(none) vec_ ## suffix ##_insert(vec_ ##suffix * vec, size_t index, type ite
         return_error(VECTOR_INDEX_BOUNDS_ERROR, none);                                  \
     }                                                                                   \
                                                                                         \
-    if ((vec)->len__ >= (vec)->capacity__) {                                            \
-        error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__);         \
+    if (vec->len__ == 0) {                                                              \
+        error(none) result = vec_ ## suffix ## _resize((vec) , 1);                      \
+        if (is_error(result)) {                                                         \
+            return result;                                                              \
+        }                                                                               \
+    } else if ((vec)->len__ >= (vec)->capacity__) {                                     \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__ * 2);     \
         if (is_error(result)) {                                                         \
             return result;                                                              \
         }                                                                               \
@@ -96,6 +97,8 @@ error(none) vec_ ## suffix ##_insert(vec_ ##suffix * vec, size_t index, type ite
     }                                                                                   \
                                                                                         \
     vec->data[index] = item;                                                            \
+    vec->len__ += 1;                                                                    \
+    return_none();                                                                      \
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _remove(vec_ ## suffix * vec, size_t index) {             \
@@ -235,8 +238,13 @@ error(none) vec_ ## suffix ##_insert(vec_ ##suffix * vec, size_t index, type ite
         return_error(VECTOR_INDEX_BOUNDS_ERROR, none);                                  \
     }                                                                                   \
                                                                                         \
-    if ((vec)->len__ >= (vec)->capacity__) {                                            \
-        error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__);         \
+    if (vec->len__ == 0) {                                                              \
+        error(none) result = vec_ ## suffix ## _resize((vec) , 1);                      \
+        if (is_error(result)) {                                                         \
+            return result;                                                              \
+        }                                                                               \
+    } else if ((vec)->len__ >= (vec)->capacity__) {                                     \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__ * 2);     \
         if (is_error(result)) {                                                         \
             return result;                                                              \
         }                                                                               \
@@ -247,6 +255,8 @@ error(none) vec_ ## suffix ##_insert(vec_ ##suffix * vec, size_t index, type ite
     }                                                                                   \
                                                                                         \
     vec->data[index] = item;                                                            \
+    vec->len__ += 1;                                                                    \
+    return_none();                                                                      \
 }                                                                                       \
                                                                                         \
 error(none) vec_ ## suffix ## _remove(vec_ ## suffix * vec, size_t index) {             \
@@ -260,7 +270,7 @@ error(none) vec_ ## suffix ## _remove(vec_ ## suffix * vec, size_t index) {     
                                                                                         \
 error(none) vec_ ## suffix ## _push_front(vec_ ## suffix * vec, type item) {            \
     if (vec -> capacity__ == 0) {                                                       \
-        error(none) result = vec_ ## suffix ## _resize((vec) ,1);                       \
+        error(none) result = vec_ ## suffix ## _resize((vec) , 1);                      \
         if (is_error(result)) {                                                         \
             forward_error(result, none);                                                \
         }                                                                               \
