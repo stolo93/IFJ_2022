@@ -23,14 +23,14 @@ const tokenType expr_tokens[] = {
 								};
 
 
-error( _Bool ) SA_Prolog ( token_t * Token)
+error( _Bool ) SA_Prolog ( PT_Node_t * token_node )
 {
-    if ( Token == NULL ) { return_error( INVALID_VAL, _Bool ); }
+    if ( token_node == NULL ) { return_error( INVALID_VAL, _Bool ); }
 
     bool Correct = false;
 
     //Simulate rule <PROLOG> -> prolog <PROG>
-	if ( Token->discriminant == prolog )
+	if ( token_node->data.type.terminal->discriminant == prolog )
 	{
 		error(token_ptr) tmp_token = getToken();
 		get_value(token_ptr, cur_token, tmp_token, _Bool);
@@ -47,7 +47,7 @@ error( _Bool ) SA_Prolog ( token_t * Token)
     return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Prog ( token_t * Token )
+error( _Bool ) SA_Prog ( PT_Node_t * token_node )
 {
     if ( Token == NULL )
     {
@@ -407,7 +407,7 @@ error( _Bool ) SA_Prog ( token_t * Token )
     return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Body ( token_t * Token )
+error( _Bool ) SA_Body ( PT_Node_t * token_node )
 {
     if ( Token == NULL )
     {
@@ -439,7 +439,7 @@ error( _Bool ) SA_Body ( token_t * Token )
     return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Statement ( token_t * Token)
+error( _Bool ) SA_Statement ( PT_Node_t * token_node)
 {
     if ( Token == NULL )
     {
@@ -668,7 +668,7 @@ error( _Bool ) SA_Statement ( token_t * Token)
 
 }
 
-error( _Bool ) SA_RetVal ( token_t * Token )
+error( _Bool ) SA_RetVal ( PT_Node_t * token_node )
 {
     if ( Token == NULL )
     {
@@ -698,7 +698,7 @@ error( _Bool ) SA_RetVal ( token_t * Token )
     return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Args ( token_t * Token )
+error( _Bool ) SA_Args ( PT_Node_t * token_node )
 {
     if ( Token == NULL )
     {
@@ -740,7 +740,7 @@ error( _Bool ) SA_Args ( token_t * Token )
     return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_ArgsNext ( token_t * Token )
+error( _Bool ) SA_ArgsNext ( PT_Node_t * token_node )
 {
     if ( Token == NULL )
     {
@@ -783,7 +783,7 @@ error( _Bool ) SA_ArgsNext ( token_t * Token )
     return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_ARG_Type ( token_t * Token )
+error( _Bool ) SA_ARG_Type ( PT_Node_t * token_node )
 {
     if ( Token == NULL )
     {
@@ -812,7 +812,7 @@ error( _Bool ) SA_ARG_Type ( token_t * Token )
     return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Params ( token_t * Token )
+error( _Bool ) SA_Params ( PT_Node_t * token_node )
 {
     	if ( Token == NULL )
 	{
@@ -839,7 +839,7 @@ error( _Bool ) SA_Params ( token_t * Token )
 
 }
 
-error( _Bool ) SA_ParamsNext ( token_t * Token )
+error( _Bool ) SA_ParamsNext ( PT_Node_t * token_node )
 {
 	if ( Token == NULL )
 	{
@@ -887,7 +887,7 @@ error( _Bool ) SA_ParamsNext ( token_t * Token )
 	return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Type ( token_t * Token )
+error( _Bool ) SA_Type ( PT_Node_t * token_node )
 {
 	if ( Token == NULL )
 	{
@@ -904,7 +904,7 @@ error( _Bool ) SA_Type ( token_t * Token )
 	return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Term ( token_t * Token )
+error( _Bool ) SA_Term ( PT_Node_t * token_node )
 {
 	if ( Token == NULL )
 	{
@@ -922,7 +922,7 @@ error( _Bool ) SA_Term ( token_t * Token )
 	return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Expr ( token_t * Token )
+error( _Bool ) SA_Expr ( PT_Node_t * token_node )
 {
 	if ( Token == NULL )
 	{
