@@ -1,7 +1,7 @@
 <PROLOG> -> prolog <PROG>
 <PROG> -> endOfFile
 
-<PROG> -> function identOfFunc ( <PARAMS> ) : <TYPE> { <ST_LIST> } <PROG>
+<PROG> -> function identOfFunc ( <PARAMS> ) : <TYPE> { <BODY> } <PROG>
 <PROG> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> } <PROG>
 <PROG> -> while ( <ARG_TYPE> ) { <BODY> } <PROG>
 <PROG> -> <EXPR> ; <PROG>

@@ -17,31 +17,23 @@
 
 error( _Bool ) SA_Prolog ( PT_Node_t* token_node );
 
-error( _Bool ) SA_Prog ( PT_Node_t* token_node );
+error( _Bool ) SA_Prog ( PT_Node_t** token_node );
 
-error( _Bool ) SA_Body ( PT_Node_t* token_node );
+error( _Bool ) SA_Body ( PT_Node_t** token_node );
 
-error( _Bool ) SA_ST_List ( PT_Node_t* token_node );
+error( _Bool ) SA_Statement ( PT_Node_t** token_node);
 
-error( _Bool ) SA_Statement ( PT_Node_t* token_node);
+error( _Bool ) SA_RetVal ( PT_Node_t** token_node );
 
-error( _Bool ) SA_Fcal ( PT_Node_t* token_node );
+error( _Bool ) SA_Args ( PT_Node_t** token_node );
 
-error( _Bool ) SA_Fdef ( PT_Node_t* token_node );
+error( _Bool ) SA_ArgsNext ( PT_Node_t** token_node );
 
-error( _Bool ) SA_Rval ( PT_Node_t* token_node );
+error( _Bool ) SA_ARG_Type ( PT_Node_t** token_node );
 
-error( _Bool ) SA_RetVal ( PT_Node_t* token_node );
+error( _Bool ) SA_Params ( PT_Node_t** token_node );
 
-error( _Bool ) SA_Args ( PT_Node_t* token_node );
-
-error( _Bool ) SA_ArgsNext ( PT_Node_t* token_node );
-
-error( _Bool ) SA_ARG_Type ( PT_Node_t* token_node );
-
-error( _Bool ) SA_Params ( PT_Node_t* token_node );
-
-error( _Bool ) SA_ParamsNext ( PT_Node_t* token_node );
+error( _Bool ) SA_ParamsNext ( PT_Node_t** token_node );
 
 error( _Bool ) SA_Type ( PT_Node_t* token_node );
 
@@ -69,16 +61,16 @@ bool isInTokens ( tokenType Token, const tokenType * TokenList );
 
 /**
  * @brief Get next token and check if it's descriptot is equal to @p TokenName
- * If equal return true. //TODO insert to progtree
+ * If equal return true and insert token into the Abstract syntactic tree and return the new node through @p new_node
  * If not equal return false and return token back to scanner
  */
-error(_Bool) isNextToken( tokenType TokenName );
+error(_Bool) isNextToken( tokenType TokenName, PT_Node_t* token_node );
 
 /**
  * @brief Read and destroy all tokens from set of tokens @p which
  * Used to skip expressions
  * @param which
  */
-error(none) skipTokens ( const tokenType * which );
+error(none) skipTokens ( const tokenType * which, PT_Node_t* token_node );
 
 #endif
