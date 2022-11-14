@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "headers/IFJ_2022.h"
 #include "headers/error_infrastructure.h"
 

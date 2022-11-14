@@ -2,6 +2,17 @@
 #include "headers/vector.h"
 #include "headers/vector_ord.h"
 
+enum VEC_ORDERING STRING_CMP(const char* a, const char* b) {
+int comparison = strcmp(a, b);
+if (comparison < 0) {
+return LESS_VEC;
+} else if (comparison > 0) {
+return GREATER_VEC;
+} else {
+return EQUAL_VEC;
+}
+}
+
 DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(char, char);
 DEFINE_VEC_ORD_FUNCTIONS(char, char, SIMPLE_CMP);
 DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(unsigned_char, unsigned_char);
