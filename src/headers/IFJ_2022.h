@@ -5,6 +5,8 @@
 #include "vector.h"
 #include "vector_ord.h"
 
+#define DEFAULT_SIZE_INTER 10
+
 typedef long long long_long;
 typedef unsigned char unsigned_char;
 typedef unsigned short unsigned_short;
@@ -117,7 +119,7 @@ typedef struct token
     {
         int integer;
         double decNuber;
-        char* string;
+        const char* string;
     } info;
 } token_t ;
 
