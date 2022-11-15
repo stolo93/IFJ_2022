@@ -10,6 +10,7 @@
 #include <stdbool.h>
 #include "IFJ_2022.h"
 #include "error.h"
+#include "interner.h"
 
 #define DEFAULT_SIZE 20
 #define NUM_OF_KWORDS 11

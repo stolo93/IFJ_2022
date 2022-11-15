@@ -15,7 +15,15 @@
 #include "headers/scaner.h"
 #include "headers/error.h"
 #include "headers/htab.h"
+#include "headers/interner.h"
 
+extern interner* interner_ptr;
+
+#define __interning() do{ id = intern( interner_ptr , info );\
+                      if(  is_error( id )){\
+                        forward_error( id , token_ptr );}\
+                      newToken->info.string = id._value;\
+                      }while ( 0 )\
 /** Function for resizing strings
  *
  *  @param string which will be resized
@@ -254,9 +262,9 @@ tokenType firstState ( int character )
  *  
  *  @return token or NULL pionter if error occured
  ***/
-error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
+error(token_ptr) getToken( ) //htab_pair_t_ptr table
 {
-    if ( table == NULL )
+    if ( interner_ptr == NULL )
     {
         return_error( ERROR_LEX_NOTABLE , token_ptr );
     }
@@ -271,6 +279,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
     unsigned int counter = 1 ;
     unsigned int size = DEFAULT_SIZE;
     tokenType state = def;
+    error( intern_id ) id;
 
     token_t* newToken = ( token_t* ) malloc( sizeof( token_t ) ) ;
     char* info = ( char* ) calloc ( DEFAULT_SIZE , sizeof( char ) );
@@ -353,17 +362,8 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                     return_error(ERROR_MAL,token_ptr); 
                                 }
                                 ungetc ( character , stdin ); //in case if following character wasn't whitespace
-                                newToken->info.string = info;
-
-                                error( htab_pair_t_ptr ) returnVal =  htab_lookup_add( table , info , function );
-
-                                if( is_error( returnVal ))
-                                {
-                                    free(info);
-                                    free( newToken );
-                                    forward_error( returnVal , token_ptr);
-                                }
-
+                                
+                                __interning();
                                 return_value( newToken , token_ptr );
                             }
                             ungetc(character , stdin );
@@ -389,20 +389,9 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                 free( newToken ) ;
                                 return_error( ERROR_MAL , token_ptr ); 
                             }
-
                             newToken->discriminant = checkForKeyword ( info );
-                            newToken->info.string = info ;
-
-                            if( newToken->discriminant == identOfFunct )
-                            {
-                                error( htab_pair_t_ptr ) returnVal =  htab_lookup_add( table , info , function );
-                                if( is_error( returnVal ))
-                                {
-                                    free(info);
-                                    free( newToken );
-                                    forward_error( returnVal , token_ptr);
-                                }
-                            }
+                            
+                            __interning();
                             return_value( newToken , token_ptr );
 
             case identOfTypeN :
@@ -436,9 +425,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                 free( newToken );
                                 return_error(ERROR_LEX_DTYPE, token_ptr );
                             }
-
-                            newToken->info.string = info ;
-
+                            __interning();
                             return_value( newToken , token_ptr ); 
 
             case integer :
@@ -522,8 +509,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
 
                                     return_error( ERROR_MAL , token_ptr );
                                 }
-
-                                newToken->info.string = info ;
+                                __interning();
                                 return_value( newToken , token_ptr ) ; 
                             }
 
@@ -544,8 +530,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                     return_error( ERROR_MAL , token_ptr );
                                 }
                                 newToken->discriminant = division;
-                                newToken->info.string = info;
-
+                                __interning();
                                 return_value( newToken , token_ptr );
                             }
                             else if( character == '/' )
@@ -565,7 +550,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                 free( info );
                                 free( newToken );
 
-                                return getToken( table ); 
+                                return getToken( interner_ptr ); 
                             }   
                             break; 
             case multiLineComm:
@@ -586,7 +571,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                 free ( info ) ;
                                 free ( newToken ) ; // free everything and call recursively getToken to get token  
                                 
-                                return getToken( table ); 
+                                return getToken( interner_ptr ); 
                     
                             }
                             else if( character == EOF ) //unterminated ml comment
@@ -621,8 +606,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                 free( newToken );
                                 return_error( ERROR_MAL , token_ptr );
                             }
-                            newToken->info.string = info;
-
+                            __interning();
                             return_value( newToken , token_ptr );
             case lessOper :
                             if ( character == '=' ){
@@ -630,39 +614,16 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                 newToken->discriminant = lessOrEqOper ;
                                 info [ counter ] = character;
                                 counter++;
-
                             }
-                            /*else if ( character == '?') //signature of prolog 
-                            {
-                                ungetc( character , stdin );
-                                ungetc( info[0] , stdin );
-
-                                free( info );
-
-                                if( !checkProlog() ) 
-                                {
-                                    free( newToken );
-                                    return_error( ERROR_LEX_PROLOG , token_ptr );
-                                }
-
-                                newToken->discriminant = prolog;
-                                newToken->info.integer = 1;
-
-                                return_value( newToken , token_ptr ); 
-
-                            }*/
-                            //else
-                            //{
                             ungetc( character , stdin );
-                            //} 
+                            
                             if( ! finalResize( &info ,counter) )
                             {
                                 free( info ) ;
                                 free( newToken ) ;
                                 return_error( ERROR_MAL , token_ptr );
                             }
-
-                            newToken->info.string = info ;
+                            __interning();
                             return_value( newToken , token_ptr );
         
             case moreOper :
@@ -684,7 +645,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                 return_error( ERROR_MAL , token_ptr );
                             }
 
-                            newToken->info.string = info ;
+                            __interning();
                             return_value( newToken , token_ptr ) ;
             case EqOper :
                         if ( counter == 1 && character != '=' )
@@ -700,7 +661,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
 
                                 return_error( ERROR_MAL , token_ptr );
                             }
-                            newToken->info.string = info ;
+                            __interning();
 
                             return_value( newToken , token_ptr );
                         }
@@ -722,7 +683,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                 return_error( ERROR_MAL , token_ptr );
                             }
 
-                            newToken->info.string = info ;
+                            __interning();
 
                             return_value( newToken , token_ptr ); 
                         }
@@ -750,7 +711,7 @@ error(token_ptr) getToken( htab_t_ptr table) //htab_pair_t_ptr table
                                     free( newToken );
                                     return_error( ERROR_MAL , token_ptr );
                                 }
-                                newToken->info.string = info;
+                                __interning();
 
                                 return_value( newToken , token_ptr );
                             }
@@ -842,7 +803,7 @@ error(none) returnToken( token_ptr retToken)
         ungetc( (int) retToken->info.string [ counter ] , stdin );
     } 
 
-    free( retToken->info.string );
+    //free( (char*)retToken->info.string );
     free( retToken );
     return_none();
 }

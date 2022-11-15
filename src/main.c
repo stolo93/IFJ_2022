@@ -1,12 +1,27 @@
 #include <stdio.h>
 #include "headers/IFJ_2022.h"
 #include "headers/error_infrastructure.h"
+#include "headers/interner.h"
+
+error( interner ) init;
+interner* interner_ptr;
+
 
 // All code that would go into main goes here
 // Please change the name to a better one
 error(none) real_main(int argc, char** argv) {
     (void) argc;
     (void) argv;
+
+    init = interner_new_with_capacity( DEFAULT_SIZE_INTER );
+    if( is_error( init ))
+    {
+        forward_error( init , none );
+    }
+    interner_ptr = &init._value;
+
+    (void) interner_ptr;
+    (void) init._value;
 
     return_none();
 }
