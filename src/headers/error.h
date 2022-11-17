@@ -106,7 +106,7 @@ typedef struct ERR_INFO_ {
  *
  * It is undefined behaviour to extract a value from an /p error_obj which contains an error
  */
-#define get_value_unchecked(variable_type, variable_name, error_obj) __typeof__(variable_type) variable_name = (error_obj)._value
+#define get_value_unchecked(variable_type, variable_name, error_obj) __typeof__(variable_type) (variable_name) = (error_obj)._value
 
 /**
  * Returns an error object containing the /p error_kind

@@ -39,7 +39,7 @@ error( PT_Node_ptr ) PT_AddSibling ( PT_Node_t * node, PT_Data_t data )
     }
 
     error(PT_Node_ptr) tmp_node = PT_CreateNode ( data );
-    get_value(PT_Node_ptr, new_node, tmp_node, PT_Node_ptr);
+    get_value(PT_Node_ptr, new_node, tmp_node, PT_Node_ptr); // NOLINT clang-analyzer-unix.Malloc
 
     node->rightSibling = new_node;
 
@@ -57,7 +57,7 @@ error( PT_Node_ptr ) PT_AddChild ( PT_Node_t * node, PT_Data_t data )
     if ( node->leftChild == NULL ) //In case @p node was childless
     {
         error(PT_Node_ptr) tmp_node = PT_CreateNode( data );
-        get_value(PT_Node_ptr, new_node, tmp_node, PT_Node_ptr);
+        get_value(PT_Node_ptr, new_node, tmp_node, PT_Node_ptr); // NOLINT clang-analyzer-unix.Malloc
 
         node->leftChild = new_node;
 

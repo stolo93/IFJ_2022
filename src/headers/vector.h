@@ -40,7 +40,7 @@ error(none) vec_ ## suffix ## _shrink_to_fit(vec_ ## suffix * vec);
 // Assumes there's empty space in front of the used buffer
 #define VEC_SHIFT_ELEMENTS_FORWARD(vec, suffix) for (size_t i = (vec)->len__; i > 0; i--) {(vec) -> data[i] = (vec) -> data[i - 1];}
 
-#define VEC_SHIFT_ELEMENTS_BACKWARDS(vec, suffix) for (size_t i = 1; i < vec->len__; i++) {(vec) -> data[i - 1] = (vec) -> data[i];}
+#define VEC_SHIFT_ELEMENTS_BACKWARDS(vec, suffix) for (size_t i = 1; i < (vec)->len__; i++) {(vec) -> data[i - 1] = (vec) -> data[i];}
 
 #define DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(type, suffix)                                \
 vec_ ## suffix new_vec_ ## suffix () {                                                  \

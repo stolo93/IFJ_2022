@@ -27,7 +27,7 @@ unsigned long  htab_hash_function(const char *str) {
     unsigned long hash =  5381 ;
     int c;
 
-    while( (c = *str++ ))
+    while( (c = (unsigned char)*str++ ))
     {
         hash = ((hash << 5) + hash ) + c;
     }

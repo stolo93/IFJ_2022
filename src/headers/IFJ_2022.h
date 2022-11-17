@@ -76,8 +76,8 @@ DEFINE_VEC_ORD_PROTOTYPES(int, int);
 DEFINE_VEC_PROTOTYPES(unsigned_int, unsigned_int);
 DEFINE_VEC_ORD_PROTOTYPES(unsigned_int, unsigned_int);
 
-DEFINE_VEC_PROTOTYPES(long, long)
-DEFINE_VEC_ORD_PROTOTYPES(long, long)
+DEFINE_VEC_PROTOTYPES(long, long);
+DEFINE_VEC_ORD_PROTOTYPES(long, long);
 DEFINE_VEC_PROTOTYPES(unsigned_long, unsigned_long);
 DEFINE_VEC_ORD_PROTOTYPES(unsigned_long, unsigned_long);
 

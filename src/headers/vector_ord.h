@@ -6,7 +6,7 @@
 #include "IFJ_2022.h"
 
 #ifndef CACHE_LINE_SIZE
-#define CACHE_LINE_SIZE 64
+#define CACHE_LINE_SIZE (size_t)64
 #endif
 
 // Using vec suffix so we don't alias common verbs
@@ -16,7 +16,7 @@ enum VEC_ORDERING {
     GREATER_VEC,
 };
 
-#define SIMPLE_CMP(a, b) ((a < b) ? LESS_VEC : (a > b) ? GREATER_VEC : EQUAL_VEC)
+#define SIMPLE_CMP(a, b) (((a) < (b)) ? LESS_VEC : ((a) > (b)) ? GREATER_VEC : EQUAL_VEC)
 #define ORD_REVERSE(ord) ((ord) == LESS_VEC) ? GREATER_VEC : ((ord) == GREATER_VEC) ? LESS_VEC : EQUAL_VEC
 
 enum VEC_ORDERING STRING_CMP(const char* a, const char* b);
@@ -41,7 +41,7 @@ bool vec_ ## suffix ## _is_sorted(const vec_ ## suffix * vec) {                 
 }                                                                                      \
                                                                                        \
 void vec_ ## suffix ## _insertion_sort(vec_ ## suffix * vec) {                         \
-    for (size_t i = 1; i < vec->len__; i++) {                                          \
+    for (size_t i = 1; i < (vec)->len__; i++) {                                          \
         type comparator = vec->data[i];                                                \
         size_t j = i - 1;                                                              \
         while (ORD_FUNCTION(vec->data[j], comparator) == GREATER_VEC){                 \

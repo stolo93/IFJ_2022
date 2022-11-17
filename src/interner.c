@@ -1,8 +1,10 @@
-#include <stddef.h>
+#define __STDC_WANT_LIB_EXT1__ 1
+
+#include <stdlib.h>
 
 #include "headers/interner.h"
 
-#define interner_error_reducer(string) free((void*)string);
+#define interner_error_reducer(string) free((void*)(string));
 DEFINE_VEC_FUNCTIONS_WITH_DESTRUCTOR(string_t, string, interner_error_reducer);
 DEFINE_VEC_ORD_FUNCTIONS(string_t, string, STRING_CMP);
 
@@ -39,7 +41,11 @@ error(intern_id) intern_copy(interner* interner_obj, const char* string) {
         return_error(ERROR_MAL, intern_id);
     }
 
-    memcpy(new_string, string, string_len);
+#ifdef __STDC_LIB_EXT1__
+    memcpy_s(new_string, string, string_len);
+#else
+    memcpy(new_string, string, string_len); // NOLINT (clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling)
+#endif
 
     return intern(interner_obj, new_string);
 }

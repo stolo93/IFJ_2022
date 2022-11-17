@@ -5,6 +5,7 @@
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
 
+// NOLINTBEGIN (bugprone-suspicious-include)
 #include "./htab_lib/htab_clear.c"
 #include "./htab_lib/htab_erase.c"
 #include "./htab_lib/htab_find.c"
@@ -16,3 +17,4 @@
 #include "./htab_lib/htab_resize.c"
 #include "./htab_lib/htab_size.c"
 #include "./htab_lib/htab_vec_functions.c"
+// NOLINTEND (bugprone-suspicious-include)
