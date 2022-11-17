@@ -16,6 +16,8 @@ enum VEC_ORDERING {
     GREATER_VEC,
 };
 
+// NOLINTBEGIN (bugprone-macro-parentheses)
+
 #define SIMPLE_CMP(a, b) (((a) < (b)) ? LESS_VEC : ((a) > (b)) ? GREATER_VEC : EQUAL_VEC)
 #define ORD_REVERSE(ord) ((ord) == LESS_VEC) ? GREATER_VEC : ((ord) == GREATER_VEC) ? LESS_VEC : EQUAL_VEC
 
@@ -25,9 +27,9 @@ enum VEC_ORDERING STRING_CMP(const char* a, const char* b);
 void vec_ ## suffix ## _sort(vec_ ## suffix * vec);                            \
 void vec_ ## suffix ## _sort_unstable(vec_ ## suffix * vec);                   \
 bool vec_ ## suffix ## _is_sorted(const vec_ ## suffix * vec);                 \
-type* vec_ ## suffix ## _find(const vec_ ## suffix * vec, type item);          \
-type* vec_ ## suffix ## _find_sorted(const vec_ ## suffix * vec, type item);   \
-error(none) vec_ ## suffix ## _insert_sorted(vec_ ## suffix * vec, type item); \
+typeof(type*) vec_ ## suffix ## _find(const vec_ ## suffix * vec, typeof(type) item);          \
+typeof(type*) vec_ ## suffix ## _find_sorted(const vec_ ## suffix * vec, typeof(type) item);   \
+error(none) vec_ ## suffix ## _insert_sorted(vec_ ## suffix * vec, typeof(type) item); \
 
 // ORD_FUNCTION takes two instances of a vec value and returns VEC_ORDERING
 // Sorts are adaptive and switch to insertion sort for small enough sequences
@@ -41,8 +43,8 @@ bool vec_ ## suffix ## _is_sorted(const vec_ ## suffix * vec) {                 
 }                                                                                      \
                                                                                        \
 void vec_ ## suffix ## _insertion_sort(vec_ ## suffix * vec) {                         \
-    for (size_t i = 1; i < (vec)->len__; i++) {                                          \
-        type comparator = vec->data[i];                                                \
+    for (size_t i = 1; i < (vec)->len__; i++) {                                        \
+        typeof(type) comparator = vec->data[i];                                        \
         size_t j = i - 1;                                                              \
         while (ORD_FUNCTION(vec->data[j], comparator) == GREATER_VEC){                 \
             vec->data[j + 1] = vec->data[j];                                           \
@@ -61,20 +63,20 @@ void vec_ ## suffix ## _sort(vec_ ## suffix * vec) {                            
 }                                                                                      \
                                                                                        \
 size_t vec_ ## suffix ## _partition(vec_ ## suffix * vec) {                            \
-    type pivot = vec->data[vec->len__ - 1];                                            \
+    typeof(type) pivot = vec->data[vec->len__ - 1];                                    \
                                                                                        \
     size_t smaller = -1;                                                               \
                                                                                        \
     for (size_t larger = 0; larger <= vec->len__ - 2; larger++) {                      \
         if (ORD_FUNCTION(vec->data[larger], pivot) == LESS_VEC) {                      \
             smaller++;                                                                 \
-            type temp = vec->data[smaller];                                            \
+            typeof(type) temp = vec->data[smaller];                                    \
             vec->data[smaller] = vec->data[larger];                                    \
             vec->data[larger] = temp;                                                  \
         }                                                                              \
     }                                                                                  \
                                                                                        \
-    type temp = vec->data[smaller + 1];                                                \
+    typeof(type) temp = vec->data[smaller + 1];                                        \
     vec->data[smaller + 1] = vec->data[vec->len__ - 1];                                \
     vec->data[vec->len__ - 1] = temp;                                                  \
     return smaller + 1;                                                                \
@@ -111,7 +113,7 @@ void vec_ ## suffix ## _sort_unstable(vec_ ## suffix * vec) {                   
     }                                                                                  \
 }                                                                                      \
                                                                                        \
-type* vec_ ## suffix ## _find(const vec_ ## suffix * vec, type item) {                 \
+typeof(type*) vec_ ## suffix ## _find(const vec_ ## suffix * vec, typeof(type) item) { \
     for (size_t i = 0; i < vec->len__; ++i) {                                          \
         if (ORD_FUNCTION(vec->data[i], item) == EQUAL_VEC) {                           \
             return vec->data + i;                                                      \
@@ -121,7 +123,7 @@ type* vec_ ## suffix ## _find(const vec_ ## suffix * vec, type item) {          
     return NULL;                                                                       \
 }                                                                                      \
                                                                                        \
-size_t vec_ ## suffix ## _binary_search(const vec_ ## suffix * vec, type item) {       \
+size_t vec_ ## suffix ## _binary_search(const vec_ ## suffix*vec, typeof(type) item) { \
     size_t left = 0;                                                                   \
     size_t right = vec->len__;                                                         \
                                                                                        \
@@ -137,7 +139,7 @@ size_t vec_ ## suffix ## _binary_search(const vec_ ## suffix * vec, type item) {
     return left;                                                                       \
 }                                                                                      \
                                                                                        \
-type* vec_ ## suffix ## _find_sorted(const vec_ ## suffix * vec, type item) {          \
+typeof(type*) vec_ ## suffix ## _find_sorted(const vec_ ## suffix*vec, typeof(type) item) {  \
     size_t location = vec_ ## suffix ## _binary_search(vec, item);                     \
                                                                                        \
     if (ORD_FUNCTION(vec->data[location], item) == EQUAL_VEC) {                        \
@@ -147,7 +149,7 @@ type* vec_ ## suffix ## _find_sorted(const vec_ ## suffix * vec, type item) {   
     return NULL;                                                                       \
 }                                                                                      \
                                                                                        \
-error(none) vec_ ## suffix ## _insert_sorted(vec_ ## suffix * vec, type item) {        \
+error(none) vec_ ## suffix ## _insert_sorted(vec_ ## suffix * vec, typeof(type) item) {        \
     if ((vec)->len__ >= (vec)->capacity__) {                                           \
         error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__);        \
         if (is_error(result)) {                                                        \
@@ -159,5 +161,7 @@ error(none) vec_ ## suffix ## _insert_sorted(vec_ ## suffix * vec, type item) { 
     vec_ ## suffix ## _insert(vec, location, item);                                    \
     return_none();                                                                     \
 }                                                                                      \
+
+// NOLINTEND (bugprone-macro-parentheses)
 
 #endif //IFJ_2022_VECTOR_ORD_H

@@ -69,7 +69,9 @@ char * findDot( char* info )
 {
     for(unsigned int counter = 0 ; counter < strlen( info ) ; counter++ )
     {
-        if( info [ counter ] == '.') return info + counter ;
+        if( info [ counter ] == '.') {
+            return info + counter ;
+        }
     }
 
     return NULL;
@@ -113,25 +115,39 @@ bool mapStringToKeyword(const char* str, tokenType* token) {
     if (strcmp(str, "") == 0) {
         *token = def;
         return true;
-    } else if (strcmp(str, "else") == 0) {
+    }
+
+    if (strcmp(str, "else") == 0) {
         *token = elseT;
         return true;
-    } else if (strcmp(str, "function") == 0) {
+    }
+
+    if (strcmp(str, "function") == 0) {
         *token = functionT;
         return true;
-    } else if (strcmp(str, "if") == 0) {
+    }
+
+    if (strcmp(str, "if") == 0) {
         *token = ifT;
         return true;
-    } else if (strcmp(str, "null") == 0) {
+    }
+
+    if (strcmp(str, "null") == 0) {
         *token = nullT;
         return true;
-    } else if (strcmp(str, "return") == 0) {
+    }
+
+    if (strcmp(str, "return") == 0) {
         *token = returnT;
         return true;
-    } else if (strcmp(str, "void") == 0) {
+    }
+
+    if (strcmp(str, "void") == 0) {
         *token = voidT;
         return true;
-    } else if (strcmp(str, "while") == 0) {
+    }
+
+    if (strcmp(str, "while") == 0) {
         *token = whileT;
         return true;
     }
@@ -147,9 +163,9 @@ bool isStringAType(const char* str) {
     //NOLINTNEXTLINE (bugprone-branch-clone)
     if (strcmp(str, "float") == 0) {
         return true;
-    } else if (strcmp(str, "int") == 0) {
+    } if (strcmp(str, "int") == 0) {
         return true;
-    } else if (strcmp(str, "string") == 0) {
+    } if (strcmp(str, "string") == 0) {
         return true;
     }
 
@@ -221,7 +237,9 @@ token_t* convertNum ( token_t* newToken , char* info )
     
     newToken->discriminant = decNum;
     newToken->info.decNuber = strtod( info , NULL );
-    if( errno == ERANGE) newToken->info.decNuber = -1.0;
+    if( errno == ERANGE) {
+        newToken->info.decNuber = -1.0;
+    }
     return newToken;
 }
 
@@ -232,28 +250,28 @@ token_t* convertNum ( token_t* newToken , char* info )
  ***/
 tokenType firstState ( int character )
 {
-    if ( character == '$') return identOfVar;
-    else if ( isalpha( character ) || character == '_') return identOfFunct;
-    else if ( character == '?' ) return identOfTypeN;
-    else if ( isdigit( character ) ) return integer;
-    else if ( character == '"' ) return string;
-    else if ( character == '/' ) return division;
-    else if ( character == '+' ) return plusSign;
-    else if ( character == '-' ) return minusSign;
-    else if ( character == '*' ) return multiply;
-    else if ( character == '.' ) return concatenation;
-    else if ( character == '<' ) return lessOper;
-    else if ( character == '>' ) return moreOper;
-    else if ( character == '=' ) return EqOper;
-    else if ( character == ':' ) return colon;
-    else if ( character == ';' ) return semicolon;
-    else if ( character == ',' ) return comma;
-    else if ( character == '(' ) return openParen;
-    else if ( character == ')' ) return closeParen;
-    else if ( character == '{' ) return openSetParen;
-    else if ( character == '}' ) return closeSetParen;
-    else if ( character == '!' ) return notEqOper ;
-    else return def;
+    if ( character == '$') { return identOfVar; }
+    if ( isalpha( character ) || character == '_') { return identOfFunct; }
+    if ( character == '?' ) { return identOfTypeN;}
+    if ( isdigit( character ) ) { return integer; }
+    if ( character == '"' ) { return string; }
+    if ( character == '/' ) { return division; }
+    if ( character == '+' ) { return plusSign; }
+    if ( character == '-' ) { return minusSign; }
+    if ( character == '*' ) { return multiply; }
+    if ( character == '.' ) { return concatenation; }
+    if ( character == '<' ) { return lessOper; }
+    if ( character == '>' ) { return moreOper; }
+    if ( character == '=' ) { return EqOper; }
+    if ( character == ':' ) { return colon; }
+    if ( character == ';' ) { return semicolon; }
+    if ( character == ',' ) { return comma; }
+    if ( character == '(' ) { return openParen; }
+    if ( character == ')' ) { return closeParen; }
+    if ( character == '{' ) { return openSetParen; }
+    if ( character == '}' ) { return closeSetParen; }
+    if ( character == '!' ) { return notEqOper; }
+    return def;
 
 }
 
@@ -307,7 +325,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
         return_value( newToken , token_ptr );
     }
     // discards whitespace characters 
-    while( isspace( character = getc( stdin ) ) && character != EOF );
+    while( isspace( character = getc( stdin ) ) && character != EOF ) {}
 
     //if EOF is encountered special token is sent
     if( character == EOF )
@@ -434,7 +452,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             
                             if ( isdigit( character ) )
                             {
-                                if(! exp ) sign = false; //if there was 'e' and it was followed by num sign can't appear
+                                if(! exp ) { sign = false; } //if there was 'e' and it was followed by num sign can't appear
                                 err = false;             //this marks that 'e' or '.' was followed by number  
 
                                 info [ counter ] = (char)character ;
@@ -450,7 +468,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 counter++ ;
                                 break; 
                             }
-                            else if ( ( character == 'e' || character == 'E' ) && exp && !err )
+                            if ( ( character == 'e' || character == 'E' ) && exp && !err )
                             {
                                 exp = false; //this marks that 'e' appeared in number
                                 dot = false; //this further marks that '.' won't be part of number
@@ -460,7 +478,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 counter++ ;
                                 break ;
                             }
-                            else if ( ( character == '+' || character == '-' ) && sign && !exp)
+                            if ( ( character == '+' || character == '-' ) && sign && !exp)
                             {
                                 sign = false; //this marks that sign appeared in number
                                 info [ counter ] = (char)character ;
@@ -482,11 +500,11 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             free ( info );
                             if( newToken->discriminant == decNum )
                             {
-                                if(newToken->info.decNuber == -1.0) return_error( ERROR_LEX,token_ptr);
+                                if(newToken->info.decNuber == -1.0) { return_error( ERROR_LEX,token_ptr); }
                             }
                             else if (newToken->discriminant == integer )
                             {
-                                if ( newToken->info.integer == -1 ) return_error( ERROR_LEX , token_ptr );
+                                if ( newToken->info.integer == -1 ) { return_error( ERROR_LEX , token_ptr ); }
                             }                          
 
                             return_value( newToken , token_ptr );
@@ -817,9 +835,9 @@ error(none) returnToken( token_ptr retToken)
 int skipWhiteSpaceAndCmpChar ( int cmp )
 {
     int character = 0;
-    while ( (character = getc ( stdin )) != EOF && isspace( character )) ;
+    while ( (character = getc ( stdin )) != EOF && isspace( character )) {}
 
-    if ( character != cmp ) return 0;
+    if ( character != cmp ) { return 0; }
 
     return character ;
 }
@@ -847,7 +865,7 @@ int checkProlog ()
         string [ counter ] = (char)character ;
     }
 
-    if ( strcmp ( string , "<?php" ) != 0) return 0;
+    if ( strcmp ( string , "<?php" ) != 0) { return 0; }
 
     while( ( character = getc( stdin ) ) != EOF )
     {
@@ -930,7 +948,7 @@ int checkProlog ()
         return 0; 
 
     }
-    while ( (character = getc ( stdin )) != EOF && isspace( character )) ;
+    while ( (character = getc ( stdin )) != EOF && isspace( character )) {}
 
     counter = 1 ;
     if ( character != 'd' )
@@ -951,11 +969,11 @@ int checkProlog ()
         }
     }
 
-    if ( strcmp( string2 , "declare" ) != 0 ) return 0 ;
+    if ( strcmp( string2 , "declare" ) != 0 ) { return 0 ; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( '(' ) ) return 0;
+    if ( ! skipWhiteSpaceAndCmpChar( '(' ) ) { return 0; }
 
-    if ( (character = skipWhiteSpaceAndCmpChar( 's' )) == 0) return 0;
+    if ( (character = skipWhiteSpaceAndCmpChar( 's' )) == 0) { return 0; }
 
     
     counter = 1 ;
@@ -971,15 +989,15 @@ int checkProlog ()
         }
     }
     
-    if ( strcmp( string3 , "strict_types" ) != 0 ) return 0 ;
+    if ( strcmp( string3 , "strict_types" ) != 0 ) { return 0 ; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( '=') ) return 0 ;
+    if ( ! skipWhiteSpaceAndCmpChar( '=') ) { return 0 ; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( '1' ) ) return 0;
+    if ( ! skipWhiteSpaceAndCmpChar( '1' ) ) { return 0; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( ')' )) return 0;
+    if ( ! skipWhiteSpaceAndCmpChar( ')' )) { return 0; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( ';' )) return 0;
+    if ( ! skipWhiteSpaceAndCmpChar( ';' )) { return 0; }
 
      return 2;     
 
