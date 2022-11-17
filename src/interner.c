@@ -18,13 +18,11 @@ error(interner) interner_new_with_capacity(size_t capacity) {
 }
 
 error(intern_id) intern(interner* interner_obj, char* string) {
-    if (vec_string_len(&(interner_obj->strings)) == 0) {
-        vec_string_push_front(&(interner_obj->strings), string);
-        return_value(string, intern_id);
-    }
-
     size_t index = vec_string_binary_search(&(interner_obj->strings), string);
-    if (strcmp(string, interner_obj->strings.data[index]) == 0) {
+    if (index == vec_string_len(&(interner_obj->strings))) {
+        vec_string_push_back(&(interner_obj->strings), string);
+        return_value(string, intern_id);
+    } else if (strcmp(string, interner_obj->strings.data[index]) == 0) {
         free((void*)string);
         return_value(interner_obj->strings.data[index], intern_id);
     } else {
