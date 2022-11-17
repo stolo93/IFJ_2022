@@ -47,7 +47,7 @@ error(_Bool ) htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
                 free((char*)text);
                 return_value(false , bool );
 
-            }else if(strcmp(text,tmp->pair.key)){
+            }else if(strcmp(text,tmp->pair.key) != 0){
 
                 free((char*)tmp->pair.key);
                 tmp->pair.key = (char*)text;       //restoring right key

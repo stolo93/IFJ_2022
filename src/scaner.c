@@ -9,9 +9,9 @@
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include <math.h>
 #include <errno.h>
 #include <limits.h>
+#include <stdint.h>
 #include "headers/scaner.h"
 #include "headers/error.h"
 #include "headers/htab.h"
@@ -144,6 +144,7 @@ bool mapStringToKeyword(const char* str, tokenType* token) {
  *  @return success of finding data type
  ***/
 bool isStringAType(const char* str) {
+    //NOLINTNEXTLINE (bugprone-branch-clone)
     if (strcmp(str, "float") == 0) {
         return true;
     } else if (strcmp(str, "int") == 0) {
@@ -298,6 +299,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
         int correct = checkProlog();
         if ( correct == 0 )
         {
+            free(newToken);
             return_error( ERROR_LEX_PROLOG , token_ptr );
         }  
         newToken->info.integer = correct;
@@ -329,7 +331,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
         return_error(ERROR_LEX,token_ptr);  
     }
 
-    info[0] = character ;
+    info[0] = (char)character ;
 
     while( true )
     {
@@ -341,14 +343,14 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             if ( counter == 1 && ( isalpha( character ) || character == '_'))
                             {   
                                 //control if following character isn't number or other invalid character 
-                                info [ counter ] = character;
+                                info [ counter ] = (char)character;
                                 endState = true;   
                                 counter++;
                                 break;
                             }
                             else if ( counter > 1 && ( isalnum( character ) || character == '_') )
                             {
-                                info [ counter ] = character ;
+                                info [ counter ] = (char)character ;
                                 counter++;
                                 break;
                             }
@@ -376,7 +378,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
 
                             if ( isalnum ( character ) || character == '_' )
                             {
-                                info [ counter ] = character;    
+                                info [ counter ] = (char)character;
                                 counter++ ;
                                 break ;
                             }
@@ -407,7 +409,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             }
                             if ( islower ( character ) ) //after '?' I know there can't upper case character
                             {                            // so I send it down right away to be returned as error
-                                info [ counter ] = character ;
+                                info [ counter ] = (char)character ;
                                 counter++ ;
                                 break ;
                             }
@@ -435,7 +437,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 if(! exp ) sign = false; //if there was 'e' and it was followed by num sign can't appear
                                 err = false;             //this marks that 'e' or '.' was followed by number  
 
-                                info [ counter ] = character ;
+                                info [ counter ] = (char)character ;
                                 counter++ ;
                                 break ;
                             }
@@ -444,7 +446,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             {
                                 dot = false;              //this marks that '.' appeared in number
                                 err = true;               //following character must be number otherwise error state
-                                info [ counter ] = character ;
+                                info [ counter ] = (char)character ;
                                 counter++ ;
                                 break; 
                             }
@@ -454,14 +456,14 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 dot = false; //this further marks that '.' won't be part of number
                                 err = true;  //following character can only be number or sign
 
-                                info [ counter ] = character ;
+                                info [ counter ] = (char)character ;
                                 counter++ ;
                                 break ;
                             }
                             else if ( ( character == '+' || character == '-' ) && sign && !exp)
                             {
                                 sign = false; //this marks that sign appeared in number
-                                info [ counter ] = character ; 
+                                info [ counter ] = (char)character ;
                                 counter++ ;                    
                                                                
                                 break;  
@@ -500,7 +502,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             
                             if ( character == '"' )
                             {
-                                info [ counter ] = character;
+                                info [ counter ] = (char)character;
                                 counter++;
                                 if( ! finalResize( &info ,counter) )
                                 {
@@ -513,7 +515,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 return_value( newToken , token_ptr ) ; 
                             }
 
-                            info [ counter ] = character;
+                            info [ counter ] = (char)character;
 
                             counter++;
                             break;
@@ -612,7 +614,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             if ( character == '=' ){
 
                                 newToken->discriminant = lessOrEqOper ;
-                                info [ counter ] = character;
+                                info [ counter ] = (char)character;
                                 counter++;
                             }
                             ungetc( character , stdin );
@@ -630,7 +632,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             if ( character == '=' ){
 
                                 newToken->discriminant = moreOrEqOper ;
-                                info [ counter ] = character;
+                                info [ counter ] = (char)character;
                                 counter++;
 
                             }
@@ -667,13 +669,13 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                         }
                         else if ( counter == 1 && character == '=' )
                         {
-                            info [ counter ] = character ;
+                            info [ counter ] = (char)character ;
                             counter++ ;
                             break;
                         }
                         if ( counter == 2 && character == '=' )
                         {
-                            info [ counter ] = character ;
+                            info [ counter ] = (char)character ;
                             counter++;
 
                             if ( ! finalResize ( &info ,counter) )
@@ -697,13 +699,13 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
             case notEqOper:
                             if ( counter == 1 && character == '=' )
                             {
-                                info [ counter ] = character ;
+                                info [ counter ] = (char)character ;
                                 counter++;
                                 break;
                             }
                             if ( counter == 2 && character == '=' )
                             {
-                                info [ counter ] = character ;
+                                info [ counter ] = (char)character ;
                                 counter++;
                                 if ( ! finalResize( &info ,counter))
                                 {
@@ -785,9 +787,9 @@ error(none) returnToken( token_ptr retToken)
         }
        
         
-        int counter = strlen( string ) - 1; 
+        size_t counter = strlen( string ) - 1;
 
-        for(; counter >= 0; counter-- )
+        for(; counter != SIZE_MAX; counter-- )
         {
             ungetc( (int) string [ counter ] , stdin );
         }
@@ -796,9 +798,9 @@ error(none) returnToken( token_ptr retToken)
         return_none();
     }
     
-    int counter = strlen( retToken->info.string ) - 1; 
+    size_t counter = strlen( retToken->info.string ) - 1;
 
-    for( ; counter >= 0 ; counter-- )
+    for( ; counter != SIZE_MAX ; counter-- )
     {
         ungetc( (int) retToken->info.string [ counter ] , stdin );
     } 
@@ -842,10 +844,10 @@ int checkProlog ()
     for( unsigned int counter = 0 ; counter < LEN_OF_PROLSYM - 1 ; counter ++)
     {
         character = getc( stdin ) ;
-        string [ counter ] = character ;
+        string [ counter ] = (char)character ;
     }
 
-    if ( strcmp ( string , "<?php" )) return 0;
+    if ( strcmp ( string , "<?php" ) != 0) return 0;
 
     while( ( character = getc( stdin ) ) != EOF )
     {
@@ -914,7 +916,7 @@ int checkProlog ()
                         break ;
             default: return 0;
 
-        };
+        }
  
         if( endLine )
         {
@@ -936,12 +938,12 @@ int checkProlog ()
         ungetc( character , stdin );
         return 1;
     }
-    string2 [ 0 ] = character ;
+    string2 [ 0 ] = (char)character ;
     
 
     while ( ( character = getc ( stdin ))  != EOF )
     {
-        string2 [ counter ] = character ;
+        string2 [ counter ] = (char)character ;
         counter++ ;
         if( counter == LEN_OF_DECLARE )
         {
@@ -949,7 +951,7 @@ int checkProlog ()
         }
     }
 
-    if ( strcmp( string2 , "declare" ) ) return 0 ;
+    if ( strcmp( string2 , "declare" ) != 0 ) return 0 ;
 
     if ( ! skipWhiteSpaceAndCmpChar( '(' ) ) return 0;
 
@@ -957,11 +959,11 @@ int checkProlog ()
 
     
     counter = 1 ;
-    string3 [ 0 ] = character ;
+    string3 [ 0 ] = (char)character ;
 
      while ( ( character = getc ( stdin ))  != EOF )
     {
-        string3 [ counter ] = character ;
+        string3 [ counter ] = (char)character ;
         counter++ ;
         if ( counter == LEN_OF_STRICT )
         {
@@ -969,7 +971,7 @@ int checkProlog ()
         }
     }
     
-    if ( strcmp( string3 , "strict_types" ) ) return 0 ;
+    if ( strcmp( string3 , "strict_types" ) != 0 ) return 0 ;
 
     if ( ! skipWhiteSpaceAndCmpChar( '=') ) return 0 ;
 

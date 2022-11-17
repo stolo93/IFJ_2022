@@ -1,9 +1,9 @@
 #ifndef IFJ_2022_INTERNER_H
 #define IFJ_2022_INTERNER_H
 
+#include <stddef.h>
 #include "error.h"
 #include "IFJ_2022.h"
-#include "stddef.h"
 #include "vector.h"
 #include "vector_ord.h"
 
