@@ -12,6 +12,7 @@
 #define __assume(cond) do { if (!(cond)) __builtin_unreachable(); } while (0)
 #endif
 
+// NOLINTBEGIN (bugprone-macro-parentheses)
 #define DEFINE_VEC_PROTOTYPES(type, suffix)                                        \
 typedef struct vec_ ## suffix {                                                    \
     type *  data;                                                                  \
@@ -374,5 +375,6 @@ error(none) vec_ ## suffix ## _shrink_to_fit(vec_ ## suffix * vec) {            
     __assume(vec -> len__ <= vec-> capacity__);                                         \
     return vec_ ## suffix ## _resize(vec, vec -> len__);                                \
 };
+// NOLINTEND (bugprone-macro-parentheses)
 
 #endif //IFJ_2022_VECTOR_H

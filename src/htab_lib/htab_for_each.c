@@ -39,15 +39,15 @@ error(_Bool ) htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
 
             (*f)(&tmp->pair);
 
-            if(control_key != tmp->pair.key){         //check if key address is different
+            if(control_key != tmp->pair.key) {         //check if key address is different
 
-                if(tmp->pair.key) free((char*)tmp->pair.key);     //free unwanted address
+                if(tmp->pair.key) { free((char*)tmp->pair.key); }    //free unwanted address
                 
                 tmp->pair.key = (char*)control_key;     //copy into table
                 free((char*)text);
                 return_value(false , bool );
 
-            }else if(strcmp(text,tmp->pair.key) != 0){
+            } else if(strcmp(text,tmp->pair.key) != 0){
 
                 free((char*)tmp->pair.key);
                 tmp->pair.key = (char*)text;       //restoring right key

@@ -3,14 +3,16 @@
 #include "headers/vector_ord.h"
 
 enum VEC_ORDERING STRING_CMP(const char* a, const char* b) {
-int comparison = strcmp(a, b);
-if (comparison < 0) {
-return LESS_VEC;
-} else if (comparison > 0) {
-return GREATER_VEC;
-} else {
-return EQUAL_VEC;
-}
+    int comparison = strcmp(a, b);
+    if (comparison < 0) {
+        return LESS_VEC;
+    }
+
+    if (comparison > 0) {
+        return GREATER_VEC;
+    }
+
+    return EQUAL_VEC;
 }
 
 DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(char, char);
