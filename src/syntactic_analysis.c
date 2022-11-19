@@ -1376,10 +1376,9 @@ bool isInTokens ( tokenType Token, const tokenType * TokenList)
         return false;
     }
 
-    int i = 0;
-    while ( TokenList[i] != N_VLD )
+    while ( *TokenList != N_VLD )
     {
-        if ( Token == TokenList[i] )
+        if ( Token == *(TokenList++) )
         {
             return true;
         }
