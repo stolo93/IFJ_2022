@@ -101,7 +101,7 @@ typedef enum
     PROLOG, PROG, BODY, TYPE,
     PARAMS, PARAMS_NEXT, ARGS,
     ARG_TYPE, ARGS_NEXT, TERM,
-    RET_VAL, STATEMENT, EXPR
+    RET_VAL, STATEMENT, EXPR, RVAL
 } nonTerminal_t;
 
 

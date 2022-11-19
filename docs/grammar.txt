@@ -6,7 +6,7 @@
 <PROG> -> while ( <ARG_TYPE> ) { <BODY> } <PROG>
 <PROG> -> <EXPR> ; <PROG>
 <PROG> -> identOfFunc ( <ARGS> ) ; <PROG>
-<PROG> -> identOfVar = <EXPR> ; <PROG>
+<PROG> -> identOfVar = <RVAL> ; <PROG>
 <PROG> -> return <RET_VAL> ; <PROG>
 
 <BODY> -> <STATEMENT> <BODY>
@@ -16,8 +16,11 @@
 <STATEMENT> -> while ( <ARG_TYPE> ) { <BODY> }
 <STATEMENT> -> <EXPR> ;
 <STATEMENT> -> identOfFunc ( <ARGS> ) ;
-<STATEMENT> -> identOfVar = <EXPR> ;
+<STATEMENT> -> identOfVar = <RVAL> ;
 <STATEMENT> -> return <RET_VAL> ;
+
+<RVAL> -> <EXPR>
+<RVAL> -> identOfFunc ( <ARGS> )
 
 <PARAMS> -> <TYPE> identOfVar <PARAMS_NEXT>
 <PARAMS> ->''

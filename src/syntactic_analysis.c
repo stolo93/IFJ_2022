@@ -942,6 +942,88 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 
 }
 
+error( _Bool ) SA_RVAL ( PT_Node_t ** token_node )
+{
+	if ( token_node == NULL )
+	{
+		return_error(INVALID_VAL, _Bool);
+	}
+	if ( *token_node == NULL )
+	{
+		return_error(INVALID_VAL, _Bool);
+	}
+
+	bool Correct = false;
+	PT_Node_t * cur_node = *token_node;
+	PT_Data_t tmp_node_data;
+
+	error(_Bool) tmp_result;
+	error(PT_Node_ptr) tmp_node;
+	error(token_ptr) tmp_token;
+
+	// Fucntion call
+	if ( (*token_node)->data.type.terminal->discriminant == identOfFunct )
+	{
+		// Open Paren
+		tmp_result = isNextToken(openParen, cur_node);
+		get_value(bool, is_open_paren_fcal, tmp_result, _Bool);
+		test_result(is_open_paren_fcal);
+		cur_node = cur_node->rightSibling;
+
+		// Create node for <ARGS>
+		tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = ARGS};
+		tmp_node = PT_AddSibling(cur_node, tmp_node_data);
+		get_value(PT_Node_ptr, args_node_fcal, tmp_node, _Bool);
+		cur_node = cur_node->rightSibling;
+
+		// <ARGS>
+		tmp_token = getToken();
+		get_value(token_ptr, args_token_fcal, tmp_token, _Bool);
+		tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = args_token_fcal};
+		tmp_node = PT_AddChild(args_node_fcal, tmp_node_data);
+		get_value(PT_Node_ptr, args_node_child_fcal, tmp_node, _Bool);
+
+		tmp_result = SA_Args(&args_node_child_fcal);
+		get_value(bool, res_sa_args_fcal, tmp_result, _Bool);
+		test_result(res_sa_args_fcal);
+
+		// Close paren
+		tmp_result = isNextToken(closeParen, cur_node);
+		get_value(bool, is_close_paren_fcal, tmp_result, _Bool);
+		test_result(is_close_paren_fcal);
+		cur_node = cur_node->rightSibling;
+
+		// Semicolon
+		tmp_result = isNextToken(semicolon, cur_node);
+		get_value(bool, is_semicolon_fcal, tmp_result, _Bool);
+		test_result(is_semicolon_fcal);
+		cur_node = cur_node->rightSibling;
+
+		// End of rule function call
+		Correct = true;
+	}
+
+	// Expression
+	else if ( isInTokens((*token_node)->data.type.terminal->discriminant, expr_tokens) )
+	{
+		// Create node for <EXPR> and insert it as a parent of @p token_node
+		PT_Data_t expr_node_data = {.isTerminal = false, .type.nonTerminal = EXPR};
+		error(PT_Node_ptr) tmp_node = PT_CreateNode(expr_node_data);
+		get_value(PT_Node_ptr, expr_node, tmp_node, _Bool);
+
+		expr_node->leftChild = *token_node;
+		*token_node = expr_node;
+
+		error(_Bool) result = SA_Expr(expr_node->leftChild);
+		get_value(bool, res_sa_expr, result, _Bool);
+		test_result(res_sa_expr);
+
+		Correct = true;
+	}
+
+	return_value(Correct, _Bool);
+}
+
 error( _Bool ) SA_RetVal ( PT_Node_t ** token_node )
 {
     if ( token_node == NULL )

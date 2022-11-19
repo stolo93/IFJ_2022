@@ -23,6 +23,8 @@ error( _Bool ) SA_Body ( PT_Node_t** token_node );
 
 error( _Bool ) SA_Statement ( PT_Node_t** token_node);
 
+error( _Bool ) SA_RVAL (PT_Node_t ** token_node);
+
 error( _Bool ) SA_RetVal ( PT_Node_t** token_node );
 
 error( _Bool ) SA_Args ( PT_Node_t** token_node );
