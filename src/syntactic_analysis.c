@@ -457,20 +457,20 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			test_result(is_eq_assign);
 			cur_node = cur_node->rightSibling;
 
-			// Create node for <EXPR>
-			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = EXPR};
+			// Create node for <RVAL>
+			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = RVAL};
 			tmp_node = PT_AddSibling(cur_node, tmp_node_data);
-			get_value(PT_Node_ptr, expr_node_assign, tmp_node, _Bool);
+			get_value(PT_Node_ptr, rval_node_assign, tmp_node, _Bool);
 			cur_node = cur_node->rightSibling;
 
-			// <EXPR>
+			// <RVAL>
 			tmp_token = getToken();
-			get_value(token_ptr, expr_token_assign, tmp_token, _Bool);
-			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = expr_token_assign};
-			tmp_node = PT_AddChild(expr_node_assign, tmp_node_data);
-			get_value(PT_Node_ptr, expr_node_child_assign, tmp_node, _Bool);
+			get_value(token_ptr, rval_token_assign, tmp_token, _Bool);
+			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = rval_token_assign};
+			tmp_node = PT_AddChild(rval_node_assign, tmp_node_data);
+			get_value(PT_Node_ptr, rval_node_child_assign, tmp_node, _Bool);
 
-			tmp_result = SA_Expr(expr_node_child_assign);
+			tmp_result = SA_RVAL(&rval_node_child_assign);
 			get_value(bool, res_sa_expr, tmp_result, _Bool);
 			test_result(res_sa_expr);
 
@@ -859,22 +859,22 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 			test_result(is_eq_assign);
 			cur_node = cur_node->rightSibling;
 
-			// Create node for <EXPR>
-			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = EXPR};
+			// Create node for <RVAL>
+			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = RVAL};
 			tmp_node = PT_AddSibling(cur_node, tmp_node_data);
-			get_value(PT_Node_ptr, expr_node_assign, tmp_node, _Bool);
+			get_value(PT_Node_ptr, rval_node_assign, tmp_node, _Bool);
 			cur_node = cur_node->rightSibling;
 
-			// <EXPR>
+			// <RVAL>
 			tmp_token = getToken();
-			get_value(token_ptr, expr_token_assign, tmp_token, _Bool);
-			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = expr_token_assign};
-			tmp_node = PT_AddChild(expr_node_assign, tmp_node_data);
-			get_value(PT_Node_ptr, expr_node_child_assign, tmp_node, _Bool);
+			get_value(token_ptr, rval_token_assign, tmp_token, _Bool);
+			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = rval_token_assign};
+			tmp_node = PT_AddChild(rval_node_assign, tmp_node_data);
+			get_value(PT_Node_ptr, rval_node_child_assign, tmp_node, _Bool);
 
-			tmp_result = SA_Expr(expr_node_child_assign);
-			get_value(bool, res_sa_expr, tmp_result, _Bool);
-			test_result(res_sa_expr);
+			tmp_result = SA_RVAL(&rval_node_child_assign);
+			get_value(bool, res_sa_rval, tmp_result, _Bool);
+			test_result(res_sa_rval);
 
 			// Semicolon
 			tmp_result = isNextToken(semicolon, cur_node);
