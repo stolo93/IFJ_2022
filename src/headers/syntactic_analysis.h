@@ -42,12 +42,10 @@ error( _Bool ) SA_Type ( PT_Node_t* token_node );
 error( _Bool ) SA_Term ( PT_Node_t* token_node );
 
 /**
- * @todo For now SA_Expr only skips all tokens until it finds end of the expression,
- * which is either '{' (if the expression is used as a condition for either loop or if)
- * or ';' in case the expression is used as R-value in assignment
+ * @brief @p condition specifies whether the expression analyzed, is used as a condition in if statement or while loop
  *
  */
-error( _Bool ) SA_Expr ( PT_Node_t** token_node );
+error( _Bool ) SA_Expr ( PT_Node_t** token_node, bool cond_expr );
 
 
 //Utilities

@@ -207,7 +207,7 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			tmp_node = PT_AddChild(expr_node_if, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Expr(&(expr_node_if->leftChild));
+			tmp_result = SA_Expr(&(expr_node_if->leftChild), true);
 			get_value(bool, res_sa_expr_if, tmp_result, _Bool);
 			test_result(res_sa_expr_if);
 
@@ -312,7 +312,7 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			tmp_node = PT_AddChild(expr_node_while, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Expr(&(expr_node_while->leftChild));
+			tmp_result = SA_Expr(&(expr_node_while->leftChild), true);
 			get_value(bool, res_sa_expr_while, tmp_result, _Bool);
 			test_result(res_sa_expr_while);
 
@@ -554,7 +554,7 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 				expr_node->leftChild = *token_node;
 				*token_node = expr_node;
 
-                tmp_result = SA_Expr(&(expr_node->leftChild));
+                tmp_result = SA_Expr(&(expr_node->leftChild), false);
 				get_value(bool, res_sa_expr, tmp_result, _Bool);
 				test_result(res_sa_expr);
 				cur_node = expr_node;
@@ -735,7 +735,7 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 			tmp_node = PT_AddChild(expr_node_if, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Expr(&(expr_node_if->leftChild));
+			tmp_result = SA_Expr(&(expr_node_if->leftChild), true);
 			get_value(bool, res_sa_expr_if, tmp_result, _Bool);
 			test_result(res_sa_expr_if);
 
@@ -823,7 +823,7 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 			tmp_node = PT_AddChild(expr_node_while, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Expr(&(expr_node_while->leftChild));
+			tmp_result = SA_Expr(&(expr_node_while->leftChild), true);
 			get_value(bool, res_sa_expr_while, tmp_result, _Bool);
 			test_result(res_sa_expr_while);
 
@@ -948,7 +948,7 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 				expr_node->leftChild = *token_node;
 				*token_node = expr_node;
 
-                tmp_result = SA_Expr(&(expr_node->leftChild));
+                tmp_result = SA_Expr(&(expr_node->leftChild), false);
 				get_value(bool, res_sa_expr, tmp_result, _Bool);
 				test_result(res_sa_expr);
 				cur_node = expr_node;
@@ -1035,7 +1035,7 @@ error( _Bool ) SA_RVAL ( PT_Node_t ** token_node )
 		expr_node->leftChild = *token_node;
 		*token_node = expr_node;
 
-		error(_Bool) result = SA_Expr(&(expr_node->leftChild));
+		error(_Bool) result = SA_Expr(&(expr_node->leftChild), false);
 		get_value(bool, res_sa_expr, result, _Bool);
 		test_result(res_sa_expr);
 
@@ -1079,7 +1079,7 @@ error( _Bool ) SA_RetVal ( PT_Node_t ** token_node )
 		expr_node->leftChild = *token_node;
 		*token_node = expr_node;
 
-		error(_Bool) result = SA_Expr(&(expr_node->leftChild));
+		error(_Bool) result = SA_Expr(&(expr_node->leftChild), false);
 		get_value(bool, res_sa_expr, result, _Bool);
 		test_result(res_sa_expr);
 
@@ -1458,7 +1458,7 @@ error( _Bool ) SA_Term ( PT_Node_t * token_node )
 	return_correct(Correct);
 }
 
-error( _Bool ) SA_Expr ( PT_Node_t ** token_node )
+error( _Bool ) SA_Expr ( PT_Node_t** token_node, bool cond_expr )
 {
 	if ( token_node == NULL )
 	{
@@ -1497,11 +1497,12 @@ error( _Bool ) SA_Expr ( PT_Node_t ** token_node )
 	size_t aux_vec_len;
 
 	// First token
-	if ( ! isInTokens(cur_token->discriminant, start_exp) )
+	// If analysed expression is used as if or while condition it has to start with (
+	if ( !isInTokens(cur_token->discriminant, start_exp) || (cond_expr && cur_token->discriminant != openParen))
 	{
 		vec_token_ptr_destroy(&postfix_expr);
 		vec_token_ptr_destroy(&aux_postfix);
-		return_value(false, _Bool);
+		return_correct(false);
 	}
 
 	// Push the first token onto the correct stack and free it's node in the ast
@@ -1531,7 +1532,7 @@ error( _Bool ) SA_Expr ( PT_Node_t ** token_node )
 
 	// Convert infix to postfix and check expression syntax
 
-	while ( ! isInTokens(cur_token->discriminant, end_exp) && isInTokens(cur_token->discriminant, expr_tokens) )
+	while ( !isInTokens(cur_token->discriminant, end_exp) && isInTokens(cur_token->discriminant, expr_tokens) )
 	{
 		// Operand
 		if (isInTokens(cur_token->discriminant, operands) )
@@ -1660,6 +1661,14 @@ error( _Bool ) SA_Expr ( PT_Node_t ** token_node )
 	}
 
 	// Handle the last token
+	// If expression is a if or while condition it has to end with )
+	if ( !isInTokens(cur_token->discriminant, end_exp) || (cond_expr && prev_token->discriminant != closeParen))
+	{
+		vec_token_ptr_destroy(&postfix_expr);
+		vec_token_ptr_destroy(&aux_postfix);
+		return_correct(false);
+	}
+
 	returnToken(cur_token);
 
 	// Put the rest of the auxilary stack onto the postfix stack
@@ -1814,7 +1823,7 @@ bool isHigherPrior ( tokenType first, tokenType second )
 											{ false, false, false, true },//rel
 											{ false, false, false, false }//eq
 											};
-	unsigned f_index, s_index;
+	unsigned f_index = 0, s_index = 0;
 
 	// Get the correct indices
 	if ( isInTokens(first, mul_div_ops) ) { f_index = mul_ops_idx; }
