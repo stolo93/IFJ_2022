@@ -566,6 +566,13 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
                 tmp_result = SA_Expr(expr_node->leftChild);
 				get_value(bool, res_sa_expr, tmp_result, _Bool);
 				test_result(res_sa_expr);
+				cur_node = expr_node;
+
+				// Semicolon
+				tmp_result = isNextToken(semicolon, cur_node);
+				get_value(bool, is_semicolon_rv, tmp_result, _Bool);
+				test_result(is_semicolon_rv);
+				cur_node = cur_node->rightSibling;
 
 				//Create node for <PROG>
 				tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = PROG};
@@ -968,6 +975,13 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
                 tmp_result = SA_Expr(expr_node->leftChild);
 				get_value(bool, res_sa_expr, tmp_result, _Bool);
 				test_result(res_sa_expr);
+				cur_node = expr_node;
+
+				// Semicolon
+				tmp_result = isNextToken(semicolon, cur_node);
+				get_value(bool, is_semicolon_rv, tmp_result, _Bool);
+				test_result(is_semicolon_rv);
+				cur_node = cur_node->rightSibling;
 
 				Correct = true;
             }
