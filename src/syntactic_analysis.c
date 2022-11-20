@@ -449,8 +449,8 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
         // Assignement
         case identOfVar:
 
-			//eqOper
-			tmp_result = isNextToken(EqOper, cur_node);
+			//Assignment operator
+			tmp_result = isNextToken(assigment, cur_node);
 			get_value(bool, is_eq_assign, tmp_result, _Bool);
 			test_result(is_eq_assign);
 			cur_node = cur_node->rightSibling;
@@ -896,8 +896,8 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
         // Assignment
         case identOfVar:
 
-			//eqOper
-			tmp_result = isNextToken(EqOper, cur_node);
+			//Assignment operator
+			tmp_result = isNextToken(assigment, cur_node);
 			get_value(bool, is_eq_assign, tmp_result, _Bool);
 			test_result(is_eq_assign);
 			cur_node = cur_node->rightSibling;
@@ -1041,12 +1041,6 @@ error( _Bool ) SA_RVAL ( PT_Node_t ** token_node )
 		tmp_result = isNextToken(closeParen, cur_node);
 		get_value(bool, is_close_paren_fcal, tmp_result, _Bool);
 		test_result(is_close_paren_fcal);
-		cur_node = cur_node->rightSibling;
-
-		// Semicolon
-		tmp_result = isNextToken(semicolon, cur_node);
-		get_value(bool, is_semicolon_fcal, tmp_result, _Bool);
-		test_result(is_semicolon_fcal);
 		cur_node = cur_node->rightSibling;
 
 		// End of rule function call
