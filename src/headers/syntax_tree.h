@@ -51,7 +51,12 @@ typedef struct PT_Node
 
 
 typedef PT_Node_t* PT_Node_ptr;
+typedef PT_Node_ptr* PT_Node_ptr_ptr;
+
+define_error( PT_Node_ptr_ptr );
 define_error( PT_Node_ptr );
+
+DEFINE_VEC_PROTOTYPES(PT_Node_ptr, pnode);
 
 
 /**
@@ -76,6 +81,26 @@ error( PT_Node_ptr ) PT_AddSibling ( PT_Node_ptr node, PT_Data_t data );
  *
  */
 error( PT_Node_ptr ) PT_AddChild ( PT_Node_ptr node, PT_Data_t data );
+
+/**
+ * @brief Create AST representing an expression in postfix notation
+ *
+ */
+error( PT_Node_ptr ) PT_FromPostFix( vec_token_ptr * token_stack );
+
+/**
+ * @brief Print all terminals which are under @p node
+ *
+ * @param node
+ */
+void PT_PrintTerminals ( PT_Node_t * node );
+
+/**
+ * @brief Print token discriminant
+ *
+ * @param discriminant 
+ */
+void PT_PrintTokenType ( tokenType discriminant );
 
 /**
  * @brief Deletes given node and everything underneath it
