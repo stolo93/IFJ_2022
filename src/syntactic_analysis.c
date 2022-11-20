@@ -569,6 +569,25 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 				get_value(bool, res_sa_expr, tmp_result, _Bool);
 				test_result(res_sa_expr);
 
+				//Create node for <PROG>
+				tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = PROG};
+				tmp_node = PT_AddSibling(cur_node, tmp_node_data);
+				get_value(PT_Node_ptr, prog_node_expr, tmp_node, _Bool);
+				cur_node = cur_node->rightSibling;
+
+				// <PROG>
+				tmp_token = getToken();
+				get_value(token_ptr, prog_token_expr, tmp_token, _Bool);
+				tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = prog_token_expr};
+				tmp_node = PT_AddChild(prog_node_expr, tmp_node_data);
+				get_value(PT_Node_ptr, prog_node_child_expr, tmp_node, _Bool);
+
+
+				tmp_result = SA_Prog(&prog_node_child_expr);
+				get_value(bool, res_sa_prog_expr, tmp_result, _Bool);
+				test_result(res_sa_prog_expr);
+
+				// If everything got this far it's correct
 				Correct = true;
             }
             break;
