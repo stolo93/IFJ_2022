@@ -27,15 +27,6 @@ error( htab_item_ptr ) _create_new_item(htab_key_t key , sType type ){
         return_error( ERROR_MAL , htab_item_ptr);
     }
 
-    /*char* new_key = (char*) malloc(sizeof(char) * strlen(key)+1); //this may be gone due to using same pointer for same string !!!
-
-    if(!new_key){
-        
-        free(new_item);
-        return_error( ERROR_MAL , htab_item_ptr );
-    }*/
-
-    //memcpy((char*)new_key,(char*)key,strlen(key)+1);  //copying key into new entry
     new_item->pair.key = (char* )key;                                   
     new_item->pair.symType = type;
     new_item->pair.redefined = false;     
@@ -47,9 +38,7 @@ error( htab_item_ptr ) _create_new_item(htab_key_t key , sType type ){
     else
     {
         new_item->pair.diff.func.outType = notDefined;
-        
-        get_value( vec_structFuncParam , newVec , new_vec_structFuncParam_with_capacity( 3 ) , htab_item_ptr);
-        new_item->pair.diff.func.inParams = newVec;
+        new_item->pair.diff.func.inParams = new_vec_structFuncParam();
     }
     new_item->next = NULL;
 
