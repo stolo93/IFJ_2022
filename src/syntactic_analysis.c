@@ -12,11 +12,12 @@
 #include "./headers/scaner.h"
 
 #include <stdbool.h>
+#include <stdio.h>
 
 #define test_result(result) do{ if( !result ) { return_value(false, _Bool); } } while(0)
 #define test_error(er_obj, forw_type) do{ if( is_error(er_obj) ) { forward_error(er_obj, forw_type);} } while(0)
 
-const tokenType expr_tokens[] = {
+static const tokenType expr_tokens[] = {
 								identOfVar, integer, decNum, string, nullT, plusSign, minusSign,
 								multiply, division, concatenation, lessOper, lessOrEqOper,
 								moreOper, moreOrEqOper, EqOper, notEqOper, openParen, closeParen,
@@ -204,7 +205,7 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			tmp_node = PT_AddChild(expr_node_if, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Expr(expr_node_if->leftChild);
+			tmp_result = SA_Expr(&(expr_node_if->leftChild));
 			get_value(bool, res_sa_expr_if, tmp_result, _Bool);
 			test_result(res_sa_expr_if);
 
@@ -309,7 +310,7 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			tmp_node = PT_AddChild(expr_node_while, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Expr(expr_node_while->leftChild);
+			tmp_result = SA_Expr(&(expr_node_while->leftChild));
 			get_value(bool, res_sa_expr_while, tmp_result, _Bool);
 			test_result(res_sa_expr_while);
 
@@ -540,7 +541,7 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 				expr_node->leftChild = *token_node;
 				*token_node = expr_node;
 
-                tmp_result = SA_Expr(expr_node->leftChild);
+                tmp_result = SA_Expr(&(expr_node->leftChild));
 				get_value(bool, res_sa_expr, tmp_result, _Bool);
 				test_result(res_sa_expr);
 				cur_node = expr_node;
@@ -720,7 +721,7 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 			tmp_node = PT_AddChild(expr_node_if, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Expr(expr_node_if->leftChild);
+			tmp_result = SA_Expr(&(expr_node_if->leftChild));
 			get_value(bool, res_sa_expr_if, tmp_result, _Bool);
 			test_result(res_sa_expr_if);
 
@@ -807,7 +808,7 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 			tmp_node = PT_AddChild(expr_node_while, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Expr(expr_node_while->leftChild);
+			tmp_result = SA_Expr(&(expr_node_while->leftChild));
 			get_value(bool, res_sa_expr_while, tmp_result, _Bool);
 			test_result(res_sa_expr_while);
 
@@ -923,7 +924,7 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 				expr_node->leftChild = *token_node;
 				*token_node = expr_node;
 
-                tmp_result = SA_Expr(expr_node->leftChild);
+                tmp_result = SA_Expr(&(expr_node->leftChild));
 				get_value(bool, res_sa_expr, tmp_result, _Bool);
 				test_result(res_sa_expr);
 				cur_node = expr_node;
@@ -1009,7 +1010,7 @@ error( _Bool ) SA_RVAL ( PT_Node_t ** token_node )
 		expr_node->leftChild = *token_node;
 		*token_node = expr_node;
 
-		error(_Bool) result = SA_Expr(expr_node->leftChild);
+		error(_Bool) result = SA_Expr(&(expr_node->leftChild));
 		get_value(bool, res_sa_expr, result, _Bool);
 		test_result(res_sa_expr);
 
@@ -1053,7 +1054,7 @@ error( _Bool ) SA_RetVal ( PT_Node_t ** token_node )
 		expr_node->leftChild = *token_node;
 		*token_node = expr_node;
 
-		error(_Bool) result = SA_Expr(expr_node->leftChild);
+		error(_Bool) result = SA_Expr(&(expr_node->leftChild));
 		get_value(bool, res_sa_expr, result, _Bool);
 		test_result(res_sa_expr);
 
@@ -1430,22 +1431,254 @@ error( _Bool ) SA_Term ( PT_Node_t * token_node )
 	return_value(Correct, _Bool);
 }
 
-error( _Bool ) SA_Expr ( PT_Node_t * token_node )
+error( _Bool ) SA_Expr ( PT_Node_t ** token_node )
 {
 	if ( token_node == NULL )
 	{
 		return_error(INVALID_VAL, _Bool);
 	}
-
-	bool Correct = false;
-
-	//TODO implement proper expression analysis
-	error(none) ret_val = skipTokens(expr_tokens, token_node);
-	if ( is_error(ret_val) )
+	if ( *token_node == NULL )
 	{
-		forward_error(ret_val, _Bool);
+		return_error(INVALID_VAL, _Bool);
 	}
-	Correct = true;
+
+	bool Correct = true;
+
+	vec_token_ptr postfix_expr = new_vec_token_ptr();
+	vec_token_ptr aux_postfix = new_vec_token_ptr();
+
+	// Token categories
+
+	static const tokenType operators[] = { plusSign, minusSign, multiply, division, concatenation, lessOper, lessOrEqOper, moreOper, moreOrEqOper, EqOper, notEqOper , N_VLD};
+	static const tokenType operands[] = { nullT, identOfVar, integer, decNum, string, N_VLD};
+	static const tokenType end_exp[] = { openSetParen, semicolon, N_VLD };
+	static const tokenType start_exp[] = { identOfVar, integer, decNum, string, nullT, openParen, N_VLD };
+
+	// Acceptable tokens before a particular token
+
+	static const tokenType bef_operand[] = { plusSign, minusSign, multiply, division, concatenation, lessOper, lessOrEqOper, moreOper, moreOrEqOper, EqOper, notEqOper, openParen, N_VLD };
+	static const tokenType bef_operator[] = { nullT, identOfVar, integer, decNum, string, closeParen, N_VLD };
+	static const tokenType bef_openParen[] = { plusSign, minusSign, multiply, division, concatenation, lessOper, lessOrEqOper, moreOper, moreOrEqOper, EqOper, notEqOper, openParen, N_VLD };
+	static const tokenType bef_closeParen[] = { nullT, identOfVar, integer, decNum, string, closeParen, N_VLD};
+
+
+	error(token_ptr) tmp_token;
+	error(token_ptr_ptr) aux_token_tmp;
+	token_t * cur_token = (*token_node)->data.type.terminal;
+	token_t * prev_token;
+	token_t * aux_token;
+	size_t aux_vec_len;
+
+	// First token
+	if ( ! isInTokens(cur_token->discriminant, start_exp) )
+	{
+		vec_token_ptr_destroy(&postfix_expr);
+		vec_token_ptr_destroy(&aux_postfix);
+		return_value(false, _Bool);
+	}
+
+	// Push the first token onto the correct stack and free it's node in the ast
+	if ( cur_token->discriminant == openParen )
+	{
+		vec_token_ptr_push_back(&aux_postfix, cur_token);
+	}
+	else
+	{
+		vec_token_ptr_push_back(&postfix_expr, cur_token);
+	}
+	free(*token_node);
+	*token_node = NULL;
+
+	// Convert the rest of the expression
+
+	prev_token = cur_token;
+	tmp_token = getToken();
+	if ( is_error(tmp_token) )
+	{
+		vec_token_ptr_destroy(&postfix_expr);
+		vec_token_ptr_destroy(&aux_postfix);
+		forward_error(tmp_token, _Bool);
+	}
+	cur_token = tmp_token._value;
+
+
+	// Convert infix to postfix and check expression syntax
+
+	while ( ! isInTokens(cur_token->discriminant, end_exp) && isInTokens(cur_token->discriminant, expr_tokens) )
+	{
+		// Operand
+		if (isInTokens(cur_token->discriminant, operands) )
+		{
+			if ( ! isInTokens(prev_token->discriminant, bef_operand) )
+			{
+				Correct = false;
+				break;
+			}
+			vec_token_ptr_push_back(&postfix_expr, cur_token);
+
+		}
+
+		// Operator
+		else if (isInTokens(cur_token->discriminant, operators) )
+		{
+			if ( ! isInTokens(prev_token->discriminant, bef_operator) )
+			{
+				Correct = false;
+				break;
+			}
+
+			aux_vec_len = vec_token_ptr_len(&aux_postfix);
+			bool inserted = false;
+
+			while ( !inserted )
+			{
+				if ( aux_vec_len == 0 )
+				{
+					vec_token_ptr_push_back(&aux_postfix, cur_token);
+					inserted = true;
+					break;
+				}
+
+				// Get token from the top of auxilary stack
+				aux_token_tmp = vec_token_ptr_get(&aux_postfix, aux_vec_len-1);
+				if ( is_error(tmp_token) )
+				{
+					vec_token_ptr_destroy(&postfix_expr);
+					vec_token_ptr_destroy(&aux_postfix);
+					free(cur_token);
+					forward_error(tmp_token, _Bool);
+				}
+				aux_token = *(aux_token_tmp._value);
+
+				// if aux_atack.top == ) || aux_stack.top == operator with lower priority
+				if ( aux_token->discriminant == openParen || isHigherPrior(cur_token->discriminant, aux_token->discriminant) )
+				{
+					vec_token_ptr_push_back(&aux_postfix, cur_token);
+					inserted = true;
+				}
+
+				else
+				{
+					vec_token_ptr_pop_back(&aux_postfix);
+					vec_token_ptr_push_back(&postfix_expr, aux_token);
+				}
+
+				aux_vec_len = vec_token_ptr_len(&aux_postfix);
+			}
+
+		}
+
+		// (
+		else if ( cur_token->discriminant == openParen )
+		{
+			if ( ! isInTokens(prev_token->discriminant, bef_openParen) )
+			{
+				Correct = false;
+				break;
+			}
+			vec_token_ptr_push_back(&aux_postfix, cur_token);
+		}
+
+		// )
+		else if ( cur_token->discriminant == closeParen )
+		{
+			aux_vec_len = vec_token_ptr_len(&aux_postfix);
+			if ( ! isInTokens(prev_token->discriminant, bef_closeParen) || aux_vec_len == 0 )
+			{
+				Correct = false;
+				break;
+			}
+
+			do
+			{
+				aux_token_tmp = vec_token_ptr_get(&aux_postfix, aux_vec_len-1);
+				if ( is_error(tmp_token) )
+				{
+					vec_token_ptr_destroy(&postfix_expr);
+					vec_token_ptr_destroy(&aux_postfix);
+					free(cur_token);
+					forward_error(tmp_token, _Bool);
+				}
+				aux_token = *(aux_token_tmp._value);
+
+				vec_token_ptr_push_back(&postfix_expr, aux_token);
+				vec_token_ptr_pop_back(&aux_postfix);
+				aux_vec_len = vec_token_ptr_len(&aux_postfix);
+
+			} while ( aux_vec_len != 0 && aux_token->discriminant != openParen );
+
+			if ( aux_token->discriminant != openParen )
+			{
+				Correct = false;
+				break;
+			}
+			else
+			{
+				vec_token_ptr_pop_back(&postfix_expr);
+			}
+
+		}
+
+		// Get next token
+		tmp_token = getToken();
+		if ( is_error(tmp_token) )
+		{
+			vec_token_ptr_destroy(&postfix_expr);
+			vec_token_ptr_destroy(&aux_postfix);
+			forward_error(tmp_token, _Bool);
+		}
+
+		prev_token = cur_token;
+		cur_token = tmp_token._value;
+	}
+
+	// Handle the last token
+	returnToken(cur_token);
+
+	// Put the rest of the auxilary stack onto the postfix stack
+	while ( vec_token_ptr_len(&aux_postfix) != 0 )
+	{
+		aux_token_tmp = vec_token_ptr_get(&aux_postfix, vec_token_ptr_len(&aux_postfix)-1);
+		if ( is_error(tmp_token) )
+		{
+			vec_token_ptr_destroy(&postfix_expr);
+			vec_token_ptr_destroy(&aux_postfix);
+			free(cur_token);
+			forward_error(tmp_token, _Bool);
+		}
+		aux_token = *(aux_token_tmp._value);
+
+		if ( aux_token->discriminant == openParen )
+		{
+			Correct = false;
+			break;
+		}
+		vec_token_ptr_push_back(&postfix_expr, aux_token);
+		vec_token_ptr_pop_back(&aux_postfix);
+	}
+
+	// for (size_t i = 0; i < vec_token_ptr_len(&postfix_expr); i++ )
+	// {
+	// 	PT_PrintTokenType(postfix_expr.data[i]->discriminant);
+	// }
+
+
+	if ( Correct )
+	{
+		// Build postfix tree
+		error(PT_Node_ptr) expr_tree = PT_FromPostFix(&postfix_expr);
+		if ( is_error(expr_tree) )
+		{
+			vec_token_ptr_destroy(&aux_postfix);
+			vec_token_ptr_destroy(&postfix_expr);
+			forward_error(expr_tree, _Bool);
+		}
+
+		*token_node = expr_tree._value;
+	}
+
+	vec_token_ptr_destroy(&aux_postfix);
+	vec_token_ptr_destroy(&postfix_expr);
 
 	return_value(Correct, _Bool);
 }
@@ -1533,4 +1766,39 @@ error(_Bool) isNextToken( tokenType TokenName, PT_Node_t* token_node )
 		returnToken(cur_token);
 		return_value(false, _Bool);
 	}
+}
+
+bool isHigherPrior ( tokenType first, tokenType second )
+{
+	static const tokenType mul_div_ops[] = { multiply, division, N_VLD };
+	static const tokenType add_sub_cat_ops[] = { plusSign, minusSign, concatenation, N_VLD };
+	static const tokenType rel_ops[] = { moreOper, moreOrEqOper, lessOper, lessOrEqOper, N_VLD };
+	static const tokenType eq_ops[] = { EqOper, notEqOper, N_VLD };
+
+	const unsigned mul_ops_idx = 0;
+	const unsigned add_ops_idx = 1;
+	const unsigned rel_ops_idx = 2;
+	const unsigned eq_ops_idx = 3;
+
+	// is higher priority
+	static const bool precedence_rel[4][4] = { //mul  add   rel   eq
+											{ false, true, true, true }, //mul
+											{ false, false, true, true },//add
+											{ false, false, false, true },//rel
+											{ false, false, false, false }//eq
+											};
+	unsigned f_index, s_index;
+
+	// Get the correct indices
+	if ( isInTokens(first, mul_div_ops) ) { f_index = mul_ops_idx; }
+	else if ( isInTokens(first, add_sub_cat_ops) ) {f_index = add_ops_idx; }
+	else if ( isInTokens(first, rel_ops) ) {f_index = rel_ops_idx; }
+	else if ( isInTokens(first, eq_ops) ) {f_index = eq_ops_idx;}
+
+	if ( isInTokens(second, mul_div_ops) ) { s_index = mul_ops_idx; }
+	else if ( isInTokens(second, add_sub_cat_ops) ) {s_index = add_ops_idx; }
+	else if ( isInTokens(second, rel_ops) ) {s_index = rel_ops_idx; }
+	else if ( isInTokens(second, eq_ops) ) {s_index = eq_ops_idx;}
+
+	return precedence_rel[f_index][s_index];
 }

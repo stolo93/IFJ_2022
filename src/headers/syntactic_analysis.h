@@ -47,7 +47,7 @@ error( _Bool ) SA_Term ( PT_Node_t* token_node );
  * or ';' in case the expression is used as R-value in assignment
  *
  */
-error( _Bool ) SA_Expr ( PT_Node_t* token_node );
+error( _Bool ) SA_Expr ( PT_Node_t** token_node );
 
 
 //Utilities
@@ -67,6 +67,15 @@ bool isInTokens ( tokenType Token, const tokenType * TokenList );
  * If not equal return false and return token back to scanner
  */
 error(_Bool) isNextToken( tokenType TokenName, PT_Node_t* token_node );
+
+/**
+ * @brief Check precedence relation between the two tokens given as parameters
+ *
+ * @param first
+ * @param second
+ * @return True if @p first has higher priority than @p second
+ */
+bool isHigherPrior ( tokenType first, tokenType second );
 
 /**
  * @brief Read and destroy all tokens from set of tokens @p which
