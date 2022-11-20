@@ -20,8 +20,8 @@ error(none) real_main(int argc, char** argv) {
     }
     interner_ptr = &init._value;
 
-    (void) interner_ptr;
-    (void) init._value;
+    interner_destroy( interner_ptr);
+    
 
     return_none();
 }
