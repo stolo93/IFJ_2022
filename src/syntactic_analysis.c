@@ -618,12 +618,12 @@ error( _Bool ) SA_Body ( PT_Node_t ** token_node )
 		*token_node = NULL;
     }
 
-    //Statement
+    //Statement and next body
     else if ( isInTokens((*token_node)->data.type.terminal->discriminant, tokenList_statement) || isInTokens((*token_node)->data.type.terminal->discriminant, expr_tokens))
     {
 		// Create <STATEMENT> node and insert it as a parent of current token node
-		PT_Data_t stat_node_data = {.isTerminal = false, .type.nonTerminal = STATEMENT};
-		error(PT_Node_ptr) tmp_node = PT_CreateNode(stat_node_data);
+		PT_Data_t tmp_node_data = {.isTerminal = false, .type.nonTerminal = STATEMENT};
+		error(PT_Node_ptr) tmp_node = PT_CreateNode(tmp_node_data);
 		get_value(PT_Node_ptr, stat_node, tmp_node, _Bool);
 
 		stat_node->leftChild = *token_node;
@@ -632,6 +632,25 @@ error( _Bool ) SA_Body ( PT_Node_t ** token_node )
 		error(_Bool) result = SA_Statement(&(stat_node->leftChild));
 		get_value(bool, res_sa_statement, result, _Bool);
 		test_result(res_sa_statement);
+
+		error(token_ptr) tmp_token;
+		error(_Bool) tmp_result;
+
+		// Create node for <BODY>
+		tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = BODY};
+		tmp_node = PT_AddSibling(stat_node, tmp_node_data);
+		get_value(PT_Node_ptr, body_node, tmp_node, _Bool);
+
+		// <BODY>
+		tmp_token = getToken();
+		get_value(token_ptr, body_token_while, tmp_token, _Bool);
+		tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = body_token_while};
+		tmp_node = PT_AddChild(body_node, tmp_node_data);
+		test_error(tmp_node, _Bool);
+
+		tmp_result = SA_Body(&(body_node->leftChild));
+		get_value(bool, res_sa_body_while, tmp_result, _Bool);
+		test_result(res_sa_body_while);
 
 		Correct = true;
     }
