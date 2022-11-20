@@ -13,8 +13,12 @@
 #include "vector.h"
 #include "IFJ_2022.h"
 
-#define  SIZE_OF_BUILD_IN_STRING 6
-#define  NUMBER_OF_BUILD_IN_FUNCTIONS 4
+#define  SIZE_OF_BUILD_IN_STRING 10
+#define  NUMBER_OF_BUILD_IN_STRINGS 11
+#define  NUMBER_OF_BUILD_IN_FUNCTIONS 8
+#define  POS_S 10
+#define  POS_I 8
+#define  POS_J 9
 
 typedef enum dataType { integerT , floatingT , stringT , notDefined , noType ,  
                         integerTNull , floatingTNull , stringTNull } dType ;
@@ -61,7 +65,7 @@ typedef struct struct_func
     vec_structFuncParam inParams;
 } structFunc;
 
-// Dvojice dat v tabulce:
+
 typedef struct htab_pair {
     
     sType symType;    //type of symbol
