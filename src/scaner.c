@@ -518,7 +518,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 return_error( ERROR_LEX_INVSTR , token_ptr );
                             }
                             
-                            if ( character == '"' )
+                            if ( character == '"' && info[ counter - 1] != '\\')
                             {
                                 info [ counter ] = (char)character;
                                 counter++;
@@ -565,7 +565,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             } 
                             break;
             case lineComment :
-                            if( character == '\n' )
+                            if( character == '\n' || character == EOF )
                             {
                                 free( info );
                                 free( newToken );
@@ -635,8 +635,10 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 info [ counter ] = (char)character;
                                 counter++;
                             }
-                            ungetc( character , stdin );
-                            
+                            else
+                            {
+                                ungetc( character , stdin );
+                            }
                             if( ! finalResize( &info ,counter) )
                             {
                                 free( info ) ;
@@ -776,6 +778,11 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
  ***/
 error(none) returnToken( token_ptr retToken)
 {
+    if( retToken->discriminant == endOfFile )
+    {
+        free( retToken );
+        return_none();
+    }
     if( retToken->discriminant == integer || retToken->discriminant == decNum )
     {
         int len = 0;
