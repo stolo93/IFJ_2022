@@ -45,9 +45,9 @@ error( _Bool ) SA_Prolog ( PT_Node_t * token_node )
 		//Insert current token into the AST
 		PT_Data_t new_node_data = {.isTerminal = true, .type.terminal = cur_token};
 		tmp_node = PT_AddChild(prog_node, new_node_data);
-		get_value(PT_Node_ptr, prog_child_node, tmp_node, _Bool);
+		test_error(tmp_node, _Bool);
 
-		error(_Bool) tmp_result = SA_Prog(&prog_child_node);
+		error(_Bool) tmp_result = SA_Prog(&(prog_node->leftChild));
 		get_value(bool, res_sa_prog, tmp_result, _Bool);
 
 		Correct = res_sa_prog;
@@ -131,9 +131,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, type_token_iof, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = type_token_iof};
 			tmp_node = PT_AddChild(type_node_fdef, tmp_node_data);
-			get_value(PT_Node_ptr, type_node_child_fdef, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Type(type_node_child_fdef);
+			tmp_result = SA_Type(type_node_fdef->leftChild);
 			get_value(bool, res_sa_type_iof, tmp_result, _Bool);
 			test_result(res_sa_type_iof);
 
@@ -178,10 +178,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, prog_token_iof, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = prog_token_iof};
 			tmp_node = PT_AddChild(prog_node_fdef, tmp_node_data);
-			get_value(PT_Node_ptr, prog_node_child_fdef, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-
-			tmp_result = SA_Prog(&prog_node_child_fdef);
+			tmp_result = SA_Prog(&(prog_node_fdef->leftChild));
 			get_value(bool, res_sa_prog_iof, tmp_result, _Bool);
 			test_result(res_sa_prog_iof);
 
@@ -209,9 +208,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, arg_type_token_if, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = arg_type_token_if};
 			tmp_node = PT_AddChild(arg_type_node_if, tmp_node_data);
-			get_value(PT_Node_ptr, arg_type_node_child_if, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&arg_type_node_child_if);
+			tmp_result = SA_ARG_Type(&(arg_type_node_if->leftChild));
 			get_value(bool, res_sa_arg_type_if, tmp_result, _Bool);
 			test_result(res_sa_arg_type_if);
 
@@ -296,9 +295,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, prog_token_if, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = prog_token_if};
 			tmp_node = PT_AddChild(prog_node_if, tmp_node_data);
-			get_value(PT_Node_ptr, prog_node_child_if, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Prog(&prog_node_child_if);
+			tmp_result = SA_Prog(&(prog_node_if->leftChild));
 			get_value(bool, res_sa_prog_if, tmp_result, _Bool);
 			test_result(res_sa_prog_if);
 
@@ -326,9 +325,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, arg_type_token_while, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = arg_type_token_while};
 			tmp_node = PT_AddChild(arg_type_node_while, tmp_node_data);
-			get_value(PT_Node_ptr, arg_type_node_child_while, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&arg_type_node_child_while);
+			tmp_result = SA_ARG_Type(&(arg_type_node_while->leftChild));
 			get_value(bool, res_sa_arg_type_while, tmp_result, _Bool);
 			test_result(res_sa_arg_type_while);
 
@@ -378,9 +377,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, prog_token_while, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = prog_token_while};
 			tmp_node = PT_AddChild(prog_node_while, tmp_node_data);
-			get_value(PT_Node_ptr, prog_node_child_while, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Prog(&prog_node_child_while);
+			tmp_result = SA_Prog(&(prog_node_while->leftChild));
 			get_value(bool, res_sa_prog_while, tmp_result, _Bool);
 			test_result(res_sa_prog_while);
 
@@ -437,9 +436,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, prog_token_fcal, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = prog_token_fcal};
 			tmp_node = PT_AddChild(prog_node_fcal, tmp_node_data);
-			get_value(PT_Node_ptr, prog_node_child_fcal, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Prog(&prog_node_child_fcal);
+			tmp_result = SA_Prog(&(prog_node_fcal->leftChild));
 			get_value(bool, res_sa_prog_fcal, tmp_result, _Bool);
 			test_result(res_sa_prog_fcal);
 
@@ -467,9 +466,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, rval_token_assign, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = rval_token_assign};
 			tmp_node = PT_AddChild(rval_node_assign, tmp_node_data);
-			get_value(PT_Node_ptr, rval_node_child_assign, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_RVAL(&rval_node_child_assign);
+			tmp_result = SA_RVAL(&(rval_node_assign->leftChild));
 			get_value(bool, res_sa_expr, tmp_result, _Bool);
 			test_result(res_sa_expr);
 
@@ -490,9 +489,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, prog_token_assign, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = prog_token_assign};
 			tmp_node = PT_AddChild(prog_node_assign, tmp_node_data);
-			get_value(PT_Node_ptr, prog_node_child_assign, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Prog(&prog_node_child_assign);
+			tmp_result = SA_Prog(&(prog_node_assign->leftChild));
 			get_value(bool, res_sa_prog_assign, tmp_result, _Bool);
 			test_result(res_sa_prog_assign);
 
@@ -537,9 +536,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 			get_value(token_ptr, prog_token_rv, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = prog_token_rv};
 			tmp_node = PT_AddChild(prog_node_ret, tmp_node_data);
-			get_value(PT_Node_ptr, prog_node_child_ret, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_Prog(&prog_node_child_ret);
+			tmp_result = SA_Prog(&(prog_node_ret->leftChild));
 			get_value(bool, res_sa_prog_rv, tmp_result, _Bool);
 			test_result(res_sa_prog_rv);
 
@@ -579,10 +578,9 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
 				get_value(token_ptr, prog_token_expr, tmp_token, _Bool);
 				tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = prog_token_expr};
 				tmp_node = PT_AddChild(prog_node_expr, tmp_node_data);
-				get_value(PT_Node_ptr, prog_node_child_expr, tmp_node, _Bool);
+				test_error(tmp_node, _Bool);
 
-
-				tmp_result = SA_Prog(&prog_node_child_expr);
+				tmp_result = SA_Prog(&(prog_node_expr->leftChild));
 				get_value(bool, res_sa_prog_expr, tmp_result, _Bool);
 				test_result(res_sa_prog_expr);
 
@@ -724,9 +722,9 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 			get_value(token_ptr, arg_type_token_if, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = arg_type_token_if};
 			tmp_node = PT_AddChild(arg_type_node_if, tmp_node_data);
-			get_value(PT_Node_ptr, arg_type_node_child_if, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&arg_type_node_child_if);
+			tmp_result = SA_ARG_Type(&(arg_type_node_if->leftChild));
 			get_value(bool, res_sa_arg_type_if, tmp_result, _Bool);
 			test_result(res_sa_arg_type_if);
 
@@ -824,9 +822,9 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 			get_value(token_ptr, arg_type_token_while, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = arg_type_token_while};
 			tmp_node = PT_AddChild(arg_type_node_while, tmp_node_data);
-			get_value(PT_Node_ptr, arg_type_node_child_while, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&arg_type_node_child_while);
+			tmp_result = SA_ARG_Type(&(arg_type_node_while->leftChild));
 			get_value(bool, res_sa_arg_type_while, tmp_result, _Bool);
 			test_result(res_sa_arg_type_while);
 
@@ -889,9 +887,9 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 			get_value(token_ptr, rval_token_assign, tmp_token, _Bool);
 			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = rval_token_assign};
 			tmp_node = PT_AddChild(rval_node_assign, tmp_node_data);
-			get_value(PT_Node_ptr, rval_node_child_assign, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_RVAL(&rval_node_child_assign);
+			tmp_result = SA_RVAL(&(rval_node_assign->leftChild));
 			get_value(bool, res_sa_rval, tmp_result, _Bool);
 			test_result(res_sa_rval);
 
@@ -1186,9 +1184,9 @@ error( _Bool ) SA_ArgsNext ( PT_Node_t ** token_node )
 			get_value(token_ptr, token_arg_type, tmp_token, _Bool);
 			PT_Data_t arg_type_child_data = {.isTerminal = true, .type.terminal = token_arg_type};
 			tmp_node = PT_AddChild(arg_type_node, arg_type_child_data);
-			get_value(PT_Node_ptr, arg_type_child_node, tmp_node, _Bool);
+			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&arg_type_child_node);
+			tmp_result = SA_ARG_Type(&(arg_type_node->leftChild));
 			get_value(bool, res_sa_arg_type, tmp_result, _Bool);
 			test_result(res_sa_arg_type);
 
@@ -1384,9 +1382,9 @@ error( _Bool ) SA_ParamsNext ( PT_Node_t ** token_node )
 		get_value(token_ptr, type_token, tmp_token, _Bool);
 		PT_Data_t type_child_data = {.isTerminal = true, .type.terminal = type_token};
 		tmp_node = PT_AddChild(type_node, type_child_data);
-		get_value(PT_Node_ptr, type_child_node, tmp_node, _Bool);
+		test_error(tmp_node, _Bool);
 
-		tmp_result = SA_Type(type_child_node);
+		tmp_result = SA_Type(type_node->leftChild);
 		get_value(bool, res_sa_type, tmp_result, _Bool);
 		test_result(res_sa_type);
 
