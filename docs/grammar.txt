@@ -2,8 +2,8 @@
 <PROG> -> endOfFile
 
 <PROG> -> function identOfFunc ( <PARAMS> ) : <TYPE> { <BODY> } <PROG>
-<PROG> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> } <PROG>
-<PROG> -> while ( <ARG_TYPE> ) { <BODY> } <PROG>
+<PROG> -> if ( <EXPR> ) { <BODY> } else { <BODY> } <PROG>
+<PROG> -> while ( <EXPR> ) { <BODY> } <PROG>
 <PROG> -> <EXPR> ; <PROG>
 <PROG> -> identOfFunc ( <ARGS> ) ; <PROG>
 <PROG> -> identOfVar = <RVAL> ; <PROG>
@@ -12,8 +12,8 @@
 <BODY> -> <STATEMENT> <BODY>
 <BODY> -> ''
 
-<STATEMENT> -> if ( <ARG_TYPE> ) { <BODY> } else { <BODY> }
-<STATEMENT> -> while ( <ARG_TYPE> ) { <BODY> }
+<STATEMENT> -> if ( <EXPR> ) { <BODY> } else { <BODY> }
+<STATEMENT> -> while ( <EXPR> ) { <BODY> }
 <STATEMENT> -> <EXPR> ;
 <STATEMENT> -> identOfFunc ( <ARGS> ) ;
 <STATEMENT> -> identOfVar = <RVAL> ;
@@ -33,9 +33,6 @@
 
 <ARGS_NEXT> ->, <ARG_TYPE> <ARGS_NEXT>
 <ARGS_NEXT> ->''
-
-<ARG_TYPE> -> <TERM>
-<ARG_TYPE> -> identOfVar
 
 
 <RET_VAL> -> <EXPR>

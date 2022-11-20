@@ -17,7 +17,7 @@
 #define test_error(er_obj, forw_type) do{ if( is_error(er_obj) ) { forward_error(er_obj, forw_type);} } while(0)
 
 const tokenType expr_tokens[] = {
-								identOfVar, integer, decNum, string, plusSign, minusSign,
+								identOfVar, integer, decNum, string, nullT, plusSign, minusSign,
 								multiply, division, concatenation, lessOper, lessOrEqOper,
 								moreOper, moreOrEqOper, EqOper, notEqOper, openParen, closeParen,
 								N_VLD
@@ -191,34 +191,22 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
         // If else statement
         case ifT:
 
-			// Open Paren
-			tmp_result = isNextToken(openParen, cur_node);
-			get_value(bool, is_open_paren_if, tmp_result, _Bool);
-			test_result(is_open_paren_if);
-			cur_node = cur_node->rightSibling;
-
-			// Create node <ARG_TYPE>
-			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = ARG_TYPE};
+			// Create node <EXPR>
+			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = EXPR};
 			tmp_node = PT_AddSibling(cur_node, tmp_node_data);
-			get_value(PT_Node_ptr, arg_type_node_if, tmp_node, _Bool);
+			get_value(PT_Node_ptr, expr_node_if, tmp_node, _Bool);
 			cur_node = cur_node->rightSibling;
 
-			// <ARG_TYPE>
+			// <EXPR>
 			tmp_token = getToken();
-			get_value(token_ptr, arg_type_token_if, tmp_token, _Bool);
-			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = arg_type_token_if};
-			tmp_node = PT_AddChild(arg_type_node_if, tmp_node_data);
+			get_value(token_ptr, expr_token_if, tmp_token, _Bool);
+			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = expr_token_if};
+			tmp_node = PT_AddChild(expr_node_if, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&(arg_type_node_if->leftChild));
-			get_value(bool, res_sa_arg_type_if, tmp_result, _Bool);
-			test_result(res_sa_arg_type_if);
-
-			// Close paren
-			tmp_result = isNextToken(closeParen, cur_node);
-			get_value(bool, is_close_paren_if, tmp_result, _Bool);
-			test_result(is_close_paren_if);
-			cur_node = cur_node->rightSibling;
+			tmp_result = SA_Expr(expr_node_if->leftChild);
+			get_value(bool, res_sa_expr_if, tmp_result, _Bool);
+			test_result(res_sa_expr_if);
 
 			// Open set paren
 			tmp_result = isNextToken(openSetParen, cur_node);
@@ -308,34 +296,23 @@ error( _Bool ) SA_Prog ( PT_Node_t ** token_node )
         // While
         case whileT:
 
-			// Open Paren
-			tmp_result = isNextToken(openParen, cur_node);
-			get_value(bool, is_open_paren_while, tmp_result, _Bool);
-			test_result(is_open_paren_while);
-			cur_node = cur_node->rightSibling;
-
-			// Create node for <ARG_TYPE>
-			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = ARG_TYPE};
+			// Create node <EXPR>
+			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = EXPR};
 			tmp_node = PT_AddSibling(cur_node, tmp_node_data);
-			get_value(PT_Node_ptr, arg_type_node_while, tmp_node, _Bool);
+			get_value(PT_Node_ptr, expr_node_while, tmp_node, _Bool);
 			cur_node = cur_node->rightSibling;
 
-			// <ARG_TYPE>
+			// <EXPR>
 			tmp_token = getToken();
-			get_value(token_ptr, arg_type_token_while, tmp_token, _Bool);
-			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = arg_type_token_while};
-			tmp_node = PT_AddChild(arg_type_node_while, tmp_node_data);
+			get_value(token_ptr, expr_token_while, tmp_token, _Bool);
+			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = expr_token_while};
+			tmp_node = PT_AddChild(expr_node_while, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&(arg_type_node_while->leftChild));
-			get_value(bool, res_sa_arg_type_while, tmp_result, _Bool);
-			test_result(res_sa_arg_type_while);
+			tmp_result = SA_Expr(expr_node_while->leftChild);
+			get_value(bool, res_sa_expr_while, tmp_result, _Bool);
+			test_result(res_sa_expr_while);
 
-			// Close paren
-			tmp_result = isNextToken(closeParen, cur_node);
-			get_value(bool, is_close_paren_while, tmp_result, _Bool);
-			test_result(is_close_paren_while);
-			cur_node = cur_node->rightSibling;
 
 			// Open set paren
 			tmp_result = isNextToken(openSetParen, cur_node);
@@ -730,35 +707,22 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 
         // If Statement
         case ifT:
-
-			// Open Paren
-			tmp_result = isNextToken(openParen, cur_node);
-			get_value(bool, is_open_paren_if, tmp_result, _Bool);
-			test_result(is_open_paren_if);
-			cur_node = cur_node->rightSibling;
-
-			// Create node <ARG_TYPE>
-			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = ARG_TYPE};
+			// Create node <EXPR>
+			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = EXPR};
 			tmp_node = PT_AddSibling(cur_node, tmp_node_data);
-			get_value(PT_Node_ptr, arg_type_node_if, tmp_node, _Bool);
+			get_value(PT_Node_ptr, expr_node_if, tmp_node, _Bool);
 			cur_node = cur_node->rightSibling;
 
-			// <ARG_TYPE>
+			// <EXPR>
 			tmp_token = getToken();
-			get_value(token_ptr, arg_type_token_if, tmp_token, _Bool);
-			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = arg_type_token_if};
-			tmp_node = PT_AddChild(arg_type_node_if, tmp_node_data);
+			get_value(token_ptr, expr_token_if, tmp_token, _Bool);
+			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = expr_token_if};
+			tmp_node = PT_AddChild(expr_node_if, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&(arg_type_node_if->leftChild));
-			get_value(bool, res_sa_arg_type_if, tmp_result, _Bool);
-			test_result(res_sa_arg_type_if);
-
-			// Close paren
-			tmp_result = isNextToken(closeParen, cur_node);
-			get_value(bool, is_close_paren_if, tmp_result, _Bool);
-			test_result(is_close_paren_if);
-			cur_node = cur_node->rightSibling;
+			tmp_result = SA_Expr(expr_node_if->leftChild);
+			get_value(bool, res_sa_expr_if, tmp_result, _Bool);
+			test_result(res_sa_expr_if);
 
 			// Open set paren
 			tmp_result = isNextToken(openSetParen, cur_node);
@@ -830,35 +794,22 @@ error( _Bool ) SA_Statement ( PT_Node_t ** token_node)
 
         // While
         case whileT:
-
-			// Open Paren
-			tmp_result = isNextToken(openParen, cur_node);
-			get_value(bool, is_open_paren_while, tmp_result, _Bool);
-			test_result(is_open_paren_while);
-			cur_node = cur_node->rightSibling;
-
-			// Create node for <ARG_TYPE>
-			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = ARG_TYPE};
+			// Create node <EXPR>
+			tmp_node_data = (PT_Data_t) {.isTerminal = false, .type.nonTerminal = EXPR};
 			tmp_node = PT_AddSibling(cur_node, tmp_node_data);
-			get_value(PT_Node_ptr, arg_type_node_while, tmp_node, _Bool);
+			get_value(PT_Node_ptr, expr_node_while, tmp_node, _Bool);
 			cur_node = cur_node->rightSibling;
 
-			// <ARG_TYPE>
+			// <EXPR>
 			tmp_token = getToken();
-			get_value(token_ptr, arg_type_token_while, tmp_token, _Bool);
-			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = arg_type_token_while};
-			tmp_node = PT_AddChild(arg_type_node_while, tmp_node_data);
+			get_value(token_ptr, expr_token_while, tmp_token, _Bool);
+			tmp_node_data = (PT_Data_t) {.isTerminal = true, .type.terminal = expr_token_while};
+			tmp_node = PT_AddChild(expr_node_while, tmp_node_data);
 			test_error(tmp_node, _Bool);
 
-			tmp_result = SA_ARG_Type(&(arg_type_node_while->leftChild));
-			get_value(bool, res_sa_arg_type_while, tmp_result, _Bool);
-			test_result(res_sa_arg_type_while);
-
-			// Close paren
-			tmp_result = isNextToken(closeParen, cur_node);
-			get_value(bool, is_close_paren_while, tmp_result, _Bool);
-			test_result(is_close_paren_while);
-			cur_node = cur_node->rightSibling;
+			tmp_result = SA_Expr(expr_node_while->leftChild);
+			get_value(bool, res_sa_expr_while, tmp_result, _Bool);
+			test_result(res_sa_expr_while);
 
 			// Open set paren
 			tmp_result = isNextToken(openSetParen, cur_node);
@@ -1548,6 +1499,7 @@ error(none) skipTokens ( const tokenType * which, PT_Node_t* token_node )
 	} while ( isInTokens(tmp_token._value->discriminant, expr_tokens) );
 
     returnToken(cur_node->data.type.terminal);
+	free(cur_node);
 	prev_node->rightSibling = NULL;
 
     return_none();
