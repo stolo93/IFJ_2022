@@ -1,0 +1,40 @@
+name: Tests
+
+on:
+
+  push:
+    branches:
+      - main
+    paths-ignore:
+      -'docs/**'
+      -'sample_programs/**'
+
+  pull_request:
+    branches:
+      - main
+    paths-ignore:
+      -'docs/**'
+      -'sample_programs/**'
+
+
+jobs:
+  Test:
+
+    runs-op: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Clone tests repo
+        with:
+          repository: galloj/IFJ22_Tester/
+          path: ''./tests'
+
+
+      - name: Build
+        run: make
+
+
+      - name: Python tests
+        run: |
+          cd ./tests && python3 test.py ../main
+          cd ..
