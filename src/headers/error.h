@@ -99,7 +99,13 @@ enum error_kinds {
     ERROR_SEM_TYPE_EXPR,
 
     /* Other semantic errors */
-    ERROR_SEM
+    ERROR_SEM,
+
+    ERROR_SEM_NODE,
+
+    ERROR_SEM_EXPR,
+
+    ERROR_SEM_TYPE
 };
 
 const char* error_kind_name(enum error_kinds kind);

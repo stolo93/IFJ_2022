@@ -10,6 +10,8 @@
 
 #include "./headers/semantic_analysis.h"
 
+DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(htab_t_ptr, htab_t_ptr);
+
 vec_htab_t_ptr symtable_vector;
 
 //Checks:
@@ -485,8 +487,11 @@ error(_Bool) checkVariable(PT_Node_ptr node)
 
         else if(rvalNode->leftChild->data.isTerminal == false && rvalNode->leftChild->data.type.nonTerminal == EXPR) //EXPRESSION
         {
-            error(_Bool) errorObj = checkExpression(node);
+            /*error(_Bool) errorObj = checkExpression(node);
             get_value(bool, checkExpressionReturnValue, errorObj, _Bool);
+            return_value(checkExpressionReturnValue, bool);*/
+            error( dType) errorObj = checkExpressionAssigment(node);
+            get_value(dType, checkExpressionReturnValue, errorObj, _Bool);
             return_value(checkExpressionReturnValue, bool);
         }
     }
@@ -541,7 +546,7 @@ error(_Bool) checkWhileBlock(PT_Node_ptr node, htab_pair_t_ptr functionContext)
     return_value(true, bool);
 }
 
-error(_Bool) checkExpression(PT_Node_ptr node)
+/*error(_Bool) checkExpression(PT_Node_ptr node)
 {
     if(node == NULL)
     {
@@ -551,7 +556,7 @@ error(_Bool) checkExpression(PT_Node_ptr node)
     //TODO
 
     return_value(false, _Bool);
-}
+}*/
 
 error(_Bool) checkReturnSatement(PT_Node_ptr node, htab_pair_t_ptr functionRecord)
 {
