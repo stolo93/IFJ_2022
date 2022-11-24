@@ -84,9 +84,9 @@ char * findDot( char* info )
 /*tokenType checkForKeyword ( char* string )
 {
     //list of all keywords , DON'T change order of elements otherwise you get wrong token types
-    const char * kWords [] = { "" , "else" , "float" , "function" , "if" ,  "int" , "null" 
+    const char * kWords [] = { "" , "else" , "float" , "function" , "if" ,  "int" , "null"
                                   ,"return" , "string"  , "void" , "while"  };
-    
+
     const char * dTypes [] = { "float" , "int" , "string" } ;
 
     for ( unsigned int counter = 0 ; counter < NUM_OF_KWORDS - 3 ; counter++ )
@@ -100,7 +100,7 @@ char * findDot( char* info )
 
     return identOfFunct ;
 
-}*/ //I will leave it here because it was tested and it works 
+}*/ //I will leave it here because it was tested and it works
 
 /** Function which checks identifiers for keywords
  *
@@ -176,20 +176,20 @@ bool isStringAType(const char* str) {
 /** Function which checks identifiers for keywords
  *
  *  @param string which will be checked for keyword
- *  @return state indicating type of keyword 
+ *  @return state indicating type of keyword
  ***/
 tokenType checkForKeyword ( char* string )
 {
     tokenType token;
-    
+
     if (mapStringToKeyword(string, &token)) {
         return token;
     }
-    
+
     if (isStringAType(string)) {
         return  identOfType;
     }
-    
+
     return identOfFunct;
 }
 
@@ -204,24 +204,24 @@ tokenType checkForKeyword ( char* string )
  *  @return token with stored number
  ***/
 token_t* convertNum ( token_t* newToken , char* info )
-{ 
-    
+{
+
     bool decN = false ;
-    
-    char * E = strchr( info , 'E' ) ; //checks if E is present in number 
+
+    char * E = strchr( info , 'E' ) ; //checks if E is present in number
     if ( E == NULL )
     {
-        E = strchr( info , 'e' ) ; 
+        E = strchr( info , 'e' ) ;
     }
-    
-    decN = findDot( info ); 
+
+    decN = findDot( info );
 
     if ( E != NULL )
     {
         decN = true;
     }
     if ( !decN ){
-        
+
         newToken->discriminant = integer;
 
         long num = strtol( info , NULL ,10 );
@@ -230,13 +230,13 @@ token_t* convertNum ( token_t* newToken , char* info )
         {
             newToken->info.integer = -1;
         }
-        else 
+        else
         {
             newToken->info.integer = (int) num ;
         }
         return newToken;
     }
-    
+
     newToken->discriminant = decNum;
     newToken->info.decNuber = strtod( info , NULL );
     if( errno == ERANGE) {
@@ -245,9 +245,9 @@ token_t* convertNum ( token_t* newToken , char* info )
     return newToken;
 }
 
-/** Function for determinig first state 
+/** Function for determinig first state
  *
- *  @param character 
+ *  @param character
  *  @return first state
  ***/
 tokenType firstState ( int character )
@@ -280,7 +280,7 @@ tokenType firstState ( int character )
 
 /** Function which reads token and sends it to caller
  *
- *  
+ *
  *  @return token or NULL pionter if error occured
  ***/
 error(token_ptr) getToken( ) //htab_pair_t_ptr table
@@ -309,7 +309,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
     {
         free( newToken );
         free( info );
-        return_error(ERROR_MAL,token_ptr); 
+        return_error(ERROR_MAL,token_ptr);
     }
 
     if ( firstCall == true )
@@ -321,12 +321,12 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
         {
             free(newToken);
             return_error( ERROR_LEX_PROLOG , token_ptr );
-        }  
+        }
         newToken->info.integer = correct;
         newToken->discriminant = prolog;
         return_value( newToken , token_ptr );
     }
-    // discards whitespace characters 
+    // discards whitespace characters
     while( isspace( character = getc( stdin ) ) && character != EOF ) {}
 
     //if EOF is encountered special token is sent
@@ -348,7 +348,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
 
         free( info );
         free( newToken );
-        return_error(ERROR_LEX,token_ptr);  
+        return_error(ERROR_LEX,token_ptr);
     }
 
     info[0] = (char)character ;
@@ -361,10 +361,10 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
         {
             case identOfVar :
                             if ( counter == 1 && ( isalpha( character ) || character == '_'))
-                            {   
-                                //control if following character isn't number or other invalid character 
+                            {
+                                //control if following character isn't number or other invalid character
                                 info [ counter ] = (char)character;
-                                endState = true;   
+                                endState = true;
                                 counter++;
                                 break;
                             }
@@ -381,17 +381,17 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 {
                                     free( info );
                                     free( newToken );
-                                    return_error(ERROR_MAL,token_ptr); 
+                                    return_error(ERROR_MAL,token_ptr);
                                 }
                                 ungetc ( character , stdin ); //in case if following character wasn't whitespace
-                                
+
                                 __interning();
                                 return_value( newToken , token_ptr );
                             }
                             ungetc(character , stdin );
                             free(info);
                             free(newToken);
-                            return_error( ERROR_LEX_VAR , token_ptr); 
+                            return_error( ERROR_LEX_VAR , token_ptr);
 
             case identOfFunct :
                             //endState = true ;
@@ -409,10 +409,10 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             {
                                 free (info ) ;
                                 free( newToken ) ;
-                                return_error( ERROR_MAL , token_ptr ); 
+                                return_error( ERROR_MAL , token_ptr );
                             }
                             newToken->discriminant = checkForKeyword ( info );
-                            
+
                             __interning();
                             return_value( newToken , token_ptr );
 
@@ -420,11 +420,11 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             if ( counter == 1 && noRepeat )
                             {
                                 counter-- ;
-                                noRepeat = false ; 
+                                noRepeat = false ;
 
                                 if ( character == '>' ){
                                     state = endOfFile;
-                                    break; 
+                                    break;
                                 }
                             }
                             if ( islower ( character ) ) //after '?' I know there can't upper case character
@@ -437,9 +437,9 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             ungetc ( character , stdin );
                             if (  !finalResize( &info ,counter) )
                             {
-                                free( info ) ; 
+                                free( info ) ;
                                 free( newToken ) ;
-                                return_error( ERROR_MAL , token_ptr); 
+                                return_error( ERROR_MAL , token_ptr);
                             }
                             if (checkForKeyword ( info ) != identOfType) // if string isn't identificator of type it is error
                             {
@@ -448,27 +448,27 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 return_error(ERROR_LEX_DTYPE, token_ptr );
                             }
                             __interning();
-                            return_value( newToken , token_ptr ); 
+                            return_value( newToken , token_ptr );
 
             case integer :
-                            
+
                             if ( isdigit( character ) )
                             {
                                 if(! exp ) { sign = false; } //if there was 'e' and it was followed by num sign can't appear
-                                err = false;             //this marks that 'e' or '.' was followed by number  
+                                err = false;             //this marks that 'e' or '.' was followed by number
 
                                 info [ counter ] = (char)character ;
                                 counter++ ;
                                 break ;
                             }
-                            
+
                             if ( character == '.' && dot)
                             {
                                 dot = false;              //this marks that '.' appeared in number
                                 err = true;               //following character must be number otherwise error state
                                 info [ counter ] = (char)character ;
                                 counter++ ;
-                                break; 
+                                break;
                             }
                             if ( ( character == 'e' || character == 'E' ) && exp && !err )
                             {
@@ -484,9 +484,9 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             {
                                 sign = false; //this marks that sign appeared in number
                                 info [ counter ] = (char)character ;
-                                counter++ ;                    
-                                                               
-                                break;  
+                                counter++ ;
+
+                                break;
                             }
                             if((! isdigit(character) ) && err == true )
                             {
@@ -494,8 +494,8 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 free( newToken );
                                 return_error( ERROR_LEX , token_ptr );
                             }
-                            
-                            ungetc( character , stdin );  
+
+                            ungetc( character , stdin );
 
                             newToken = convertNum( newToken , info );
 
@@ -507,11 +507,11 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             else if (newToken->discriminant == integer )
                             {
                                 if ( newToken->info.integer == -1 ) { return_error( ERROR_LEX , token_ptr ); }
-                            }                          
+                            }
 
                             return_value( newToken , token_ptr );
 
-            case string : 
+            case string :
                             if ( ( character == '$' && info [ counter - 1 ] != '\\' ) || character < ' ' )
                             {
                                 // '$' can only be in escape sequence
@@ -519,7 +519,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 free ( newToken );
                                 return_error( ERROR_LEX_INVSTR , token_ptr );
                             }
-                            
+
                             if ( character == '"' && info[ counter - 1] != '\\')
                             {
                                 info [ counter ] = (char)character;
@@ -532,7 +532,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                     return_error( ERROR_MAL , token_ptr );
                                 }
                                 __interning();
-                                return_value( newToken , token_ptr ) ; 
+                                return_value( newToken , token_ptr ) ;
                             }
 
                             info [ counter ] = (char)character;
@@ -544,7 +544,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             if( character != '/' && character != '*' )
                             {
                                 ungetc( character , stdin ) ;
-                                
+
                                 if( ! finalResize( &info ,counter) )
                                 {
                                     free( info );
@@ -564,7 +564,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             {
                                 state = multiLineComm;
                                 break;
-                            } 
+                            }
                             break;
             case lineComment :
                             if( character == '\n' || character == EOF )
@@ -572,9 +572,9 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 free( info );
                                 free( newToken );
 
-                                return getToken(); 
-                            }   
-                            break; 
+                                return getToken();
+                            }
+                            break;
             case multiLineComm:
                             if( character == EOF ) //unterminated ml comment
                             {
@@ -591,10 +591,10 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             if(character == '/' )
                             {
                                 free ( info ) ;
-                                free ( newToken ) ; // free everything and call recursively getToken to get token  
-                                
-                                return getToken(); 
-                    
+                                free ( newToken ) ; // free everything and call recursively getToken to get token
+
+                                return getToken();
+
                             }
                             else if( character == EOF ) //unterminated ml comment
                             {
@@ -607,21 +607,21 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                                 break;
                             }
                             state = multiLineComm;
-                            break; 
+                            break;
 
-            case plusSign :   //they all work same so they will fall 
-            case minusSign : 
-            case multiply : 
+            case plusSign :   //they all work same so they will fall
+            case minusSign :
+            case multiply :
             case colon :
             case semicolon :
-            case comma : 
+            case comma :
             case openParen :
             case openSetParen :
             case closeParen :
-            case closeSetParen :   
+            case closeSetParen :
             case concatenation :
                             ungetc( character , stdin ) ;
-                            
+
                             if ( ! finalResize( &info ,counter) )
                             {
                                 free( info );
@@ -649,7 +649,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             }
                             __interning();
                             return_value( newToken , token_ptr );
-        
+
             case moreOper :
                             if ( character == '=' ){
 
@@ -661,7 +661,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             else
                             {
                                 ungetc( character , stdin );
-                            } 
+                            }
                             if( ! finalResize( &info ,counter) )
                             {
                                 free( info ) ;
@@ -709,14 +709,14 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
 
                             __interning();
 
-                            return_value( newToken , token_ptr ); 
+                            return_value( newToken , token_ptr );
                         }
-                        
+
                         free( info );
                         free( newToken );
 
                         return_error( ERROR_LEX , token_ptr );
-            
+
 
             case notEqOper:
                             if ( counter == 1 && character == '=' )
@@ -754,7 +754,7 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
                             }
                             free ( newToken );
 
-                            return_error( ERROR_LEX , token_ptr); 
+                            return_error( ERROR_LEX , token_ptr);
 
             default: break;
         }
@@ -762,10 +762,10 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
         if ( counter >= size )
         {
             if( !resizeString ( &info , &size ) ) //resize string if needed
-            {                   
+            {
                 free(info);
                 free(newToken);
-                return_error( ERROR_MAL , token_ptr ); 
+                return_error( ERROR_MAL , token_ptr );
             }
         }
 
@@ -789,14 +789,14 @@ error(none) returnToken( token_ptr retToken)
     {
         int len = 0;
         if (retToken->discriminant == decNum )
-        { 
+        {
             len = snprintf(NULL , 0 , "%lf" , retToken->info.decNuber ); //getting number of digits in number
         }
-        else 
+        else
         {
             len = snprintf(NULL , 0 , "%d" , retToken->info.integer );
-        }   
-        char* string = ( char * ) calloc ( len , sizeof( char )) ; // maybe I overshot it a bit  
+        }
+        char* string = ( char * ) calloc ( len , sizeof( char )) ; // maybe I overshot it a bit
 
         if( string == NULL )
         {
@@ -806,14 +806,14 @@ error(none) returnToken( token_ptr retToken)
         }
         if( retToken->discriminant == integer )
         {
-            sprintf( string , "%d" , retToken->info.integer );                                                              
+            sprintf( string , "%d" , retToken->info.integer );
         }
         else
         {
             sprintf( string , "%lf" , retToken->info.decNuber );
         }
-       
-        
+
+
         size_t counter = strlen( string ) - 1;
 
         for(; counter != SIZE_MAX; counter-- )
@@ -824,13 +824,13 @@ error(none) returnToken( token_ptr retToken)
         free( retToken );
         return_none();
     }
-    
+
     size_t counter = strlen( retToken->info.string ) - 1;
 
     for( ; counter != SIZE_MAX ; counter-- )
     {
         ungetc( (int) retToken->info.string [ counter ] , stdin );
-    } 
+    }
 
     //free( (char*)retToken->info.string );
     free( retToken );
@@ -849,7 +849,7 @@ int skipWhiteSpaceAndCmpChar ( int cmp )
 
         switch( state )
         {
-            case def: 
+            case def:
                     if( character == cmp)
                     {
                         return character;
@@ -878,7 +878,7 @@ int skipWhiteSpaceAndCmpChar ( int cmp )
                         state = multiLineComm;
                         break;
                     }
-                    else 
+                    else
                     {
                         return 0;
                     }
@@ -906,7 +906,7 @@ int skipWhiteSpaceAndCmpChar ( int cmp )
                     {
                         state = def;
                         break;
-                    }        
+                    }
                     break;
             default:
                     return 0;
@@ -921,19 +921,19 @@ int skipWhiteSpaceAndCmpChar ( int cmp )
 
 /** Function which checks if prolog is correct
  *
- *  @return 0 if prolog is incorect , 1 if prolog is correct and 
+ *  @return 0 if prolog is incorect , 1 if prolog is correct and
  *  switch is not present, 2 if prolog is correct and switch is present
  ***/
-int checkProlog () 
+int checkProlog ()
 {
     int character = 0;
     int counter = 0;
-    char string [ LEN_OF_PROLSYM ] = "";
-    char string2 [ LEN_OF_DECLARE ] = "";
-    char string3 [ LEN_OF_STRICT ] = "";
+    char string [ LEN_OF_PROLSYM + 1 ] = "";
+    char string2 [ LEN_OF_DECLARE + 1 ] = "";
+    char string3 [ LEN_OF_STRICT + 1 ] = "";
     bool endLine = false;
     bool endLineComm = false;
-    
+
     tokenType state = plusSign ;
 
     for( unsigned int counter = 0 ; counter < LEN_OF_PROLSYM - 1 ; counter ++)
@@ -942,21 +942,23 @@ int checkProlog ()
         string [ counter ] = (char)character ;
     }
 
-    if ( strcmp ( string , "<?php" ) != 0) { return 0; }
+    string[LEN_OF_PROLSYM] = '\0';
+
+    if ( strncmp ( string , "<?php", LEN_OF_PROLSYM ) != 0) { return 0; }
 
     while( ( character = getc( stdin ) ) != EOF )
     {
-        
+
         switch( state )
         {
-            case plusSign: 
+            case plusSign:
                         if ( character == '/')
                         {
                             state = lineComment;
                         }
                         else if( character == '\n')
                         {
-                            endLine = true ; 
+                            endLine = true ;
                             break;
                         }
                         else if( ! isspace( character ) )
@@ -973,13 +975,13 @@ int checkProlog ()
                         else if ( character == '*' )
                         {
                             state = multiLineComm ;
-                            break ; 
+                            break ;
                         }
                         return 0;
             case identOfFunct:
                         if ( character == '\n' )
                         {
-                            
+
                             endLine = true;
                             break;
                         }
@@ -996,7 +998,7 @@ int checkProlog ()
                             break;
                         }
                         break;
-            case multiLineCommPE : 
+            case multiLineCommPE :
                         if ( character == '/' && endLineComm == true )
                         {
                             endLine = true ;
@@ -1005,24 +1007,24 @@ int checkProlog ()
                         if( character == '/' && endLineComm == false )
                         {
                             state = plusSign ;
-                            break; 
+                            break;
                         }
                         state = lineComment ;
                         break ;
             default: return 0;
 
         }
- 
+
         if( endLine )
         {
-            
+
             break;
         }
-        
+
     }
     if( character == EOF && endLine == false )
     {
-        return 0; 
+        return 0;
 
     }
     //while ( (character = getc ( stdin )) != EOF && isspace( character )) {}
@@ -1049,13 +1051,15 @@ int checkProlog ()
         }
     }
 
-    if ( strcmp( string2 , "declare" ) != 0 ) { return 0 ; }
+    string2[counter+1] = '\0';
+
+    if ( strncmp( string2 , "declare", counter+1 ) != 0 ) { return 0 ; }
 
     if ( ! skipWhiteSpaceAndCmpChar( '(' ) ) { return 0; }
 
     if ( (character = skipWhiteSpaceAndCmpChar( 's' )) == 0) { return 0; }
 
-    
+
     counter = 1 ;
     string3 [ 0 ] = (char)character ;
 
@@ -1068,8 +1072,10 @@ int checkProlog ()
             break;
         }
     }
-    
-    if ( strcmp( string3 , "strict_types" ) != 0 ) { return 0 ; }
+
+    string3[counter+1] = '\0';
+
+    if ( strncmp( string3 , "strict_types", counter+1 ) != 0 ) { return 0 ; }
 
     if ( ! skipWhiteSpaceAndCmpChar( '=') ) { return 0 ; }
 
@@ -1079,6 +1085,6 @@ int checkProlog ()
 
     if ( ! skipWhiteSpaceAndCmpChar( ';' )) { return 0; }
 
-     return 2;     
+     return 2;
 
 }
