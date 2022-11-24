@@ -24,17 +24,21 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Clone tests repo
-        with:
-          repository: galloj/IFJ22_Tester/
-          path: './tests'
+      - uses: actions/checkout@v3
+      - run:  git clone https://github.com/galloj/IFJ22_Tester.git
 
 
       - name: Build
         run: make
 
 
-      - name: Python tests
+      - name: Python tests -without IFJcode interpreter
         run: |
-          cd ./tests && python3 test.py ../main
-          cd ..
+          cd IFJ22_Tester
+          ./test.py ../main
+
+      - name: Python tests -with IFJcode interpreter
+        if: success() || failure()
+        run: |
+          cd IFJ22_Tester
+          ./test.py ../main ../ic22int
