@@ -20,14 +20,14 @@ on:
 jobs:
   Test:
 
-    runs-op: ubuntu-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
       - name: Clone tests repo
         with:
           repository: galloj/IFJ22_Tester/
-          path: ''./tests'
+          path: './tests'
 
 
       - name: Build
