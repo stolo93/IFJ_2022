@@ -142,10 +142,10 @@ bool mapStringToKeyword(const char* str, tokenType* token) {
         return true;
     }
 
-    if (strcmp(str, "void") == 0) {
+    /*if (strcmp(str, "void") == 0) {
         *token = voidT;
         return true;
-    }
+    }*/
 
     if (strcmp(str, "while") == 0) {
         *token = whileT;
@@ -166,6 +166,8 @@ bool isStringAType(const char* str) {
     } if (strcmp(str, "int") == 0) {
         return true;
     } if (strcmp(str, "string") == 0) {
+        return true;
+    } if (strcmp(str, "void") == 0) {
         return true;
     }
 
@@ -842,7 +844,75 @@ error(none) returnToken( token_ptr retToken)
 int skipWhiteSpaceAndCmpChar ( int cmp )
 {
     int character = 0;
-    while ( (character = getc ( stdin )) != EOF && isspace( character )) {}
+    tokenType state = def;
+    while ( (character = getc ( stdin )) != EOF /*&& isspace( character )*/) {
+
+        switch( state )
+        {
+            case def: 
+                    if( character == cmp)
+                    {
+                        return character;
+                    }
+                    else if( character == '/')
+                    {
+                        state = division;
+                        break;
+                    }
+                    else if( isspace( character ))
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        return 0;
+                    }
+            case division:
+                    if( character == '/')
+                    {
+                        state = lineComment;
+                        break;
+                    }
+                    if( character == '*')
+                    {
+                        state = multiLineComm;
+                        break;
+                    }
+                    else 
+                    {
+                        return 0;
+                    }
+            case lineComment:
+                    if( character == '\n')
+                    {
+                        state = def;
+                        break;
+                    }
+                    break;
+            case multiLineComm:
+                    if( character == '*')
+                    {
+                        state = multiLineCommPE;
+                        break;
+                    }
+                    break;
+            case multiLineCommPE:
+                    if( character == '*')
+                    {
+                        state = multiLineCommPE;
+                        break;
+                    }
+                    else if( character == '/')
+                    {
+                        state = def;
+                        break;
+                    }        
+                    break;
+            default:
+                    return 0;
+        }
+
+    }
 
     if ( character != cmp ) { return 0; }
 
@@ -955,16 +1025,19 @@ int checkProlog ()
         return 0; 
 
     }
-    while ( (character = getc ( stdin )) != EOF && isspace( character )) {}
+    //while ( (character = getc ( stdin )) != EOF && isspace( character )) {}
 
     counter = 1 ;
-    if ( character != 'd' )
+    /*if ( character != 'd' )
     {
         ungetc( character , stdin );
         return 1;
+    }*/
+    string2 [ 0 ] = (char) skipWhiteSpaceAndCmpChar('d') ;
+    if( string2 [0] == 0)
+    {
+        return 0;
     }
-    string2 [ 0 ] = (char)character ;
-    
 
     while ( ( character = getc ( stdin ))  != EOF )
     {
