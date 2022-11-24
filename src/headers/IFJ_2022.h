@@ -113,7 +113,7 @@ typedef enum tokenType { def , elseT, /*floatT ,*/ functionT , ifT , /*intT ,*/ 
              lessOper , lessOrEqOper , moreOper , moreOrEqOper ,
              EqOper , notEqOper, assigment , openParen , closeParen , openSetParen ,
              closeSetParen , comma , semicolon , colon , endOfFile , identOfTypeN ,
-             multiLineCommPE, prolog , N_VLD } tokenType;
+             multiLineCommPE, prolog , N_VLD , intToReal , intToBool , floatToBool , stringToBool } tokenType;
 
 typedef struct token
 {

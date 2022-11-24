@@ -21,7 +21,7 @@
 #define  POS_J 9
 
 typedef enum dataType { integerT , floatingT , stringT , notDefined , noType ,  
-                        integerTNull , floatingTNull , stringTNull } dType ;
+                        integerTNull , floatingTNull , stringTNull , boolT} dType ;
 typedef enum symbolType { function , variable } sType ;
 
 // Table

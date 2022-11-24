@@ -8,6 +8,9 @@
  *
  */
 
+#ifndef __SEM_ANALYSIS__
+#define __SEM_ANALYSIS__
+
 #include "stdbool.h"
 #include "./error.h"
 #include "./symtable.h"
@@ -18,8 +21,9 @@
 
 typedef htab_t_ptr* htab_t_ptr_ptr;
 define_error(htab_t_ptr_ptr);
+define_error(dType);
 DEFINE_VEC_PROTOTYPES(htab_t_ptr, htab_t_ptr);
-DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(htab_t_ptr, htab_t_ptr);
+
 
 /**
  * @brief Function makes semantic checks on provided progtree
@@ -94,7 +98,14 @@ error(_Bool) checkWhileBlock(PT_Node_ptr node, htab_pair_t_ptr functionContext);
  * @param node provided node
  *
  */
-error( _Bool ) checkExpression(PT_Node_ptr node);
+error( dType ) checkExpressionIfWhile( PT_Node_ptr node );
+
+/**
+ * @brief Function checks for semantic errors in expression
+ * @param node provided node
+ *
+ */
+error( dType ) checkExpressionAssigment( PT_Node_ptr node );
 
 /**
  * @brief Function checks for semantic errors in return statement of a function
@@ -146,3 +157,5 @@ error(PT_Node_ptr) findProgNode(PT_Node_t * node);
  *
  */
 error(PT_Node_ptr) findLastNodeOnRow(PT_Node_t * node);
+
+#endif

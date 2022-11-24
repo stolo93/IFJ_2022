@@ -65,6 +65,12 @@ const char* error_kind_name(enum error_kinds kind) {
         case ERROR_SEM:
             s(ERROR_SEM);
         /* Undefined function */
+        case ERROR_SEM_NODE:
+            s(ERROR_SEM_NODE);
+        case ERROR_SEM_EXPR:
+            s(ERROR_SEM_EXPR);
+        case ERROR_SEM_TYPE:
+            s(ERROR_SEM_TYPE);
         default:
             return "ERROR KIND WAS NOT GIVEN A NAME PLEASE CHANGE";
     }
@@ -131,6 +137,12 @@ const char* error_kind_message(enum error_kinds kind) {
             return "SEM: Invalid type compatibility in aritmetic, string or relational expression";
         case ERROR_SEM:
             return "SEM: Other semantic errors";
+        case ERROR_SEM_NODE:
+            return "Error in expression";
+        case ERROR_SEM_EXPR:
+            return "Not defined variable";
+        case ERROR_SEM_TYPE:
+            return "Wrong types";
         default:
             return "KIND WAS NOT GIVEN A ERROR MESSAGE!!!";
     }
@@ -155,6 +167,7 @@ int error_kind_exit_code(enum error_kinds kind) {
         case VECTOR_EMPTY_ERROR:
         case VECTOR_REALLOC_ERROR:
         case VECTOR_INDEX_BOUNDS_ERROR:
+        case ERROR_SEM_NODE:
             return 99;
         case ERROR_LEX_VAR:
         case ERROR_LEX_DTYPE:
@@ -181,6 +194,10 @@ int error_kind_exit_code(enum error_kinds kind) {
             return 7;
         case ERROR_SEM:
             return 8;
+        case ERROR_SEM_EXPR:
+            return 5;
+        case ERROR_SEM_TYPE:
+            return 7;
         default:
             return 99;
     }
