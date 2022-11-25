@@ -5,6 +5,7 @@
 #include "./headers/scaner.h"
 #include "./headers/syntax_tree.h"
 #include "./headers/error.h"
+#include "./headers/codegen.h"
 
 error( interner ) init;
 interner* interner_ptr;
@@ -39,12 +40,20 @@ error(none) real_main(int argc, char** argv) {
     // Syntactic analysis
     error(_Bool) tmp_result = SA_Prolog(token_node);
 
-
-    interner_destroy( interner_ptr);
-    PT_DeleteNode(&syntax_tree);
-
     if ( is_error(tmp_result) )
     {
+        interner_destroy( interner_ptr);
+        PT_DeleteNode(&syntax_tree);
+        forward_error(tmp_result, none);
+    }
+
+    error(none) codegen_result = generate_code_from_syntax_tree(&token_node);
+
+
+    if ( is_error(codegen_result) )
+    {
+        interner_destroy( interner_ptr);
+        PT_DeleteNode(&syntax_tree);
         forward_error(tmp_result, none);
     }
 
