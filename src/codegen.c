@@ -297,7 +297,7 @@ error(PT_Node_ptr) print_if(PT_Node_t* if_start, int* label_indexer, const char*
     printf("LABEL .%s.%d\nJUMPIFNEQ .%s.%d GF@RAX float@0x0p+0\nJUMP .%s.%d\n", label_prefix, *label_indexer + 2, label_prefix, index_if_block, label_prefix, index_else_block);
 
     // bool comparison function
-    printf("LABEL .%s.%d\nJUMPIFNEQ .%s.%d GF@RAX float@0x0p+0\nJUMP .%s.%d\n", label_prefix, *label_indexer + 2, label_prefix, index_if_block, label_prefix, index_else_block);
+    printf("LABEL .%s.%d\nJUMPIFEQ .%s.%d GF@RAX bool@true\nJUMP .%s.%d\n", label_prefix, *label_indexer + 3, label_prefix, index_if_block, label_prefix, index_else_block);
     *label_indexer = *label_indexer + 4;
 
     // if block
@@ -600,7 +600,7 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
     int label_indexer = 0;
 
     // Define a base frame we use instead of the global to simplify defining variables
-    printf("CREATEFRAME\nPUSHFRAME\n");
+    printf(".IFJcode22\nCREATEFRAME\nPUSHFRAME\n");
 
     // Define helper variables
     printf("DEFVAR GF@RAX\nDEFVAR GF@RBX\n");
