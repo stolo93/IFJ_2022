@@ -71,6 +71,8 @@ const char* error_kind_name(enum error_kinds kind) {
             s(ERROR_SEM_EXPR);
         case ERROR_SEM_TYPE:
             s(ERROR_SEM_TYPE);
+        case ERROR_GEN_UNSPECIFIED:
+            s(ERROR_GEN_UNSPECIFIED);
         default:
             return "ERROR KIND WAS NOT GIVEN A NAME PLEASE CHANGE";
     }
@@ -143,6 +145,8 @@ const char* error_kind_message(enum error_kinds kind) {
             return "Not defined variable";
         case ERROR_SEM_TYPE:
             return "Wrong types";
+        case ERROR_GEN_UNSPECIFIED:
+            return "An error of unknown origin occurred in codegen?\a";
         default:
             return "KIND WAS NOT GIVEN A ERROR MESSAGE!!!";
     }
@@ -198,6 +202,8 @@ int error_kind_exit_code(enum error_kinds kind) {
             return 5;
         case ERROR_SEM_TYPE:
             return 7;
+        case ERROR_GEN_UNSPECIFIED:
+            return 99;
         default:
             return 99;
     }

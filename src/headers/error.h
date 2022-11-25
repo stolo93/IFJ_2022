@@ -105,7 +105,10 @@ enum error_kinds {
 
     ERROR_SEM_EXPR,
 
-    ERROR_SEM_TYPE
+    ERROR_SEM_TYPE,
+
+    /* Some error occurred during code generation */
+    ERROR_GEN_UNSPECIFIED,
 };
 
 const char* error_kind_name(enum error_kinds kind);

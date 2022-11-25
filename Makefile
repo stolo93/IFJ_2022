@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -Werror -g --warn-no-unused-function
-OBJS = main.o error.o error_infrastructure.o symtable.o vector.o scaner.o syntax_tree.o interner.o syntactic_analysis.o semantic_analysis.o semantic_expression.o
+OBJS = main.o error.o error_infrastructure.o symtable.o vector.o scaner.o syntax_tree.o interner.o syntactic_analysis.o semantic_analysis.o semantic_expression.o codegen.o codegen_context.o
 SOURCES = src/*.c
 HEADERS = src/headers/*.h
 LINTER_CHECKS = clang-analyzer-*,-clang-analyzer-cplusplus*,bugprone-*,-misc-no-recursion,-bugprone-reserved-identifier,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
@@ -25,4 +25,4 @@ lint_pedantic:
 clean:
 	rm *.o main deps
 
-.PHONY: clean dependencies lint lint_pedantic
+.PHONY: clean dependencies
