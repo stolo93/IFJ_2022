@@ -14,7 +14,7 @@
 #include <stdint.h>
 #include "headers/scaner.h"
 #include "headers/error.h"
-#include "headers/htab.h"
+//#include "headers/htab.h"
 #include "headers/interner.h"
 
 extern interner* interner_ptr;

@@ -8,7 +8,7 @@
 #define __SCANNER_H__
 
 #include <stdbool.h>
-#include "htab.h"
+//#include "htab.h"
 #include "IFJ_2022.h"
 #include "error.h"
 #include "interner.h"

@@ -8,7 +8,7 @@
 #ifndef __HTAB_H_T__
 #define __HTAB_H_T__
 
-#include "htab.h"
+#include "symtable.h"
 
 struct htab{
     size_t size;
