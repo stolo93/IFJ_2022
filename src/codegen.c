@@ -703,7 +703,7 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
                 set_node_from_error(current, continued);
 
                 // If the function returns a value it will be on the stack, we aren't saving the value, so we clear the stack
-                printf("CLEARS/n");
+                printf("CLEARS\n");
                 break;
             }
 
