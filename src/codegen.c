@@ -752,6 +752,6 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
     end:
     vec_context_destroy(&context);
     // Cleanup the last stack frame and exit with default value
-    printf("POPFRAME/nEXIT int@0\n");
+    printf("POPFRAME\nEXIT int@0\n");
     return_none();
 }
