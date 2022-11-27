@@ -9,13 +9,7 @@
 #define LEFT 0
 #define RIGHT 1
 
-
-
-
-
 extern vec_htab_t_ptr symtable_vector;
-
-
 
 /*
   getting down to operands DONE
@@ -27,7 +21,7 @@ extern vec_htab_t_ptr symtable_vector;
   for normal operation if operand istring retuern error DONE
   if it is division return float DONE
   relation operations TODO
-  
+
   */
 
 error( dType ) getTerminalDType( PT_Node_ptr node)
@@ -48,8 +42,8 @@ error( dType ) getTerminalDType( PT_Node_ptr node)
                 return_error(ERROR_SEM_EXPR , dType );//nonexistent varaible or function
             }
             if( tmp != NULL )
-            {    
-                return_value( tmp->diff.var.dataType , dType);  
+            {
+                return_value( tmp->diff.var.dataType , dType);
             }
         }
     }
@@ -65,8 +59,12 @@ error( dType ) getTerminalDType( PT_Node_ptr node)
     {
         return_value( stringT , dType );
     }
+    if( disc == nullT )
+    {
+        return_value( noType , dType );
+    }
     return_value( notDefined , dType );
-}  
+}
 
 error( none ) addIntToRealNode( PT_Node_ptr node , bool side)
 {
@@ -115,6 +113,7 @@ error( none ) addIntToRealNode( PT_Node_ptr node , bool side)
     }
     return_none();
 }
+
 error( none ) operandConversion( PT_Node_ptr node , dType type1 , dType type2)
 {
     if( node == NULL)
@@ -141,7 +140,7 @@ error( none ) operandConversion( PT_Node_ptr node , dType type1 , dType type2)
     }
     else if( ( type1 == stringT && type2 != stringT ) || ( type2 == stringT && type1 != stringT))
     {
-        return_error( ERROR_SEM_TYPE , none); //string can't be converted to ani data type
+        return_error( ERROR_SEM_TYPE , none); //string can't be converted to any data type
     }
     else if( type1 == integerT && type2 == integerT)
     {
@@ -160,7 +159,6 @@ error( none ) operandConversion( PT_Node_ptr node , dType type1 , dType type2)
     return_none();
 }
 
-
 error( dType ) checkExpression(PT_Node_ptr node , bool mode)
 {
     if( node == NULL )
@@ -169,7 +167,8 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
     }
     dType type1 = notDefined;
     dType type2 = notDefined;
-    
+
+
     //if both ptrs are null that means I found identOfvar ot var
     if(node->leftChild == NULL && node->rightSibling == NULL)
     {
@@ -193,7 +192,6 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
     }
     type2 = tmp1._value;
 
-    
     if(( type1 == boolT || type2 == boolT ) && mode == false)
     {
         return_error( ERROR_SEM_TYPE , dType ); //bool can't be inside expression it can be only as final d type
@@ -202,9 +200,13 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
     tokenType disc = node->data.type.terminal->discriminant;
     if(  disc == concatenation )
     {
-        if( type1 != stringT || type2 != stringT )
+        if( (type1 != stringT || type2 != stringT) && checkForTypeCompatibility(type1, type2) == false )
         {
             return_error( ERROR_SEM_TYPE , dType ); //you can only concatenate two strings
+        }
+        else if(type1 == stringT || type2 == stringT)
+        {
+            return_value(stringT, dType);
         }
     }
     else if( disc == plusSign || disc == minusSign || disc == multiply || disc == division)
@@ -233,9 +235,9 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
         {
             return_value( type1 , dType );
         }
-        else
-        { 
-            //one of operands is float so conversion must happen 
+        else if( type1 == floatingT || type2 == floatingT )
+        {
+            //one of operands is float so conversion must happen
             error( none ) success = operandConversion( node , type1 , type2 );
             if( is_error( success ))
             {
@@ -244,6 +246,17 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
             else
             {
                 return_value( floatingT , dType );
+            }
+        }
+        else
+        {
+            if( type1 != notDefined )
+            {
+                return_value(type1 , dType );
+            }
+            if( type2 != notDefined )
+            {
+                return_value(type2 , dType );
             }
         }
     }

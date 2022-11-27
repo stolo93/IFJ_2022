@@ -10,8 +10,12 @@
 
 #include "./headers/semantic_analysis.h"
 
-DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(htab_t_ptr, htab_t_ptr);
+extern error( dType ) getTerminalDType( PT_Node_ptr node);
+extern error( dType ) checkExpression(PT_Node_ptr node , bool mode);
+extern error( dType ) checkExpressionAssigment( PT_Node_ptr node );
+extern error( dType ) checkExpressionIfWhile( PT_Node_ptr node );
 
+DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(htab_t_ptr, htab_t_ptr);
 vec_htab_t_ptr symtable_vector;
 
 //Checks:
@@ -51,8 +55,8 @@ error(_Bool) sendProgTree(PT_Node_ptr root)
         vec_htab_t_ptr_destroy(&symtable_vector);
         forward_error(errorObj, _Bool);
     }
-
     vec_htab_t_ptr_destroy(&symtable_vector);
+
     return_value(true, bool);
 }
 
@@ -76,7 +80,7 @@ error(_Bool) getAllFunctionDefinitions(PT_Node_ptr root, htab_t_ptr table)
     while(tmpNode->leftChild)
     {
         tmpNode = tmpNode->leftChild;
-        if(tmpNode->data.type.terminal->discriminant == functionT)
+        if(tmpNode->data.isTerminal && tmpNode->data.type.terminal->discriminant == functionT)
         {
             error(htab_pair_t_ptr) errorObj;
             errorObj = htab_find(table, tmpNode->rightSibling->data.type.terminal->info.string);
@@ -90,13 +94,8 @@ error(_Bool) getAllFunctionDefinitions(PT_Node_ptr root, htab_t_ptr table)
                 error(htab_pair_t_ptr) htabErrorObj =  htab_lookup_add(table, tmpNode->rightSibling->data.type.terminal->info.string, function);
                 get_value(htab_pair_t_ptr, functionRecord, htabErrorObj, _Bool);
 
-                error(htab_t_ptr) symtableErrorObj = htab_init(DEFAULT_SYMTABLE_SIZE);
-                get_value(htab_t_ptr, symtable, symtableErrorObj, _Bool);
-                vec_htab_t_ptr_push_front(&symtable_vector, symtable);
-
                 error(_Bool) fdefErrorObj = checkFunctionDefinition(tmpNode, functionRecord);
 
-                vec_htab_t_ptr_pop_front(&symtable_vector);
                 if(is_error(fdefErrorObj))
                 {
                     forward_error(fdefErrorObj, _Bool);
@@ -130,7 +129,6 @@ error(_Bool) goThroughProgTreeNodes(PT_Node_ptr node)
     }
 
     PT_Node_ptr tmpNode = progNode;
-
     while(tmpNode->leftChild)
     {
         error(_Bool) checkNodeErrorObj = checkProgTreeNode(tmpNode, NULL);
@@ -139,7 +137,7 @@ error(_Bool) goThroughProgTreeNodes(PT_Node_ptr node)
             forward_error(checkNodeErrorObj, _Bool);
         }
 
-        error(PT_Node_ptr) progNodeErrorObj = findProgNode(tmpNode);   //get next progNode into tmpNode
+        error(PT_Node_ptr) progNodeErrorObj = findProgNode(tmpNode->leftChild);   //get next progNode into tmpNode
         get_value(PT_Node_ptr, nextProgNode, progNodeErrorObj, _Bool);
         if(nextProgNode == NULL)
         {
@@ -152,64 +150,288 @@ error(_Bool) goThroughProgTreeNodes(PT_Node_ptr node)
 
 error(_Bool) checkProgTreeNode(PT_Node_ptr node, htab_pair_t_ptr functionContext)
 {
-    error(_Bool) errorObj;
     if(node == NULL)
     {
         return_error(INVALID_VAL, _Bool);
     }
+    error(_Bool) errorObj;
 
-    if(node->data.isTerminal == false)
+    if(node->data.isTerminal == false && node->data.type.nonTerminal != PROG)
     {
         return_value(true, bool);
     }
 
-    switch (node->data.type.terminal->discriminant)
+
+    if(node->leftChild->data.isTerminal)
     {
-        case identOfFunct:
-            errorObj = checkFunctionCall(node);
-            if(is_error(errorObj))
-            {
-                forward_error(errorObj, _Bool);
-            }
-            break;
+        switch (node->leftChild->data.type.terminal->discriminant)
+        {
+            case functionT:
+                {
+                    get_value(htab_t_ptr, mainSymtable, getMainSymTable(), _Bool);
+                    get_value(htab_pair_t_ptr, functionDefinitionRecord, htab_find(mainSymtable, node->leftChild->rightSibling->data.type.terminal->info.string), _Bool);
 
-        case identOfVar:
-            errorObj = checkVariable(node);
-            if(is_error(errorObj))
-            {
-                forward_error(errorObj, _Bool);
-            }
-            break;
+                    get_value(htab_t_ptr, funSymtable, htab_init(DEFAULT_SYMTABLE_SIZE), _Bool);
+                    vec_htab_t_ptr_push_front(&symtable_vector, funSymtable);
 
-        case ifT:
-            errorObj = checkIfBlock(node, functionContext);
-            if(is_error(errorObj))
-            {
-                forward_error(errorObj, _Bool);
-            }
-            break;
+                    errorObj = checkFunctionBody(node->leftChild, functionDefinitionRecord);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
 
-        case whileT:
-            errorObj = checkWhileBlock(node, functionContext);
-            if(is_error(errorObj))
-            {
-                forward_error(errorObj, _Bool);
-            }
-            break;
+                    vec_htab_t_ptr_pop_front(&symtable_vector);
+                    break;
+                }
 
-        case returnT:
-            if(functionContext == NULL)
-            {
+            case identOfFunct:
+                {
+                    errorObj = checkFunctionCall(node->leftChild);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+                    break;
+                }
+
+            case identOfVar:
+                {
+                    errorObj = checkVariable(node->leftChild);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+                    break;
+                }
+
+            case ifT:
+                {
+                    error(htab_t_ptr) symtableErrorObj = htab_init(DEFAULT_SYMTABLE_SIZE);
+                    get_value(htab_t_ptr, ifSymtable, symtableErrorObj, _Bool);
+                    vec_htab_t_ptr_push_front(&symtable_vector, ifSymtable);
+
+                    errorObj = checkIfBlock(node->leftChild, NULL, functionContext);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+
+                    vec_htab_t_ptr_pop_front(&symtable_vector);
+                    break;
+                }
+
+            case whileT:
+                {
+                    errorObj = checkWhileBlock(node->leftChild, NULL, functionContext);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+                    break;
+                }
+
+            case returnT:
+                {
+                    if(functionContext == NULL)
+                    {
+                        break;
+                    }
+                    errorObj = checkReturnSatement(node->leftChild, functionContext);
+                    break;
+                }
+
+            default:
                 break;
-            }
-            errorObj = checkReturnSatement(node, functionContext);
-            break;
+        }
+    }
+    else
+    {
+        switch(node->leftChild->data.type.nonTerminal)
+        {
+            case EXPR:
+                if(node->leftChild->leftChild != NULL)
+                {
+                    if(node->leftChild->rightSibling->data.type.terminal->discriminant == EqOper)
+                    {
+                        error(dType) errorObj = checkExpressionAssigment(node->leftChild);
+                        if(is_error(errorObj))
+                        {
+                            forward_error(errorObj, _Bool);
+                        }
+                    }
+                    else
+                    {
+                        error(dType) errorObj = checkExpression(node->leftChild->leftChild , false);
+                        if(is_error(errorObj))
+                        {
+                            forward_error(errorObj, _Bool);
+                        }
+                    }
+                }
+                break;
 
-        default:
-            break;
+            default:
+                break;
+        }
     }
 
     return_value(true, bool);
+}
+
+error(_Bool) checkFunctionBody(PT_Node_ptr node, htab_pair_t_ptr functionRecord)
+{
+    if(node == NULL || functionRecord == NULL)
+    {
+        return_error(INVALID_VAL, _Bool);
+    }
+
+    int returnStatementCounter = 0;
+
+    //get to start of statement list
+    PT_Node_ptr currentNode = node;
+    while(currentNode->rightSibling)
+    {
+        if(currentNode->data.type.nonTerminal == BODY)   //found start of statement list
+        {
+            break;
+        }
+        else if(currentNode->data.type.nonTerminal == PARAMS)
+        {
+            if(currentNode->leftChild == NULL)  //function has no parameters
+            {
+                currentNode = currentNode->rightSibling;
+                continue;
+            }
+            else
+            {
+                PT_Node_ptr currentParamNode = currentNode->leftChild;
+                do
+                {
+                    error(dType) errorObj = getNodeType(currentParamNode->leftChild);
+                    get_value(dType, type, errorObj, _Bool);
+                    error(htab_t_ptr_ptr) symtableErrorObj = vec_htab_t_ptr_get(&symtable_vector, 0);
+                    get_value(htab_t_ptr_ptr, symtable, symtableErrorObj, _Bool);
+
+                    error(htab_pair_t_ptr) htabErrorObj =  htab_lookup_add(*symtable, currentParamNode->rightSibling->data.type.terminal->info.string, variable);
+                    get_value(htab_pair_t_ptr, variableRecord, htabErrorObj, _Bool);
+                    variableRecord->diff.var.dataType = type;
+
+                    if(currentParamNode->rightSibling->rightSibling->leftChild == NULL)
+                    {
+                        break;
+                    }
+
+                    currentParamNode = currentParamNode->rightSibling->rightSibling->leftChild->rightSibling;
+
+                } while(currentParamNode->leftChild);
+            }
+        }
+        currentNode = currentNode->rightSibling;
+    }
+
+    if(currentNode->leftChild == NULL)  //function has empty body
+    {
+        if(returnStatementCounter == 0 && functionRecord->diff.func.outType != noType)
+        {
+            return_error(ERROR_SEM_FUNC_RET_TYPE, _Bool);
+        }
+        return_value(true, bool);
+    }
+
+    currentNode = currentNode->leftChild;
+    error(_Bool) errorObj;
+
+    do  //go through statement list
+    {
+        if(currentNode->leftChild->data.isTerminal == false)    //skip nonTerminal
+        {
+            get_value(PT_Node_ptr, lastNodeOnRow, findLastNodeOnRow(currentNode), _Bool);
+            if(lastNodeOnRow->leftChild == NULL)
+            {
+                break;
+            }
+            currentNode = lastNodeOnRow->leftChild;
+        }
+
+        switch (currentNode->leftChild->data.type.terminal->discriminant)
+        {
+            case ifT:
+                {
+                    errorObj = checkIfBlock(currentNode->leftChild, &returnStatementCounter, functionRecord);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+                    break;
+                }
+
+            case whileT:
+                {
+                    error(htab_t_ptr) symtableErrorObj = htab_init(DEFAULT_SYMTABLE_SIZE);
+                    get_value(htab_t_ptr, whileSymtable, symtableErrorObj, _Bool);
+                    vec_htab_t_ptr_push_front(&symtable_vector, whileSymtable);
+
+                    errorObj = checkWhileBlock(currentNode->leftChild, &returnStatementCounter, functionRecord);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+
+                    vec_htab_t_ptr_pop_front(&symtable_vector);
+                    break;
+                }
+
+            case identOfFunct:
+                {
+                    errorObj = checkFunctionCall(currentNode->leftChild);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+                    break;
+                }
+
+            case identOfVar:
+                {
+                    errorObj = checkVariable(currentNode->leftChild);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+                    break;
+                }
+
+            case returnT:
+                {
+                    errorObj = checkReturnSatement(currentNode->leftChild, functionRecord);
+                    if(is_error(errorObj))
+                    {
+                        forward_error(errorObj, _Bool);
+                    }
+                    returnStatementCounter++;
+                    break;
+                }
+
+            default:
+                break;
+        }
+
+        error(PT_Node_ptr) lastNodeErrorObj = findLastNodeOnRow(currentNode);
+        get_value(PT_Node_ptr, lastNodeOnRow, lastNodeErrorObj, _Bool);
+
+        if(lastNodeOnRow->leftChild == NULL)
+        {
+            break;
+        }
+        currentNode = lastNodeOnRow->leftChild;
+
+    } while(currentNode != NULL);
+
+    if(returnStatementCounter == 0 && functionRecord->diff.func.outType != noType)
+    {
+        return_error(ERROR_SEM_FUNC_RET_TYPE, _Bool);
+    }
+    return_value(true, _Bool);
 }
 
 error(_Bool) checkFunctionDefinition(PT_Node_ptr node, htab_pair_t_ptr functionRecord)
@@ -223,15 +445,24 @@ error(_Bool) checkFunctionDefinition(PT_Node_ptr node, htab_pair_t_ptr functionR
     PT_Node_ptr currentNode = node;
     while(currentNode->rightSibling)
     {
+        if(currentNode->data.isTerminal == true && currentNode->data.type.terminal->discriminant == colon)
+        {
+            if(currentNode->rightSibling->data.type.nonTerminal == TYPE)    //get function return value
+            {
+                error(dType) errorObj = getNodeType(currentNode->rightSibling->leftChild);
+                get_value(dType, type, errorObj, _Bool);
+
+                functionRecord->diff.func.outType = type;
+            }
+            currentNode = currentNode->rightSibling;
+            continue;
+        }
 
         if(currentNode->data.type.nonTerminal == BODY)   //found start of statement list
         {
             break;
         }
-        else if(currentNode->data.type.nonTerminal == TYPE) //get function return value
-        {
-            functionRecord->diff.func.outType = tokenTypeToDataType(currentNode->leftChild->leftChild->data.type.terminal->discriminant);
-        }
+
         else if(currentNode->data.type.nonTerminal == PARAMS)   //add function parameters
         {
             if(currentNode->leftChild == NULL)  //function has no parameters
@@ -244,111 +475,29 @@ error(_Bool) checkFunctionDefinition(PT_Node_ptr node, htab_pair_t_ptr functionR
                 PT_Node_ptr currentParamNode = currentNode->leftChild;
                 do
                 {
-                    structFuncParam param = { .inIdent = (char*) currentParamNode->rightSibling->data.type.terminal->info.string, .inType = tokenTypeToDataType(currentParamNode->leftChild->data.type.terminal->discriminant) };
-                    error(none) success = vec_structFuncParam_push_back( &(functionRecord->diff.func.inParams) , param );
+                    error(dType) errorObj = getNodeType(currentParamNode->leftChild);
+                    get_value(dType, type, errorObj, _Bool);
+                    structFuncParam param = { .inIdent = (char*) currentParamNode->rightSibling->data.type.terminal->info.string, .inType = type};
+
+                    error(none) success = vec_structFuncParam_push_back(&(functionRecord->diff.func.inParams), param);
                     if(is_error(success))
                     {
                         forward_error(success, _Bool);
                     }
 
-                    currentParamNode = currentParamNode->rightSibling->rightSibling;
+                    if(currentParamNode->rightSibling->rightSibling->leftChild == NULL)
+                    {
+                        break;
+                    }
+
+                    currentParamNode = currentParamNode->rightSibling->rightSibling->leftChild->rightSibling;
+
                 } while(currentParamNode->leftChild);
             }
         }
-        else
-        {
-            currentNode = currentNode->rightSibling;
-        }
+
+        currentNode = currentNode->rightSibling;
     }
-
-    if(currentNode->leftChild == NULL)  //function has empty body
-    {
-        return_value(true, bool);
-    }
-
-    currentNode = currentNode->leftChild;
-    error(_Bool) errorObj;
-
-    do  //go through statement list
-    {
-        switch (currentNode->data.type.terminal->discriminant)
-        {
-            case ifT:
-                {
-                    error(htab_t_ptr) symtableErrorObj = htab_init(DEFAULT_SYMTABLE_SIZE);
-                    get_value(htab_t_ptr, ifSymtable, symtableErrorObj, _Bool);
-                    vec_htab_t_ptr_push_front(&symtable_vector, ifSymtable);
-
-                    errorObj = checkIfBlock(currentNode, functionRecord);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-
-                    vec_htab_t_ptr_pop_front(&symtable_vector);
-                    break;
-                }
-
-            case whileT:
-                {
-                    error(htab_t_ptr) symtableErrorObj = htab_init(DEFAULT_SYMTABLE_SIZE);
-                    get_value(htab_t_ptr, whileSymtable, symtableErrorObj, _Bool);
-                    vec_htab_t_ptr_push_front(&symtable_vector, whileSymtable);
-
-                    errorObj = checkWhileBlock(currentNode, functionRecord);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-
-                    vec_htab_t_ptr_pop_front(&symtable_vector);
-                    break;
-                }
-
-            case identOfFunct:
-                {
-                    errorObj = checkFunctionCall(currentNode);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-                    break;
-                }
-
-            case identOfVar:
-                {
-                    errorObj = checkVariable(currentNode);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-                    break;
-                }
-
-            case returnT:
-                {
-                    errorObj = checkReturnSatement(currentNode, functionRecord);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-                    break;
-                }
-
-            default:
-                break;
-        }
-
-        error(PT_Node_ptr) lastNodeErrorObj = findLastNodeOnRow(currentNode);
-        get_value(PT_Node_ptr, lastNodeOnRow, lastNodeErrorObj, _Bool);
-        if(lastNodeOnRow == NULL)
-        {
-            return_value(true, _Bool);
-        }
-        currentNode = lastNodeOnRow;
-
-    } while(currentNode->leftChild != NULL);
-
     return_value(true, bool);
 }
 
@@ -360,13 +509,11 @@ error(_Bool) checkFunctionCall(PT_Node_ptr node)
     }
 
     //get symbol table
-    error(htab_t_ptr_ptr) symtableErrorObj = vec_htab_t_ptr_get(&symtable_vector, vec_htab_t_ptr_len(&symtable_vector));
-    get_value(htab_t_ptr_ptr, symTable, symtableErrorObj, _Bool);
+    get_value(htab_t_ptr, mainSymtable, getMainSymTable(), _Bool);
 
     //get record with function data from symbol table
-    error(htab_pair_t_ptr) errorObj = htab_find(*symTable, node->data.type.terminal->info.string); 
+    error(htab_pair_t_ptr) errorObj = htab_find(mainSymtable, node->data.type.terminal->info.string);
     get_value(htab_pair_t_ptr, functionDefinitionRecord, errorObj, _Bool);
-
     if(functionDefinitionRecord == NULL)
     {
         return_error(ERROR_SEM_UNDEF_FUNC, _Bool);
@@ -376,13 +523,18 @@ error(_Bool) checkFunctionCall(PT_Node_ptr node)
 
     //function parameters count == 0
     int inParamsVectorLength = vec_structFuncParam_len(&(functionDefinitionRecord->diff.func.inParams));
-    if(inParamsVectorLength == 0)
+    if(node->rightSibling->rightSibling->leftChild == NULL && inParamsVectorLength > 0)
     {
-        if(argNode == NULL) //no arguments in progTree
+        return_error(ERROR_SEM_FUNC_ARGCNT_CNT, _Bool);
+    }
+
+    if(inParamsVectorLength == 0 || strcmp(functionDefinitionRecord->key , "write") == 0)
+    {
+        if(node->rightSibling->rightSibling->leftChild == NULL) //no arguments in progTree
         {
             return_value(true, bool);
         }
-        else if(argNode != NULL) //wrong argument count
+        else if(argNode != NULL && isSpecialFunction(functionDefinitionRecord->key) == false ) //wrong argument count
         {
             return_error(ERROR_SEM_FUNC_ARGCNT_CNT, _Bool);
         }
@@ -392,46 +544,54 @@ error(_Bool) checkFunctionCall(PT_Node_ptr node)
     size_t vectorIndex = 0;
     error(structFuncParam_ptr) vectorErrorObj;
 
-    do{
+    while(argNode->rightSibling)
+    {
         if(argNode->leftChild->data.type.nonTerminal == TERM)
         {
-            vectorErrorObj = vec_structFuncParam_get(&(functionDefinitionRecord->diff.func.inParams), vectorIndex);
-            get_value(structFuncParam_ptr, vectorItem, vectorErrorObj, _Bool);
-            if(vectorItem->inType != tokenTypeToDataType(argNode->leftChild->leftChild->data.type.terminal->discriminant))
+            if(isSpecialFunction(functionDefinitionRecord->key) == false)
             {
-                return_error(ERROR_SEM_FUNC_ARGCNT_TYPE, _Bool);
+                vectorErrorObj = vec_structFuncParam_get(&(functionDefinitionRecord->diff.func.inParams), vectorIndex);
+                get_value(structFuncParam_ptr, vectorItem, vectorErrorObj, _Bool);
+                get_value(dType, tmpType, getTerminalDType(argNode->leftChild->leftChild), _Bool);
+
+                if(vectorItem->inType != tmpType)
+                {
+                    return_error(ERROR_SEM_FUNC_ARGCNT_TYPE, _Bool);
+                }
             }
         }
 
         else if(argNode->leftChild->data.type.terminal->discriminant == identOfVar)
         {
-            error(htab_pair_t_ptr) errorObj = checkAllSymtableLevels(&(argNode->leftChild->leftChild->data.type.terminal->info.string), variable);
+            error(htab_pair_t_ptr) errorObj = checkAllSymtableLevels(&(argNode->leftChild->data.type.terminal->info.string));
             get_value(htab_pair_t_ptr, variableRecord, errorObj, _Bool);
 
             if(variableRecord == NULL)
             {
                 return_error(ERROR_SEM_UNDEF_VAR, _Bool);
             }
-
-            vectorErrorObj = vec_structFuncParam_get(&(variableRecord->diff.func.inParams), vectorIndex);
-            get_value(structFuncParam_ptr, vectorItem, vectorErrorObj, _Bool);
-
-            if(vectorItem->inType != variableRecord->diff.var.dataType)
+            if(isSpecialFunction(functionDefinitionRecord->key) == false)
             {
-                return_error(ERROR_SEM_FUNC_ARGCNT_TYPE, _Bool);
+                vectorErrorObj = vec_structFuncParam_get(&(functionDefinitionRecord->diff.func.inParams), vectorIndex);
+                get_value(structFuncParam_ptr, vectorItem, vectorErrorObj, _Bool);
+
+                if(vectorItem->inType != variableRecord->diff.var.dataType && checkForTypeCompatibility(vectorItem->inType, variableRecord->diff.var.dataType) == false)
+                {
+                    return_error(ERROR_SEM_FUNC_ARGCNT_TYPE, _Bool);
+                }
             }
         }
 
         vectorIndex++;
-        argNode = argNode->rightSibling;
 
         //parameters count in progTree > parameters count in vector
-        if(vectorIndex == (size_t) (inParamsVectorLength + 1) && argNode->rightSibling != NULL)
+        if((vectorIndex == (size_t)(inParamsVectorLength) && argNode->rightSibling->leftChild != NULL) && strcmp( functionDefinitionRecord->key , "write") != 0)
         {
             return_error(ERROR_SEM_FUNC_ARGCNT_CNT, _Bool);
         }
+
+        argNode = argNode->rightSibling;
     }
-    while(argNode->rightSibling != NULL);
 
     return_value(true, _Bool);
 }
@@ -443,15 +603,24 @@ error(_Bool) checkVariable(PT_Node_ptr node)
         return_error(VECTOR_EMPTY_ERROR, _Bool);
     }
 
-    error(htab_pair_t_ptr) errorObj = checkAllSymtableLevels(&(node->data.type.terminal->info.string), variable);
-    get_value(htab_pair_t_ptr, variableRecord, errorObj, _Bool);
-
-    if(variableRecord == NULL)
+    htab_pair_t_ptr variableRecord = NULL;
+    error(htab_pair_t_ptr) errorObj = checkAllSymtableLevels(&(node->data.type.terminal->info.string));
+    get_value(htab_pair_t_ptr, symtableRecord, errorObj, _Bool);
+    if(symtableRecord != NULL)
     {
-        return_error(ERROR_SEM_UNDEF_VAR, _Bool);
+        variableRecord = symtableRecord;
+    }
+    else if(symtableRecord == NULL)
+    {
+        error(htab_t_ptr_ptr) errorObj = vec_htab_t_ptr_get(&symtable_vector, 0);
+        get_value(htab_t_ptr_ptr, symtable, errorObj, _Bool);
+
+        error(htab_pair_t_ptr) htabErrorObj =  htab_lookup_add(*symtable, node->data.type.terminal->info.string, variable);
+        get_value(htab_pair_t_ptr, symtableRecord2, htabErrorObj, _Bool);
+        variableRecord = symtableRecord2;
     }
 
-    if(node->rightSibling->data.type.terminal->discriminant == EqOper)
+    if(node->rightSibling->data.type.terminal->discriminant == assigment)
     {
         PT_Node_ptr rvalNode = node->rightSibling->rightSibling;
 
@@ -487,57 +656,38 @@ error(_Bool) checkVariable(PT_Node_ptr node)
 
         else if(rvalNode->leftChild->data.isTerminal == false && rvalNode->leftChild->data.type.nonTerminal == EXPR) //EXPRESSION
         {
-            /*error(_Bool) errorObj = checkExpression(node);
-            get_value(bool, checkExpressionReturnValue, errorObj, _Bool);
-            return_value(checkExpressionReturnValue, bool);*/
-            error( dType) errorObj = checkExpressionAssigment(node);
+            error( dType) errorObj = checkExpression(rvalNode->leftChild->leftChild, false);
             get_value(dType, checkExpressionReturnValue, errorObj, _Bool);
-            return_value(checkExpressionReturnValue, bool);
+            variableRecord->diff.var.dataType = checkExpressionReturnValue;
         }
     }
 
     return_value(false, bool);
 }
 
-error(_Bool) checkIfBlock(PT_Node_ptr node, htab_pair_t_ptr functionContext)
+error(_Bool) checkIfBlock(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext)
 {
     if(node == NULL)
     {
         return_error(INVALID_VAL, _Bool);
     }
 
-    PT_Node_ptr checkNode = node->rightSibling->rightSibling;   //if -> ( -> <ARG_TYPE>
-    //TODO call checkExpression on checkNode
+    PT_Node_ptr checkNode = node->rightSibling;   //if -> ( -> <EXPR>
+     error(dType) exprResult = checkExpressionIfWhile(checkNode);
+    if(is_error(exprResult))
+    {
+        forward_error(exprResult, _Bool);
+    }
 
-    checkNode = checkNode->rightSibling->rightSibling->rightSibling;    //if -> ( -> <ARG_TYPE> -> ) -> { -> <BODY>
-    error(_Bool) errorObj = checkBodyNonTerminal(checkNode, functionContext);
+    checkNode = checkNode->rightSibling->rightSibling;    //if -> ( -> <EXPR> -> ) -> { -> <BODY>
+    error(_Bool) errorObj = checkBodyNonTerminal(checkNode, returnStatementCounter, functionContext);
     if(is_error(errorObj))
     {
         forward_error(errorObj, _Bool);
     }
 
-    checkNode = checkNode->rightSibling->rightSibling->rightSibling->rightSibling;  //if -> ( -> <ARG_TYPE> -> ) -> { -> <BODY> -> } -> else -> { -> <BODY>
-    errorObj = checkBodyNonTerminal(checkNode, functionContext);
-    if(is_error(errorObj))
-    {
-        forward_error(errorObj, _Bool);
-    }
-
-    return_value(true, bool);
-}
-
-error(_Bool) checkWhileBlock(PT_Node_ptr node, htab_pair_t_ptr functionContext)
-{
-    if(node == NULL)
-    {
-        return_error(INVALID_VAL, _Bool);
-    }
-
-    PT_Node_ptr checkNode = node->rightSibling->rightSibling;   //while -> ( -> <ARG_TYPE>
-    //TODO call checkExpression on checkNode
-
-    checkNode = checkNode->rightSibling->rightSibling->rightSibling;    //while -> ( -> <ARG_TYPE> -> ) -> { -> <BODY>
-    error(_Bool) errorObj = checkBodyNonTerminal(checkNode, functionContext);
+    checkNode = checkNode->rightSibling->rightSibling->rightSibling;  //if -> ( -> <ARG_TYPE> -> ) -> { -> <BODY> -> } -> else -> { -> <BODY>
+    errorObj = checkBodyNonTerminal(checkNode, returnStatementCounter, functionContext);
     if(is_error(errorObj))
     {
         forward_error(errorObj, _Bool);
@@ -546,17 +696,29 @@ error(_Bool) checkWhileBlock(PT_Node_ptr node, htab_pair_t_ptr functionContext)
     return_value(true, bool);
 }
 
-/*error(_Bool) checkExpression(PT_Node_ptr node)
+error(_Bool) checkWhileBlock(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext)
 {
     if(node == NULL)
     {
         return_error(INVALID_VAL, _Bool);
     }
 
-    //TODO
+    PT_Node_ptr checkNode = node->rightSibling;   //while -> ( -> <ARG_TYPE>
+    error(dType) exprResult = checkExpressionIfWhile(checkNode);
+    if(is_error(exprResult))
+    {
+        forward_error(exprResult, _Bool);
+    }
 
-    return_value(false, _Bool);
-}*/
+    checkNode = checkNode->rightSibling->rightSibling;    //while -> ( -> <ARG_TYPE> -> ) -> { -> <BODY>
+    error(_Bool) errorObj = checkBodyNonTerminal(checkNode, returnStatementCounter, functionContext);
+    if(is_error(errorObj))
+    {
+        forward_error(errorObj, _Bool);
+    }
+
+    return_value(true, bool);
+}
 
 error(_Bool) checkReturnSatement(PT_Node_ptr node, htab_pair_t_ptr functionRecord)
 {
@@ -565,9 +727,24 @@ error(_Bool) checkReturnSatement(PT_Node_ptr node, htab_pair_t_ptr functionRecor
         return_error(INVALID_VAL, _Bool);
     }
 
-    if(functionRecord->diff.func.outType != noType && node->rightSibling == NULL)
+    //function return value is not void and return statement is not followed by return value
+    if(functionRecord->diff.func.outType != noType)
     {
-        return_error(ERROR_SEM_RETVAL_EXPR, _Bool);
+        if(node->rightSibling == NULL || node->rightSibling->leftChild == NULL)
+        {
+            return_error(ERROR_SEM_RETVAL_EXPR, _Bool);
+        }
+    }
+    else if(functionRecord->diff.func.outType == noType)
+    {
+        if(node->rightSibling->leftChild != NULL)
+        {
+            return_error(ERROR_SEM_RETVAL_EXPR, _Bool);
+        }
+        else
+        {
+            return_value(true, _Bool);
+        }
     }
 
     if(node->rightSibling->leftChild->data.isTerminal == true)
@@ -580,7 +757,7 @@ error(_Bool) checkReturnSatement(PT_Node_ptr node, htab_pair_t_ptr functionRecor
                 forward_error(varErrorObj, _Bool);
             }
 
-            error(htab_pair_t_ptr) recordErrorObj = checkAllSymtableLevels(&(node->rightSibling->leftChild->data.type.terminal->info.string), variable);
+            error(htab_pair_t_ptr) recordErrorObj = checkAllSymtableLevels(&(node->rightSibling->leftChild->data.type.terminal->info.string));
             get_value(htab_pair_t_ptr, record, recordErrorObj, _Bool);
             if(functionRecord->diff.func.outType != record->diff.var.dataType)
             {
@@ -599,96 +776,132 @@ error(_Bool) checkReturnSatement(PT_Node_ptr node, htab_pair_t_ptr functionRecor
         }
         else if(node->rightSibling->leftChild->data.type.nonTerminal == EXPR)
         {
-            //TODO call checkExpression on node->rightSibling->leftChild
+            error(dType) errorObj = checkExpression(node->rightSibling->leftChild->leftChild, false);
+            get_value(dType, type, errorObj, _Bool);
+
+            if(node->rightSibling->leftChild->leftChild->data.type.terminal->discriminant == identOfVar)
+            {
+                error(htab_pair_t_ptr) recordErrorObj = checkAllSymtableLevels(&(node->rightSibling->leftChild->leftChild->data.type.terminal->info.string));
+                get_value(htab_pair_t_ptr, record, recordErrorObj, _Bool);
+                if(record != NULL)
+                {
+                    if(functionRecord->diff.func.outType != record->diff.var.dataType && checkForTypeCompatibility(functionRecord->diff.func.outType, record->diff.var.dataType) == false)
+                    {
+                        return_error(ERROR_SEM_FUNC_RET_TYPE, _Bool);
+                    }
+                }
+                return_value(true, _Bool);
+            }
+
+            if(functionRecord->diff.func.outType != type)
+            {
+                return_error(ERROR_SEM_FUNC_RET_TYPE, _Bool);
+            }
         }
     }
 
     return_value(true, bool);
 }
 
-error(_Bool) checkBodyNonTerminal(PT_Node_ptr node, htab_pair_t_ptr functionContext)
+error(_Bool) checkBodyNonTerminal(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext)
 {
     if(node == NULL)
     {
         return_error(INVALID_VAL, _Bool);
     }
 
+    if(node->leftChild == NULL) //empty body
+    {
+        return_value(true, _Bool);
+    }
+
     PT_Node_ptr currentNode = node->leftChild;
 
     do  //go through statement list
     {
-        switch (currentNode->data.type.terminal->discriminant)
+        if(true /*currentNode->data.isTerminal == true*/)
         {
-            case ifT:
-                {
-
-                    error(_Bool) errorObj = checkIfBlock(currentNode, functionContext);
-                    if(is_error(errorObj))
+            switch (currentNode->leftChild->data.type.terminal->discriminant)
+            {
+                case ifT:
                     {
-                        forward_error(errorObj, _Bool);
-                    }
+                        error(htab_t_ptr) symtableErrorObj = htab_init(DEFAULT_SYMTABLE_SIZE);
+                        get_value(htab_t_ptr, ifSymtable, symtableErrorObj, _Bool);
+                        vec_htab_t_ptr_push_front(&symtable_vector, ifSymtable);
 
-                    break;
-                }
+                        error(_Bool) errorObj = checkIfBlock(currentNode->leftChild, returnStatementCounter, functionContext);
+                        if(is_error(errorObj))
+                        {
+                            forward_error(errorObj, _Bool);
+                        }
 
-            case whileT:
-                {
-                    error(_Bool)  errorObj = checkWhileBlock(currentNode, functionContext);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-
-                    break;
-                }
-
-            case identOfFunct:
-                {
-                    error(_Bool)  errorObj = checkFunctionCall(currentNode);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-                    break;
-                }
-
-            case identOfVar:
-                {
-                    error(_Bool)  errorObj = checkVariable(currentNode);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-                    break;
-                }
-
-            case returnT:
-                {
-                    if(functionContext == NULL)
-                    {
+                        vec_htab_t_ptr_pop_front(&symtable_vector);
                         break;
                     }
-                    error(_Bool)  errorObj = checkReturnSatement(currentNode, functionContext);
-                    if(is_error(errorObj))
-                    {
-                        forward_error(errorObj, _Bool);
-                    }
-                    break;
-                }
 
-            default:
-                break;
+                case whileT:
+                    {
+                        error(_Bool)  errorObj = checkWhileBlock(currentNode->leftChild, returnStatementCounter, functionContext);
+                        if(is_error(errorObj))
+                        {
+                            forward_error(errorObj, _Bool);
+                        }
+
+                        break;
+                    }
+
+                case identOfFunct:
+                    {
+                        error(_Bool)  errorObj = checkFunctionCall(currentNode->leftChild);
+                        if(is_error(errorObj))
+                        {
+                            forward_error(errorObj, _Bool);
+                        }
+                        break;
+                    }
+
+                case identOfVar:
+                    {
+                        error(_Bool)  errorObj = checkVariable(currentNode->leftChild);
+                        if(is_error(errorObj))
+                        {
+                            forward_error(errorObj, _Bool);
+                        }
+                        break;
+                    }
+
+                case returnT:
+                    {
+                        if(functionContext == NULL)
+                        {
+                            break;
+                        }
+                        error(_Bool)  errorObj = checkReturnSatement(currentNode->leftChild, functionContext);
+                        if(is_error(errorObj))
+                        {
+                            forward_error(errorObj, _Bool);
+                        }
+                        if(returnStatementCounter != NULL)
+                        {
+                            (*returnStatementCounter)++;
+                        }
+                        break;
+                    }
+
+                default:
+                    break;
+            }
         }
 
         error(PT_Node_ptr) lastNodeErrorObj = findLastNodeOnRow(currentNode);
         get_value(PT_Node_ptr, lastNodeOnRow, lastNodeErrorObj, _Bool);
-        if(lastNodeOnRow == NULL)
+        if(lastNodeOnRow->leftChild == NULL)
         {
             return_value(true, _Bool);
         }
-        currentNode = lastNodeOnRow;
+        currentNode = lastNodeOnRow->leftChild;
 
-    } while(currentNode->leftChild != NULL);
+    } while(currentNode != NULL);
 
     return_value(true, _Bool);
 }
@@ -707,21 +920,28 @@ error(htab_t_ptr) getMainSymTable()
     return_value(*symTable, htab_t_ptr);
 }
 
-error(htab_pair_t_ptr) checkAllSymtableLevels(htab_key_t* key, sType type)
+error(htab_pair_t_ptr) checkAllSymtableLevels(htab_key_t* key)
 {
-    if(vec_htab_t_ptr_len(&symtable_vector) == 0)
+    if(key == NULL)
+    {
+        return_error(INVALID_VAL, htab_pair_t_ptr);
+    }
+
+    size_t vectorSize = vec_htab_t_ptr_len(&symtable_vector);
+
+    if(vectorSize == 0)
     {
         return_error(VECTOR_EMPTY_ERROR, htab_pair_t_ptr);
     }
 
-    for(size_t i = 0; i < vec_htab_t_ptr_len(&symtable_vector); i++)
+    for(size_t i = 0; i < vectorSize; i++)
     {
         error(htab_t_ptr_ptr) symtableErrorObj = vec_htab_t_ptr_get(&symtable_vector, i);
         get_value(htab_t_ptr_ptr, table, symtableErrorObj, htab_pair_t_ptr);
 
         error(htab_pair_t_ptr) errorObj = htab_find(*table, *key);
         get_value(htab_pair_t_ptr, record, errorObj, htab_pair_t_ptr);
-        if(record != NULL && record->symType == type)
+        if(record != NULL)
         {
             return_value(record, htab_pair_t_ptr);
         }
@@ -748,6 +968,35 @@ dType tokenTypeToDataType(tokenType type)
     return notDefined;
 }
 
+error(dType) getNodeType(PT_Node_ptr node)
+{
+    if(node == NULL)
+    {
+        return_error(INVALID_VAL, dType);
+    }
+    if(node->data.type.terminal->discriminant == identOfType || node->data.type.terminal->discriminant == identOfTypeN)
+    {
+        if(strcmp(node->data.type.terminal->info.string, "int") == 0)
+        {
+            return_value(integerT, dType);
+        }
+        if(strcmp(node->data.type.terminal->info.string, "float") == 0)
+        {
+            return_value(floatingT, dType);
+        }
+        if(strcmp(node->data.type.terminal->info.string, "string") == 0)
+        {
+            return_value(stringT, dType);
+        }
+        if(strcmp(node->data.type.terminal->info.string, "void") == 0)
+        {
+            return_value(noType, dType);
+        }
+    }
+
+    return_value(notDefined, dType);
+}
+
 error(PT_Node_ptr) findProgNode(PT_Node_t * node)
 {
     if (node == NULL)
@@ -756,7 +1005,6 @@ error(PT_Node_ptr) findProgNode(PT_Node_t * node)
     }
 
     PT_Node_ptr tmpNode = node;
-
     while(tmpNode->rightSibling)
     {
         tmpNode = tmpNode->rightSibling;
@@ -765,22 +1013,72 @@ error(PT_Node_ptr) findProgNode(PT_Node_t * node)
             return_value(tmpNode, PT_Node_ptr);
         }
     }
+
     return_value(NULL, PT_Node_ptr);
 }
 
 error(PT_Node_ptr) findLastNodeOnRow(PT_Node_t * node)
 {
-     if (node == NULL)
+    if (node == NULL)
     {
         return_error(INVALID_VAL, PT_Node_ptr);
     }
 
     PT_Node_ptr tmpNode = node;
 
-    while(tmpNode != NULL)
+    while(tmpNode->rightSibling != NULL)
     {
         tmpNode = tmpNode->rightSibling;
+        if(tmpNode->rightSibling == NULL){
+            return_value(tmpNode, PT_Node_ptr);
+        }
     }
+
     return_value(tmpNode, PT_Node_ptr);
 }
 
+bool checkForTypeCompatibility(dType type1, dType type2)
+{
+    if((type1 == integerT || type1 == integerTNull) && (type2 == integerT || type2 == integerTNull))
+    {
+        return true;
+    }
+    else if((type1 == floatingT || type1 == floatingTNull) && (type2 == floatingT || type2 == floatingTNull))
+    {
+        return true;
+    }
+    else if((type1 == stringT || type1 == stringTNull) && (type2 == stringT || type2 == stringTNull))
+    {
+        return true;
+    }
+    else if((type1 == stringT || type1 == noType) && (type2 == stringT || type2 == noType))
+    {
+        return true;
+    }
+    return false;
+}
+
+bool isSpecialFunction(char* name)
+{
+    if(name == NULL)
+    {
+        return false;
+    }
+    if(strcmp(name , "write") == 0)
+    {
+        return true;
+    }
+    else if(strcmp(name , "floatval") == 0)
+    {
+        return true;
+    }
+    else if(strcmp(name , "intval") == 0)
+    {
+        return true;
+    }
+    else if(strcmp(name , "strval") == 0)
+    {
+        return true;
+    }
+    return false;
+}

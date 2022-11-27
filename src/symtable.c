@@ -331,7 +331,7 @@ unsigned long  htab_hash_function(const char *str) {
     return hash;
 }
 
-extern interner* interner_ptr ; 
+extern interner* interner_ptr; 
 
 /** Function which interns names of buildin functions  
  *
@@ -342,6 +342,7 @@ error( none) intern_functions( char* ptrs[])
 {
     char strings[NUMBER_OF_BUILD_IN_STRINGS][ SIZE_OF_BUILD_IN_STRING ] = { "reads", "readi", "readf", "write",
                                                                             "strlen", "substring", "ord", "chr",
+                                                                            "floatval", "intval", "strval",
                                                                             "$i","$j","$s"};
     
     for( unsigned int counter = 0 ; counter < NUMBER_OF_BUILD_IN_STRINGS ; counter++ )
@@ -359,7 +360,7 @@ error( none) intern_functions( char* ptrs[])
  ***/
 error( htab_t_ptr ) add_Functions( htab_t_ptr htab)
 {
-    static const char* ptrs[11];
+    static const char* ptrs[NUMBER_OF_BUILD_IN_STRINGS];
     static bool firstcall = true;
     error( none ) success;
 
@@ -409,17 +410,17 @@ error( htab_t_ptr ) add_Functions( htab_t_ptr htab)
         {
             newEntry->diff.func.outType = stringTNull;
             
-            success = vec_structFuncParam_push_front( &(newEntry->diff.func.inParams) , param );
-            if( is_error( success ))
-            {
-                forward_error(success , htab_t_ptr);
-            }
             success = vec_structFuncParam_push_front( &(newEntry->diff.func.inParams) , param1 );
             if( is_error( success ))
             {
                 forward_error(success , htab_t_ptr);
             }
             success = vec_structFuncParam_push_front( &(newEntry->diff.func.inParams) , param2 );
+            if( is_error( success ))
+            {
+                forward_error(success , htab_t_ptr);
+            }
+            success = vec_structFuncParam_push_front( &(newEntry->diff.func.inParams) , param );
             if( is_error( success ))
             {
                 forward_error(success , htab_t_ptr);
@@ -442,6 +443,18 @@ error( htab_t_ptr ) add_Functions( htab_t_ptr htab)
             {
                 forward_error(success , htab_t_ptr);
             }
+        }
+        else if( strcmp( newEntry->key , "floatval") == 0)
+        {
+            newEntry->diff.func.outType = floatingT;
+        }
+        else if( strcmp( newEntry->key , "intval") == 0)
+        {
+            newEntry->diff.func.outType = integerT;
+        }
+        else if( strcmp( newEntry->key , "strval") == 0)
+        {
+            newEntry->diff.func.outType = stringT;
         }
     }
     return_value( htab , htab_t_ptr );

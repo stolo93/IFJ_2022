@@ -14,11 +14,11 @@
 #include "IFJ_2022.h"
 
 #define  SIZE_OF_BUILD_IN_STRING 10
-#define  NUMBER_OF_BUILD_IN_STRINGS 11
-#define  NUMBER_OF_BUILD_IN_FUNCTIONS 8
-#define  POS_S 10
-#define  POS_I 8
-#define  POS_J 9
+#define  NUMBER_OF_BUILD_IN_STRINGS 14
+#define  NUMBER_OF_BUILD_IN_FUNCTIONS 11
+#define  POS_S 13
+#define  POS_I 11
+#define  POS_J 12
 
 typedef enum dataType { integerT , floatingT , stringT , notDefined , noType ,  
                         integerTNull , floatingTNull , stringTNull , boolT} dType ;
