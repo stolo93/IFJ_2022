@@ -16,8 +16,9 @@
 #include "./symtable.h"
 #include "./syntax_tree.h"
 #include "./IFJ_2022.h"
+#include <stdio.h>
 
-#define DEFAULT_SYMTABLE_SIZE 20
+#define DEFAULT_SYMTABLE_SIZE 25
 
 typedef htab_t_ptr* htab_t_ptr_ptr;
 define_error(htab_t_ptr_ptr);
@@ -56,7 +57,15 @@ error( _Bool ) goThroughProgTreeNodes(PT_Node_ptr node);
 error( _Bool ) checkProgTreeNode(PT_Node_ptr node, htab_pair_t_ptr functionContext);
 
 /**
- * @brief Function checks for semantic errors in function definition
+ * @brief Function checks for semantic errors in function body
+ * @param node provided node
+ * @param functionRecord symbol table record of function beeing checked
+ *
+ */
+error(_Bool) checkFunctionBody(PT_Node_ptr node, htab_pair_t_ptr functionRecord);
+
+/**
+ * @brief Function checks for semantic errors in function definition (without body)
  * @param node provided node
  * @param functionRecord symbol table record of function beeing checked
  *
@@ -80,18 +89,20 @@ error( _Bool ) checkVariable(PT_Node_ptr node);
 /**
  * @brief Function checks for semantic errors in if statement
  * @param node provided node
+ * @param returnStatementCounter counter for return statements
  * @param functionContext context provided for when called in function definition
  *
  */
-error(_Bool) checkIfBlock(PT_Node_ptr node, htab_pair_t_ptr functionContext);
+error(_Bool) checkIfBlock(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext);
 
 /**
  * @brief Function checks for semantic errors in while statement
  * @param node provided node
+ * @param returnStatementCounter counter for return statements
  * @param functionContext context provided for when called in function definition
  *
  */
-error(_Bool) checkWhileBlock(PT_Node_ptr node, htab_pair_t_ptr functionContext);
+error(_Bool) checkWhileBlock(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext);
 
 /**
  * @brief Function checks for semantic errors in expression
@@ -118,10 +129,11 @@ error(_Bool) checkReturnSatement(PT_Node_ptr node, htab_pair_t_ptr functionRecor
 /**
  * @brief Function checks for semantic errors in body of if/else/while statements
  * @param node provided node
- * @param context provided for when called in function definition
+ * @param returnStatementCounter counter for return statements
+ * @param functionContext provided for when called in function definition
  *
  */
-error(_Bool) checkBodyNonTerminal(PT_Node_ptr node, htab_pair_t_ptr functionContext);
+error(_Bool) checkBodyNonTerminal(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext);
 
 /**
  * @brief Function gets symTable containing all function definitions
@@ -134,7 +146,7 @@ error(htab_t_ptr) getMainSymTable();
  * @param key identifier of entry
  *
  */
-error(htab_pair_t_ptr) checkAllSymtableLevels(htab_key_t* key, sType type);
+error(htab_pair_t_ptr) checkAllSymtableLevels(htab_key_t* key);
 
 /**
  * @brief Function converts data types from tokenType to dType
@@ -157,5 +169,31 @@ error(PT_Node_ptr) findProgNode(PT_Node_t * node);
  *
  */
 error(PT_Node_ptr) findLastNodeOnRow(PT_Node_t * node);
+
+/**
+ * @brief Function gets dType of provided node
+ * @param node provided syntax_tree node
+ *
+ */
+error(dType) getNodeType(PT_Node_ptr node);
+
+/**
+ * @brief Function checks for type compatibility (used when checking nullable values)
+ * 
+ * @param type1 type 1
+ * @param type2 type 2
+ * @return true types are compatible
+ * @return false types are not compatible
+ */
+bool checkForTypeCompatibility(dType type1, dType type2);
+
+/**
+ * @brief Function is used for determination if built-in function takes term as paramater
+ * 
+ * @param name identificator of function
+ * @return true function takes term as a parameter
+ * @return false functio does not take term as a parameter
+ */
+bool isSpecialFunction(char* name);
 
 #endif

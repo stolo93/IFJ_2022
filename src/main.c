@@ -6,6 +6,7 @@
 #include "./headers/syntax_tree.h"
 #include "./headers/error.h"
 #include "./headers/codegen.h"
+#include "./headers/semantic_analysis.h"
 
 error( interner ) init;
 interner* interner_ptr;
@@ -47,15 +48,23 @@ error(none) real_main(int argc, char** argv) {
         forward_error(tmp_result, none);
     }
 
-    error(none) codegen_result = generate_code_from_syntax_tree(&token_node);
-
-
-    if ( is_error(codegen_result) )
+    // Semantic analysis
+    error(_Bool) semantic_result = sendProgTree(token_node);
+    if(is_error(semantic_result))
     {
         interner_destroy( interner_ptr);
         PT_DeleteNode(&syntax_tree);
-        forward_error(tmp_result, none);
+        forward_error(semantic_result, none);
     }
+
+
+    //error(none) codegen_result = generate_code_from_syntax_tree(&token_node);
+    //if ( is_error(codegen_result) )
+    //{
+    //    interner_destroy( interner_ptr);
+    //    PT_DeleteNode(&syntax_tree);
+    //    forward_error(tmp_result, none);
+    //}
 
     return_none();
 }
