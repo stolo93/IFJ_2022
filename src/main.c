@@ -58,12 +58,11 @@ error(none) real_main(int argc, char** argv) {
 
     // Syntactic analysis
     error(_Bool) tmp_result = SA_Prolog(token_node);
-
     if ( is_error(tmp_result) )
     {
-        interner_destroy( interner_ptr);
+        interner_destroy(interner_ptr);
         PT_DeleteNode(&syntax_tree);
-        vec_token_ptr_destroy( &returnedTokens);
+        vec_token_ptr_destroy(&returnedTokens);
         forward_error(tmp_result, none);
     }
 
@@ -71,12 +70,25 @@ error(none) real_main(int argc, char** argv) {
     error(_Bool) semantic_result = sendProgTree(token_node);
     if(is_error(semantic_result))
     {
-        interner_destroy( interner_ptr);
+        interner_destroy(interner_ptr);
         PT_DeleteNode(&syntax_tree);
-        vec_token_ptr_destroy( &returnedTokens);
-        forward_error(semantic_result, none);
+        vec_token_ptr_destroy(&returnedTokens);
+        forward_error(tmp_result, none);
     }
-    vec_token_ptr_destroy( &returnedTokens);
+
+    error(none) codegen_result = generate_code_from_syntax_tree(&token_node);
+    if ( is_error(codegen_result) )
+    {
+        interner_destroy(interner_ptr);
+        PT_DeleteNode(&syntax_tree);
+        vec_token_ptr_destroy(&returnedTokens);
+        forward_error(codegen_result, none);
+    }
+
+    interner_destroy(interner_ptr);
+    PT_DeleteNode(&syntax_tree);
+    vec_token_ptr_destroy(&returnedTokens);
+
     return_none();
 }
 
