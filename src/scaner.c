@@ -1,6 +1,8 @@
 /****************************************************************
  * @name scanner.c
- * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @author  Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @brief File containing functions for scanner and its proper function
+ * @date 20.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
@@ -14,10 +16,10 @@
 #include <stdint.h>
 #include "headers/scaner.h"
 #include "headers/error.h"
-//#include "headers/htab.h"
 #include "headers/interner.h"
 
 extern interner* interner_ptr;
+extern vec_token_ptr returnedTokens;
 
 #define __interning() do{ id = intern( interner_ptr , info );\
                       if(  is_error( id )){\
@@ -27,7 +29,7 @@ extern interner* interner_ptr;
 /** Function for resizing strings
  *
  *  @param string which will be resized
- *  @param size current size of string
+ *  @param size pointer to current size of string
  *  @return succes of resizing
  ***/
 bool resizeString ( char** string , unsigned int * size)
@@ -46,6 +48,7 @@ bool resizeString ( char** string , unsigned int * size)
 /** Function for resizing string before being passed to token
  *
  *  @param string which will be resized
+ *  @param size current size of string 
  *  @return succes of resizing
  ***/
 bool finalResize ( char** string, unsigned int size )
@@ -63,7 +66,7 @@ bool finalResize ( char** string, unsigned int size )
 }
 /** Function for finding dot in string
  *  @param info string with number which may contain dot
- *  @return pointer pointing at dot in string
+ *  @return pointer pointing at dot in string or NULL if there was no dot in sting
  ***/
 char * findDot( char* info )
 {
@@ -201,7 +204,7 @@ tokenType checkForKeyword ( char* string )
  *  @param newToken token to which number will be passed
  *  @param info string containing number
  *
- *  @return token with stored number
+ *  @return pointer to token with stored number
  ***/
 token_t* convertNum ( token_t* newToken , char* info )
 {
@@ -281,14 +284,21 @@ tokenType firstState ( int character )
 /** Function which reads token and sends it to caller
  *
  *
- *  @return token or NULL pionter if error occured
+ *  @return pointer to token or error if error of any type occured
  ***/
-error(token_ptr) getToken( ) //htab_pair_t_ptr table
+error(token_ptr) getToken( ) 
 {
     if ( interner_ptr == NULL )
     {
         return_error( ERROR_LEX_NOTABLE , token_ptr );
     }
+    if( vec_token_ptr_len( &returnedTokens ) != 0)
+    {
+        error( token_ptr) token = vec_token_ptr_pop_front( &returnedTokens );
+        get_value( token_ptr , oldToken , token , token_ptr);
+        return_value( oldToken , token_ptr );
+    }
+    
     bool endState = false;
     bool noRepeat = true ;
     bool dot = true;
@@ -316,8 +326,8 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
     {
         firstCall = false;
         free( info );
-        int correct = checkProlog();
-        if ( correct == 0 )
+        bool correct = checkProlog();
+        if ( correct == false )
         {
             free(newToken);
             return_error( ERROR_LEX_PROLOG , token_ptr );
@@ -773,67 +783,24 @@ error(token_ptr) getToken( ) //htab_pair_t_ptr table
 
 }
 
-/** Function which returns token to stdin and frees it
+/** Function which puts token into vector from which getToken will read it 
  *
- *  @param retToken token which will be returned to stdin
- *  @return success of returning token
+ *  @param retToken token which will be returned
+ *  @return error if  returning was unsuccessfull
  ***/
 error(none) returnToken( token_ptr retToken)
 {
-    if( retToken->discriminant == endOfFile )
+    if( retToken == NULL)
+    {
+        return_error( ERROR_LEX_NOTABLE , none);
+    }
+    error(none) success = vec_token_ptr_push_front( &returnedTokens , retToken );
+
+    if( is_error(success))
     {
         free( retToken );
-        return_none();
+        forward_error( success , none );
     }
-    if( retToken->discriminant == integer || retToken->discriminant == decNum )
-    {
-        int len = 0;
-        if (retToken->discriminant == decNum )
-        {
-            len = snprintf(NULL , 0 , "%lf" , retToken->info.decNuber ); //getting number of digits in number
-        }
-        else
-        {
-            len = snprintf(NULL , 0 , "%d" , retToken->info.integer );
-        }
-        char* string = ( char * ) calloc ( len , sizeof( char )) ; // maybe I overshot it a bit
-
-        if( string == NULL )
-        {
-            free( retToken );
-
-            return_error(ERROR_MAL,none);
-        }
-        if( retToken->discriminant == integer )
-        {
-            sprintf( string , "%d" , retToken->info.integer );
-        }
-        else
-        {
-            sprintf( string , "%lf" , retToken->info.decNuber );
-        }
-
-
-        size_t counter = strlen( string ) - 1;
-
-        for(; counter != SIZE_MAX; counter-- )
-        {
-            ungetc( (int) string [ counter ] , stdin );
-        }
-        free( string );
-        free( retToken );
-        return_none();
-    }
-
-    size_t counter = strlen( retToken->info.string ) - 1;
-
-    for( ; counter != SIZE_MAX ; counter-- )
-    {
-        ungetc( (int) retToken->info.string [ counter ] , stdin );
-    }
-
-    //free( (char*)retToken->info.string );
-    free( retToken );
     return_none();
 }
 /** Function which skips whitespace characters and compares first different character
@@ -921,10 +888,9 @@ int skipWhiteSpaceAndCmpChar ( int cmp )
 
 /** Function which checks if prolog is correct
  *
- *  @return 0 if prolog is incorect , 1 if prolog is correct and
- *  switch is not present, 2 if prolog is correct and switch is present
+ *  @return false if prolog is incorect , true if prolog is correct
  ***/
-int checkProlog ()
+bool checkProlog ()
 {
     int character = 0;
     int counter = 0;
@@ -944,7 +910,7 @@ int checkProlog ()
 
     string[LEN_OF_PROLSYM] = '\0';
 
-    if ( strncmp ( string , "<?php", LEN_OF_PROLSYM ) != 0) { return 0; }
+    if ( strncmp ( string , "<?php", LEN_OF_PROLSYM ) != 0) { return false; }
 
     while( ( character = getc( stdin ) ) != EOF )
     {
@@ -1024,21 +990,14 @@ int checkProlog ()
     }
     if( character == EOF && endLine == false )
     {
-        return 0;
-
+        return false;
     }
-    //while ( (character = getc ( stdin )) != EOF && isspace( character )) {}
-
     counter = 1 ;
-    /*if ( character != 'd' )
-    {
-        ungetc( character , stdin );
-        return 1;
-    }*/
+    
     string2 [ 0 ] = (char) skipWhiteSpaceAndCmpChar('d') ;
     if( string2 [0] == 0)
     {
-        return 0;
+        return false;
     }
 
     while ( ( character = getc ( stdin ))  != EOF )
@@ -1053,11 +1012,11 @@ int checkProlog ()
 
     string2[counter+1] = '\0';
 
-    if ( strncmp( string2 , "declare", counter+1 ) != 0 ) { return 0 ; }
+    if ( strncmp( string2 , "declare", counter+1 ) != 0 ) { return false ; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( '(' ) ) { return 0; }
+    if ( ! skipWhiteSpaceAndCmpChar( '(' ) ) { return false; }
 
-    if ( (character = skipWhiteSpaceAndCmpChar( 's' )) == 0) { return 0; }
+    if ( (character = skipWhiteSpaceAndCmpChar( 's' )) == 0) { return false; }
 
 
     counter = 1 ;
@@ -1075,16 +1034,16 @@ int checkProlog ()
 
     string3[counter+1] = '\0';
 
-    if ( strncmp( string3 , "strict_types", counter+1 ) != 0 ) { return 0 ; }
+    if ( strncmp( string3 , "strict_types", counter+1 ) != 0 ) { return false ; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( '=') ) { return 0 ; }
+    if ( ! skipWhiteSpaceAndCmpChar( '=') ) { return false ; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( '1' ) ) { return 0; }
+    if ( ! skipWhiteSpaceAndCmpChar( '1' ) ) { return false; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( ')' )) { return 0; }
+    if ( ! skipWhiteSpaceAndCmpChar( ')' )) { return false; }
 
-    if ( ! skipWhiteSpaceAndCmpChar( ';' )) { return 0; }
+    if ( ! skipWhiteSpaceAndCmpChar( ';' )) { return false; }
 
-     return 2;
+    return true;
 
 }

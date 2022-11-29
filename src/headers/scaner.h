@@ -1,6 +1,8 @@
 /****************************************************************
  * @name scanner.h
- * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @author Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @brief File contaning declarations of functions which scanner uses
+ * @date 20.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
@@ -8,7 +10,6 @@
 #define __SCANNER_H__
 
 #include <stdbool.h>
-//#include "htab.h"
 #include "IFJ_2022.h"
 #include "error.h"
 #include "interner.h"
@@ -41,6 +42,6 @@ error(token_ptr) getToken () ;
 
 error(none) returnToken ( token_ptr retToken ) ;
 
-int checkProlog () ;
+bool checkProlog () ;
 
 #endif
