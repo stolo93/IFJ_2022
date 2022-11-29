@@ -1,6 +1,8 @@
 /****************************************************************
  * @name htab.c
- * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @author Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @brief File contaning functions for hash table which used as symbol table in semantic analysis
+ * @date 28.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
@@ -11,7 +13,6 @@
 #include <string.h>
 
 #include "headers/symtable.h"
-#include "headers/htab_struct.h"
 #include "headers/interner.h"
 
 #define AVG_LEN_MIN 40
@@ -22,7 +23,8 @@ DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR( structFuncParam , structFuncParam );
 /** Function which creates new intem for hash table identified by key
  *
  *  @param key identifier of entry
- *  @return pointer to the new item or NULL internal error occurs
+ *  @param type type of symbol which is being created
+ *  @return pointer to the new item or error if internal error occurs
  ***/
 error( htab_item_ptr ) _create_new_item(htab_key_t key , sType type ){
 
@@ -52,12 +54,13 @@ error( htab_item_ptr ) _create_new_item(htab_key_t key , sType type ){
 }
 
 
-//v prípade ak priemerná dĺžka zoznamov prekročí AVG_LEN_MAX tak sa počet zoznamov zdvojnásobi
 
-/** Function which finds entry and increments counter or if it fails it creates new entry.   
+
+/** Function which finds entry and raises redefined flag and returns pointer to it or if it fails it creates new entry.   
  *
  *  @param t table where we want increment or find new entry
  *  @param key identifier of entry
+ *  @param type type of symbol if new entry will be created
  *  @return pointer to the entry or error if internal error occurs
  ***/
 error( htab_pair_t_ptr ) htab_lookup_add(htab_t * t, htab_key_t key , sType type ){
@@ -106,7 +109,7 @@ error( htab_pair_t_ptr ) htab_lookup_add(htab_t * t, htab_key_t key , sType type
 /** Function which clears all records from table
  *
  *  @param t table from which we want to erase all records
- *  
+ *  @return error if function was not successfull
  ***/
 error(none) htab_clear(htab_t * t){
 
@@ -123,12 +126,7 @@ error(none) htab_clear(htab_t * t){
             
             struct htab_item * to_erase = tmp;
             tmp = tmp->next;
-            /*free((char*)to_erase->pair.key);
-            if ( to_erase->pair.symType == variable && to_erase->pair.diff.var.dataType == stringT )
-            {
-                free( to_erase->pair.diff.var.info.string ) ; // if there will be anything which takes string it should be freed here
-            }
-            else*/ 
+            
             if ( to_erase->pair.symType == function )
             {
                 vec_structFuncParam_destroy( &to_erase->pair.diff.func.inParams );
@@ -144,15 +142,11 @@ error(none) htab_clear(htab_t * t){
 }
 
 
-
-//funkcia ktorá vymaže záznam v tabuľke s klúčom key
-//ak priemerná dĺžka záznamov klesne pod AVG_LEN_MIN tak sa zmenší počet zoznamov na polovicu
-
-/** Function for erasing one entry from table and changes size of table if neccesary
+/** Function for erasing one entry from table and changing size of table if neccesary
  *
  *  @param t table from which we want to erase entry
  *  @param key identifier of record
- *  @return succes of erasing
+ *  @return succes of erasing or error if internal error occurs
  ***/
 error(_Bool ) htab_erase(htab_t * t, char* key){
 
@@ -171,11 +165,7 @@ error(_Bool ) htab_erase(htab_t * t, char* key){
         if(!strcmp(tmp->pair.key,key)){
 
             free((char*)tmp->pair.key);
-            /*if ( tmp->pair.symType == variable && tmp->pair.diff.var.dataType == stringT )
-            {
-                free( tmp->pair.diff.var.info.string ) ; // if there will be anything which takes string it shuold be freed here
-            }
-            else*/
+        
             if ( tmp->pair.symType ==  function )
             {
                
@@ -185,8 +175,10 @@ error(_Bool ) htab_erase(htab_t * t, char* key){
 
                 struct htab_item* to_be_erased = trailing;  // deleting first entry
                 t->ptrs[index] = NULL;
+
                 free(to_be_erased);
                 t->size--;
+
                 if(AVG_LEN_MIN > (t->size / t->arr_size)){    //checking average size of lists
                     htab_resize(t,(size_t)(t->arr_size/2));
                 }
@@ -194,8 +186,10 @@ error(_Bool ) htab_erase(htab_t * t, char* key){
             }
             struct htab_item* to_be_erased = trailing->next;  
             trailing->next = tmp->next;                      //new connection
+
             free(to_be_erased);
             t->size--;
+
             if(AVG_LEN_MIN > (t->size / t->arr_size)){   //checking average size of lists
                 htab_resize(t,(size_t)(t->arr_size/2));
             }
@@ -211,7 +205,7 @@ error(_Bool ) htab_erase(htab_t * t, char* key){
  *
  *  @param t table where we want to find entry
  *  @param key identifier of entry
- *  @return pointer to the entry or NULL pointer if entry don't exists
+ *  @return pointer to the entry, NULL pointer if entry don't exists or error if internal error occurs
  ***/
 error(htab_pair_t_ptr) htab_find(htab_t * t, htab_key_t key){
 
@@ -237,14 +231,14 @@ error(htab_pair_t_ptr) htab_find(htab_t * t, htab_key_t key){
         tmp = tmp->next;
     }
 
-    return_value( NULL , htab_pair_t_ptr );//return_error(ERROR_HTAB_NKEY , htab_pair_t_ptr );
+    return_value( NULL , htab_pair_t_ptr );
 }
 
 /** Function which executes function on all entries from table
  *
  *  @param t table where we want execute function 
- *  @param f pointer to function which will be executed on all entries.
- *           This function can't alter any information in entry
+ *  @param f pointer to function which will be executed on all entries. This function can't alter any information in entry
+ *  @return success of calling function or error if internal error occurs
  ***/
 error(_Bool ) htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
 
@@ -291,11 +285,11 @@ error(_Bool ) htab_for_each(const htab_t * t, void (*f)(htab_pair_t *data)){
     return_value(true , bool );
 }
 
-//funkcia ktorá uvoľní celú tabuľku
+
 /** Function which frees whole table 
  *
  *  @param t table which we want to free
- *  
+ *  @return error if internal error occurs
  ***/
 error(none ) htab_free(htab_t * t){
 
@@ -460,11 +454,11 @@ error( htab_t_ptr ) add_Functions( htab_t_ptr htab)
     return_value( htab , htab_t_ptr );
 }
 
-//funkcia ktorá vytvorí a inicializuje novú tabuľku s počtom zoznamov num
+
 /** Function which initialize hash table  
  *
  *  @param num number of lists which we want create
- *  @return pointer to the hash table or NULL if initialization fails
+ *  @return pointer to the hash table or error if initialization fails
  ***/
 error( htab_t_ptr ) htab_init(size_t num){
 
@@ -498,10 +492,11 @@ error( htab_t_ptr ) htab_init(size_t num){
     return_value( htab , htab_t_ptr );
 }
 
-/** Function which will resize number of lists 
+/** Function which will resize number of arrays with lists 
  *
  *  @param newn count of new lists 
  *  @param t table which we want to resize
+ *  @return error if any internal error occurs
  ***/
 error(none ) htab_resize(htab_t* t, size_t newn){
 
@@ -522,7 +517,7 @@ error(none ) htab_resize(htab_t* t, size_t newn){
         
         return_none();
     }
-
+    //when resizing all entries must change their position so that all functions would function properly
     for(size_t counter = 0;counter < old_size; counter++){
 
         struct htab_item* tmp = old_ptrs[counter];           //one pointer from previous order of elements
@@ -563,7 +558,7 @@ error(none ) htab_resize(htab_t* t, size_t newn){
 /** Function which returns size of table 
  *
  *  @param t table whose size we want
- *  @return size of table or -1 if t is invalid pointer
+ *  @return size of table or error if it is invalid pointer
  ***/
 error(unsigned_long_long ) htab_size(const htab_t * t){
 
@@ -578,7 +573,7 @@ error(unsigned_long_long ) htab_size(const htab_t * t){
 /** Function which returns bucket count of table 
  *
  *  @param t table whose bucket count we want
- *  @return bucket count of table or -1 if t is invalid pointer
+ *  @return bucket count of table or error if it is invalid pointer
  ***/
 error(unsigned_long_long ) htab_bucket_count(const htab_t * t){
 

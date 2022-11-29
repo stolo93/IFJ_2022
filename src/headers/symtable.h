@@ -1,6 +1,8 @@
 /****************************************************************
  * @name htab.h
- * @author : Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @author Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @brief File containing headers for hash table 
+ * @date 28.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
@@ -79,6 +81,20 @@ typedef struct htab_pair {
     bool redefined;
      
 } htab_pair_t;                 
+
+struct htab{
+    size_t size;
+    size_t arr_size;
+    struct htab_item** ptrs;
+};
+
+struct htab_item{
+    htab_pair_t pair;
+    struct htab_item* next;
+};
+
+typedef struct htab_item * htab_item_ptr;
+define_error( htab_item_ptr );
 
 typedef htab_pair_t* htab_pair_t_ptr;
 typedef htab_t* htab_t_ptr; 

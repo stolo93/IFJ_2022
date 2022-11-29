@@ -10,6 +10,8 @@
 
 error( interner ) init;
 interner* interner_ptr;
+vec_token_ptr returnedTokens;
+
 
 // All code that would go into main goes here
 // Please change the name to a better one
@@ -18,6 +20,8 @@ error(none) real_main(int argc, char** argv) {
     (void) argv;
 
     init = interner_new_with_capacity( DEFAULT_SIZE_INTER );
+    returnedTokens = new_vec_token_ptr();
+
     if( is_error( init ))
     {
         forward_error( init , none );
@@ -45,6 +49,7 @@ error(none) real_main(int argc, char** argv) {
     {
         interner_destroy( interner_ptr);
         PT_DeleteNode(&syntax_tree);
+        vec_token_ptr_destroy( &returnedTokens);
         forward_error(tmp_result, none);
     }
 
@@ -54,18 +59,10 @@ error(none) real_main(int argc, char** argv) {
     {
         interner_destroy( interner_ptr);
         PT_DeleteNode(&syntax_tree);
+        vec_token_ptr_destroy( &returnedTokens);
         forward_error(semantic_result, none);
     }
-
-
-    //error(none) codegen_result = generate_code_from_syntax_tree(&token_node);
-    //if ( is_error(codegen_result) )
-    //{
-    //    interner_destroy( interner_ptr);
-    //    PT_DeleteNode(&syntax_tree);
-    //    forward_error(tmp_result, none);
-    //}
-
+    vec_token_ptr_destroy( &returnedTokens);
     return_none();
 }
 
