@@ -1480,6 +1480,7 @@ error( _Bool ) SA_Expr ( PT_Node_t** token_node, bool cond_expr )
 	static const tokenType operands[] = { nullT, identOfVar, integer, decNum, string, N_VLD};
 	static const tokenType end_exp[] = { openSetParen, semicolon, N_VLD };
 	static const tokenType start_exp[] = { identOfVar, integer, decNum, string, nullT, openParen, N_VLD };
+	static const tokenType expr_last[] = { identOfVar, integer, decNum, string, nullT, closeParen, N_VLD};
 
 	// Acceptable tokens before a particular token
 
@@ -1662,7 +1663,7 @@ error( _Bool ) SA_Expr ( PT_Node_t** token_node, bool cond_expr )
 
 	// Handle the last token
 	// If expression is a if or while condition it has to end with )
-	if ( !isInTokens(cur_token->discriminant, end_exp) || (cond_expr && prev_token->discriminant != closeParen))
+	if ( !isInTokens(cur_token->discriminant, end_exp) || (cond_expr && prev_token->discriminant != closeParen) || !isInTokens(prev_token->discriminant, expr_last))
 	{
 		vec_token_ptr_destroy(&postfix_expr);
 		vec_token_ptr_destroy(&aux_postfix);
