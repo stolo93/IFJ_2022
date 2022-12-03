@@ -1,7 +1,7 @@
 /****************************************************************
  * @name vector.c
  * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
- * @brief File contaning declarations of functions for vector implementation
+ * @brief File containing declarations of functions for vector implementation
  * @date 20.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language

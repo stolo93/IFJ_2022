@@ -1,7 +1,7 @@
 /****************************************************************
  * @name vector_ord.h
  * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
- * @brief File contaning macros for vector_ord implementation
+ * @brief File containing macros for vector_ord implementation
  * @date 20.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
@@ -159,12 +159,17 @@ typeof(type*) vec_ ## suffix ## _find_sorted(const vec_ ## suffix*vec, typeof(ty
 }                                                                                      \
                                                                                        \
 error(none) vec_ ## suffix ## _insert_sorted(vec_ ## suffix * vec, typeof(type) item) {        \
-    if ((vec)->len__ >= (vec)->capacity__) {                                           \
-        error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__);        \
-        if (is_error(result)) {                                                        \
-            return result;                                                             \
-        }                                                                              \
-    }                                                                                  \
+    if (vec->len__ == 0) {                                                              \
+        error(none) result = vec_ ## suffix ## _resize((vec) , 1);                      \
+        if (is_error(result)) {                                                         \
+            return result;                                                              \
+        }                                                                               \
+    } else if ((vec)->len__ >= (vec)->capacity__) {                                     \
+        error(none) result = vec_ ## suffix ## _resize((vec) ,vec->capacity__ * 2);     \
+        if (is_error(result)) {                                                         \
+            return result;                                                              \
+        }                                                                               \
+    }                                                                                   \
                                                                                        \
     size_t location = vec_ ## suffix ## _binary_search(vec, item);                     \
     vec_ ## suffix ## _insert(vec, location, item);                                    \

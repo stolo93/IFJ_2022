@@ -73,7 +73,7 @@ error(none) real_main(int argc, char** argv) {
         interner_destroy(interner_ptr);
         PT_DeleteNode(&syntax_tree);
         vec_token_ptr_destroy(&returnedTokens);
-        forward_error(tmp_result, none);
+        forward_error(semantic_result, none);
     }
 
     error(none) codegen_result = generate_code_from_syntax_tree(&token_node);

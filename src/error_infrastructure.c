@@ -1,7 +1,7 @@
 /****************************************************************
  * @name error_infrastructure.c
  * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
- * @brief File contaning definitions for error info printing
+ * @brief File containing definitions for error info printing
  * @date 20.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
