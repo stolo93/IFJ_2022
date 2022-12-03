@@ -1,5 +1,9 @@
-// Non-terminals branch of to the left
-// rules continue to the right
+/****************************************************************
+ * @name codegen.c
+ * @author : Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 
 #include <stdio.h>
 #include "headers/codegen.h"
@@ -7,21 +11,68 @@
 #include "headers/codegen_context.h"
 
 #define is_worthless_discriminant(discriminant) ((discriminant) == def || (discriminant) == lineComment || (discriminant) == multiLineComm || (discriminant) == openParen || (discriminant) == closeParen || (discriminant) == openSetParen || (discriminant) == closeSetParen || (discriminant) == comma || (discriminant) == semicolon || (discriminant) == colon || (discriminant) == multiLineCommPE)
-#define filter(node_variable_name) do { node_variable_name = node_variable_name->rightSibling; } while ((node_variable_name) != NULL && (node_variable_name)->data.isTerminal && is_worthless_discriminant((node_variable_name->data.type.terminal->discriminant)))
 #define is_terminal(node, discriminant_enum) (((node)->data.isTerminal) && (node)->data.type.terminal->discriminant == (discriminant_enum))
 #define is_non_terminal(node, discriminant_enum) (!((node)->data.isTerminal) && (node)->data.type.nonTerminal == (discriminant_enum))
 #define extract_data(node, info_type) ((node)->data.type.terminal->info.info_type)
 #define get_discriminant(node) ((node)->data.type.terminal->discriminant)
 
-#define set_node_from_error(node, error_obj) node = (error_obj)._value
+#define skip_to_next_nonTerminal(node_ptr, nonTerminal) while (is_non_terminal((node_ptr), (nonTerminal)) == false) { node_ptr = (node_ptr)->rightSibling;}
 
-// Almost every terminal/non-terminal check in this code will never be hit if the rest of the program has no errors,
-// as such most of these checks may be removed if/when everything is properly tested.
+
 
 void print_normalized_string(const char* string) {
-    for (size_t i = 0; string[i] != '\0'; i++) {
+    size_t i = 0;
+    if (string[i] == '\"') {
+        i++;
+    }
+
+    for (; string[i] != '\0' && string[i] != '\"'; i++) {
         char letter = string[i];
-        if (letter <= 32 || letter == 35 || letter == 92) {
+        if (letter == '\\') {
+            i++;
+            switch (string[i]) {
+                case 'a':
+                    printf("\\%03d", '\a');
+                    break;
+                case 'b':
+                    printf("\\%03d", '\b');
+                    break;
+                case 'f':
+                    printf("\\%03d", '\f');
+                    break;
+                case 'n':
+                    printf("\\%03d", '\n');
+                    break;
+                case 'r':
+                    printf("\\%03d", '\r');
+                    break;
+                case 't':
+                    printf("\\%03d", '\t');
+                    break;
+                case 'v':
+                    printf("\\%03d", '\v');
+                    break;
+                case '\\':
+                    printf("\\%03d", '\\');
+                    break;
+                case '\'':
+                    printf("\\%03d", '\'');
+                    break;
+                case '\"':
+                    printf("\\%03d", '\"');
+                    break;
+                case '?':
+                    printf("\\%03d", '\?');
+                    break;
+                case '0':
+                    printf("\\%03d", '\0');
+                    break;
+                default:
+                    // This should never happen
+                    break;
+
+            }
+        } else if (letter <= 32 || letter == '#') {
             printf("\\%03d", letter);
         } else {
             putchar(letter);
@@ -147,17 +198,19 @@ error(none) run_expression(PT_Node_t *expression_start) {
     return_none();
 }
 
-error(PT_Node_ptr) print_while(PT_Node_t* while_start, int* label_indexer, const char* label_prefix, vec_context* context);
-error(PT_Node_ptr) call_function(PT_Node_t *call_start);
+error(none) print_while(PT_Node_t* while_start, int* label_indexer, const char* label_prefix, vec_context* context);
+error(none) call_function(PT_Node_t *call_start, int* labeler);
 
-error(none) print_body(PT_Node_t* body_node, int* label_indexer, const char* label_prefix ,vec_context* context) {
+
+error(none) print_body_without_new_context(PT_Node_t* body_node, int* label_indexer, const char* label_prefix ,vec_context* context) {
     if (is_non_terminal(body_node, STATEMENT) == false) {
         return_error(ERROR_GEN_UNSPECIFIED, none);
     }
 
-
     while (body_node != NULL) {
         PT_Node_ptr statement = body_node->leftChild;
+
+        // Set body_node to the next statement token
         body_node = body_node->rightSibling->leftChild;
 
         if (statement->data.isTerminal == false) {
@@ -169,44 +222,30 @@ error(none) print_body(PT_Node_t* body_node, int* label_indexer, const char* lab
 
         switch (terminal->discriminant) {
             case ifT: {
-                error(PT_Node_ptr) continued = print_while(statement, label_indexer, label_prefix, context);
-                if (is_error(continued)) {
+                error(none) error = print_while(statement, label_indexer, label_prefix, context);
+                if (is_error(error)) {
                     vec_context_destroy(context);
-                    forward_error(continued, none);
+                    forward_error(error, none);
                 }
                 break;
             }
             case returnT: {
-                filter(statement);
-                if (is_non_terminal(statement, RET_VAL) == false) {
-                    vec_context_destroy(context);
-                    return_error(ERROR_GEN_UNSPECIFIED, none);
-                }
+                skip_to_next_nonTerminal(statement, RET_VAL);
 
-                if (statement->leftChild == NULL) {
-                    filter(statement);
-                    printf("RETURN\n");
-                } else {
-                    if (is_non_terminal(statement->leftChild, EXPR) == false) {
-                        vec_context_destroy(context);
-                        return_error(ERROR_GEN_UNSPECIFIED, none);
-                    }
-
+                if (statement->leftChild != NULL) {
                     error(none) result = run_expression(statement->leftChild);
                     if (is_error(result)) {
                         vec_context_destroy(context);
                         forward_error(result, none);
                     }
-
-                    // Expression results are kept on stack, so we need to save them in a temp that we can return;
-                    printf("RETURN\n");
                 }
 
+                printf("RETURN\n");
                 break;
             }
 
             case whileT: {
-                error(PT_Node_ptr) continued = print_while(statement, label_indexer, label_prefix, context);
+                error(none) continued = print_while(statement, label_indexer, label_prefix, context);
                 if (is_error(continued)) {
                     vec_context_destroy(context);
                     forward_error(continued, none);
@@ -214,14 +253,14 @@ error(none) print_body(PT_Node_t* body_node, int* label_indexer, const char* lab
                 break;
             }
             case identOfFunct: {
-                error(PT_Node_ptr) continued = call_function(statement);
+                error(none) continued = call_function(statement, label_indexer);
                 if (is_error(continued)) {
                     vec_context_destroy(context);
                     forward_error(continued, none);
                 }
 
                 // If the function returns a value it will be on the stack, we aren't saving the value, so we clear the stack
-                printf("CLEARS/n");
+                printf("CLEARS\n");
                 break;
             }
 
@@ -232,26 +271,13 @@ error(none) print_body(PT_Node_t* body_node, int* label_indexer, const char* lab
                     vec_context_insert_sorted(context, (char_ptr)variable_name);
                 }
 
-                statement = statement->rightSibling;
-                if (is_terminal(statement, assigment) == false) {
-                    vec_context_destroy(context);
-                    return_error(ERROR_GEN_UNSPECIFIED, none);
-                }
-                filter(statement);
+                skip_to_next_nonTerminal(statement, RVAL);
 
-                if (is_non_terminal(statement, EXPR)) {
-                    error(none) result = run_expression(statement);
-                    if (is_error(result)) {
-                        vec_context_destroy(context);
-                        forward_error(result, none);
-                    }
+                if (is_non_terminal(statement->leftChild, EXPR)) {
+                    run_expression(statement->leftChild);
 
-                } else if (is_terminal(statement, identOfFunct)) {
-                    error(PT_Node_ptr) continued = call_function(statement);
-                    if (is_error(continued)) {
-                        vec_context_destroy(context);
-                        forward_error(continued, none);
-                    }
+                } else if (is_terminal(statement->leftChild, identOfFunct)) {
+                    call_function(statement->leftChild, label_indexer);
                 }
 
                 printf("POPS LF@%s\n", variable_name);
@@ -266,11 +292,23 @@ error(none) print_body(PT_Node_t* body_node, int* label_indexer, const char* lab
     return_none();
 }
 
-error(PT_Node_ptr) print_if(PT_Node_t* if_start, int* label_indexer, const char* label_prefix, vec_context* context) {
-    if_start = if_start->rightSibling;
+error(none) print_body(PT_Node_t* body_node, int* label_indexer, const char* label_prefix ,vec_context* outer_context) {
+    get_value(vec_context, context , clone_context_vec(outer_context), none);
+
+    error(none) result = print_body_without_new_context(body_node, label_indexer, label_prefix, &context);
+    if (is_error(result)) {
+        vec_context_destroy(&context);
+    }
+
+    return result;
+}
+
+
+error(none) print_if(PT_Node_t* if_start, int* label_indexer, const char* label_prefix, vec_context* context) {
+    skip_to_next_nonTerminal(if_start, EXPR);
     error(none) result = run_expression(if_start);
     if (is_error(result)) {
-        forward_error(result, PT_Node_ptr);
+        forward_error(result, none);
     }
 
     int index_if_block = *label_indexer;
@@ -279,105 +317,105 @@ error(PT_Node_ptr) print_if(PT_Node_t* if_start, int* label_indexer, const char*
     *label_indexer = *label_indexer + 3;
 
     // Figure out the resulting type of the expression
-    printf("POPS GF@RAX\nPUSH GF@RAX\nTYPE GF@RAX GF@RAX\n");
+    printf("POPS GF@RAX\nMOVE GF@RBX GF@RAX\nPUSHS GF@RAX\nTYPE GF@RBX GF@RAX\n");
     // Use the proper comparison function
-    printf("JUMPIFEQ .%s.%d GF@RAX \"string\"\n", label_prefix, *label_indexer);
-    printf("JUMPIFEQ .%s.%d GF@RAX \"int\"\n", label_prefix, *label_indexer + 1);
-    printf("JUMPIFEQ .%s.%d GF@RAX \"float\"\n", label_prefix, *label_indexer + 2);
-    printf("JUMPIFEQ .%s.%d GF@RAX \"bool\"\n", label_prefix, *label_indexer + 3);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@string\n", label_prefix, *label_indexer);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@int\n", label_prefix, *label_indexer + 1);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@float\n", label_prefix, *label_indexer + 2);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@bool\n", label_prefix, *label_indexer + 3);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@nil\n", label_prefix, index_else_block);
 
     // String comparison function
     // Falls thorught to the int comparison function since we're comparing the length of the string which is an int
-    printf("LABEL .%s.%d\nSTRLEN GF@RAX GF@RAX\n", label_prefix, *label_indexer);
+    printf("LABEL -%s-%d\nSTRLEN GF@RAX GF@RAX\n", label_prefix, *label_indexer);
 
     // int comparison function
-    printf("LABEL .%s.%d\nJUMPIFNEQ .%s.%d GF@RAX int@0\nJUMP .%s.%d\n", label_prefix, *label_indexer + 1, label_prefix, index_if_block, label_prefix, index_else_block);
+    printf("LABEL -%s-%d\nJUMPIFNEQ -%s-%d GF@RAX int@0\nJUMP -%s-%d\n", label_prefix, *label_indexer + 1, label_prefix, index_if_block, label_prefix, index_else_block);
 
     // float comparison function
-    printf("LABEL .%s.%d\nJUMPIFNEQ .%s.%d GF@RAX float@0x0p+0\nJUMP .%s.%d\n", label_prefix, *label_indexer + 2, label_prefix, index_if_block, label_prefix, index_else_block);
+    printf("LABEL -%s-%d\nJUMPIFNEQ -%s-%d GF@RAX float@0x0p+0\nJUMP -%s-%d\n", label_prefix, *label_indexer + 2, label_prefix, index_if_block, label_prefix, index_else_block);
 
     // bool comparison function
-    printf("LABEL .%s.%d\nJUMPIFEQ .%s.%d GF@RAX bool@true\nJUMP .%s.%d\n", label_prefix, *label_indexer + 3, label_prefix, index_if_block, label_prefix, index_else_block);
+    printf("LABEL -%s-%d\nJUMPIFEQ -%s-%d GF@RAX bool@false\n", label_prefix, *label_indexer + 3, label_prefix, index_else_block);
     *label_indexer = *label_indexer + 4;
 
     // if block
-    printf("LABEL .%s.%d\n", label_prefix, index_if_block);
+    printf("LABEL -%s-%d\n", label_prefix, index_if_block);
 
-    filter(if_start);
+    skip_to_next_nonTerminal(if_start, BODY);
     if (if_start->leftChild != NULL) {
-        print_body(if_start->leftChild, label_indexer, label_prefix ,context);
+        print_body_without_new_context(if_start->leftChild, label_indexer, label_prefix ,context);
     }
 
-    printf("JUMP .%s.%d\n", label_prefix, index_end_block);
+    printf("JUMP -%s-%d\n", label_prefix, index_end_block);
 
     // else block
-    printf("LABEL .%s.%d\n", label_prefix, index_else_block);
-    filter(if_start);
-    if (is_terminal(if_start, elseT) == false) {
-        return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-    }
-    filter(if_start);
+    printf("LABEL -%s-%d\n", label_prefix, index_else_block);
+
+    if_start = if_start->rightSibling; // skip_to_next... skip_to_next would just return the current body token if we didn't move to the right
+    skip_to_next_nonTerminal(if_start, BODY);
+
     if (if_start->leftChild != NULL) {
-        print_body(if_start->leftChild, label_indexer, label_prefix, context);
+        print_body_without_new_context(if_start->leftChild, label_indexer, label_prefix, context);
     }
-    filter(if_start);
 
     // exit
-    printf("LABEL .%s.%d\n", label_prefix, index_end_block);
+    printf("LABEL -%s-%d\n", label_prefix, index_end_block);
 
-    return_value(if_start, PT_Node_ptr);
+    return_none();
 }
 
-error(PT_Node_ptr) print_while(PT_Node_t* while_start, int* label_indexer, const char* label_prefix, vec_context* context) {
-    while_start = while_start->rightSibling;
-    filter(while_start);
+error(none) print_while(PT_Node_t* while_start, int* label_indexer, const char* label_prefix, vec_context* context) {
+    skip_to_next_nonTerminal(while_start, EXPR)
 
+    int index_while_if_block = *label_indexer;
+    int index_while_block = *label_indexer + 1;
+    int index_end_block = *label_indexer + 2;
+    *label_indexer = *label_indexer + 3;
+
+    printf("LABEL -%s-%d\n", label_prefix, index_while_if_block);
     error(none) result = run_expression(while_start);
     if (is_error(result)) {
-        forward_error(result, PT_Node_ptr);
+        forward_error(result, none);
     }
 
-    int index_while_block = *label_indexer;
-    int index_end_block = *label_indexer + 1;
-    *label_indexer = *label_indexer + 2;
+
 
     // Figure out the resulting type of the expression
-    printf("POPS GF@RAX\nPUSH GF@RAX\nTYPE GF@RAX GF@RAX\n");
+    printf("POPS GF@RAX\nMOVE GF@RBX GF@RAX\nPUSHS GF@RAX\nTYPE GF@RAX GF@RAX\n");
     // Use the proper comparison function
-    printf("JUMPIFEQ .%s.%d GF@RAX \"string\"\n", label_prefix, *label_indexer);
-    printf("JUMPIFEQ .%s.%d GF@RAX \"int\"\n", label_prefix, *label_indexer + 1);
-    printf("JUMPIFEQ .%s.%d GF@RAX \"float\"\n", label_prefix, *label_indexer + 2);
-    printf("JUMPIFEQ .%s.%d GF@RAX \"bool\"\n", label_prefix, *label_indexer + 3);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@string\n", label_prefix, *label_indexer);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@int\n", label_prefix, *label_indexer + 1);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@float\n", label_prefix, *label_indexer + 2);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@bool\n", label_prefix, *label_indexer + 3);
+    printf("JUMPIFEQ -%s-%d GF@RBX string@nil\n", label_prefix, index_end_block);
 
     // String comparison function
-    // Falls thorught to the int comparison function since we're comparing the length of the string which is an int
-    printf("LABEL .%s.%d\nSTRLEN GF@RAX GF@RAX\n", label_prefix, *label_indexer);
+    // Falls through to the int comparison function since we're comparing the length of the string which is an int
+    printf("LABEL -%s-%d\nSTRLEN GF@RAX GF@RAX\n", label_prefix, *label_indexer);
 
     // int comparison function
-    printf("LABEL .%s.%d\nJUMPIFNEQ .%s.%d GF@RAX int@0\nJUMP .%s.%d\n", label_prefix, *label_indexer + 1, label_prefix, index_while_block, label_prefix, index_end_block);
+    printf("LABEL -%s-%d\nJUMPIFNEQ -%s-%d GF@RAX int@0\nJUMP -%s-%d\n", label_prefix, *label_indexer + 1, label_prefix, index_while_block, label_prefix, index_end_block);
 
     // float comparison function
-    printf("LABEL .%s.%d\nJUMPIFNEQ .%s.%d GF@RAX float@0x0p+0\nJUMP .%s.%d\n", label_prefix, *label_indexer + 2, label_prefix, index_while_block, label_prefix, index_end_block);
+    printf("LABEL -%s-%d\nJUMPIFNEQ -%s-%d GF@RAX float@0x0p+0\nJUMP -%s-%d\n", label_prefix, *label_indexer + 2, label_prefix, index_while_block, label_prefix, index_end_block);
 
     // bool comparison function
-    printf("LABEL .%s.%d\nJUMPIFNEQ .%s.%d GF@RAX float@0x0p+0\nJUMP .%s.%d\n", label_prefix, *label_indexer + 2, label_prefix, index_while_block, label_prefix, index_end_block);
+    // We can just fall through this part instead of jumping to the while block
+    printf("LABEL -%s-%d\nJUMPIFEQ -%s-%d GF@RAX float@0x0p+0\n", label_prefix, *label_indexer + 2, label_prefix, index_end_block);
     *label_indexer = *label_indexer + 4;
 
     // while block
-    printf("LABEL .%s.%d\n", label_prefix, index_while_block);
-    filter(while_start);
-    print_body(while_start->leftChild, label_indexer, label_prefix ,context);
-    printf("LABEL .%s.%d\n", label_prefix, index_end_block);
+    printf("LABEL -%s-%d\n", label_prefix, index_while_block);
+    skip_to_next_nonTerminal(while_start, BODY);
+    print_body_without_new_context(while_start->leftChild, label_indexer, label_prefix ,context);
+    printf("LABEL -%s-%d\n", label_prefix, index_end_block);
 
-    filter(while_start);
-    return_value(while_start, PT_Node_ptr);
+
+    return_none();
 }
 
 error(none) print_call_args(PT_Node_t * args) {
-    if (is_non_terminal(args, ARG_TYPE) == false) {
-        return_error(ERROR_GEN_UNSPECIFIED, none);
-    }
-
     while (args != NULL) {
         if (is_non_terminal(args->leftChild, TERM)) {
             if (get_discriminant(args->leftChild->leftChild) == nullT) {
@@ -399,7 +437,8 @@ error(none) print_call_args(PT_Node_t * args) {
             printf("PUSHS LF@%s\n", extract_data(args->leftChild, string));
         }
 
-        args = args->rightSibling->leftChild;
+        skip_to_next_nonTerminal(args, ARGS_NEXT);
+        args = args->leftChild;
     }
 
     return_none();
@@ -409,6 +448,8 @@ error(none) call_write_on_args(PT_Node_t* write_args_start) {
     if (write_args_start == NULL) {
         return_none();
     }
+
+    skip_to_next_nonTerminal(write_args_start, ARG_TYPE);
 
     if (is_non_terminal(write_args_start->leftChild, TERM)) {
         PT_Node_t* data = write_args_start->leftChild->leftChild;
@@ -438,150 +479,123 @@ error(none) call_write_on_args(PT_Node_t* write_args_start) {
     return call_write_on_args(write_args_start->rightSibling->leftChild);
 }
 
-error(PT_Node_ptr) call_function(PT_Node_t *call_start) {
-    // Setting up and clearing a stack is the purpose of the calling function
-
-    if (is_terminal(call_start, identOfFunct) == false) {
-        return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-    }
-
+error(none) call_function(PT_Node_t *call_start, int* labeler) {
+    // Setting up and clearing a stack is the job of the caller
     const char* function_name = extract_data(call_start, string);
+    skip_to_next_nonTerminal(call_start, ARGS);
 
     if (strcmp(function_name, "reads") == 0) {
         printf("READ GF@RAX string\nPUSHS GF@RAX\n");
-        filter(call_start);
-        if (is_non_terminal(call_start, ARGS) == false) {
-            return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-        }
-        filter(call_start);
-
-        return_value(call_start, PT_Node_ptr);
-
+        return_none();
     } else if (strcmp(function_name, "readi") == 0) {
         printf("READ GF@RAX int\nPUSHS GF@RAX\n");
-        filter(call_start);
-        if (is_non_terminal(call_start, ARGS)) {
-            return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-        }
-        return_value(call_start, PT_Node_ptr);
-
+        return_none();
     } else if (strcmp(function_name, "readf") == 0) {
         printf("READ GF@RAX float\nPUSHS GF@RAX\n");
-        filter(call_start);
-        if (is_non_terminal(call_start, ARGS)) {
-            return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-        }
-        return_value(call_start, PT_Node_ptr);
-
+        return_none();
     } else if (strcmp(function_name, "write") == 0) {
-        filter(call_start);
         if (call_start->leftChild != NULL) {
             call_write_on_args(call_start->leftChild);
         }
+        return_none();
+    } else if (strcmp(function_name, "floatval") == 0) {
+        run_expression(call_start->rightSibling->rightSibling);
+        printf("POPS GF@RBX\nTYPE GF@RAX GF@RBX\nPUSHS GF@RBX\n");
+        printf("JUMPIFEQ -%d GF@RAX float\n", *labeler);
+        printf("JUMPIFEQ -%d GF@RAX int\n", (*labeler) + 1);
+        printf("JUMPIFEQ -%d GF@RAX nil\n", (*labeler) + 2);
+        printf("EXIT 53\n");
+        printf("LABEL -%d\nint2floats\nJUMP -%d", (*labeler) + 1, (*labeler));
+        printf("LABEL -%d\nPOPS GF@RBX\nPUSHS float@0x0p+0\n", (*labeler) + 2);
+        printf("LABEL -%d\n", (*labeler));
+        *labeler = (*labeler) + 3;
 
-        return_value(call_start, PT_Node_ptr);
+        return_none();
+    } else if (strcmp(function_name, "intval") == 0) {
+        run_expression(call_start->rightSibling->rightSibling);
+        printf("POPS GF@RBX\nTYPE GF@RAX GF@RBX\nPUSHS GF@RBX\n");
+        printf("JUMPIFEQ -%d GF@RAX int\n", *labeler);
+        printf("JUMPIFEQ -%d GF@RAX float\n", (*labeler) + 1);
+        printf("JUMPIFEQ -%d GF@RAX nil\n", (*labeler) + 2);
+        printf("EXIT 53\n");
+        printf("LABEL -%d\nfloat2ints\nJUMP -%d", (*labeler) + 1, (*labeler));
+        printf("LABEL -%d\nPOPS GF@RBX\nPUSHS int@0\n", (*labeler) + 2);
+        printf("LABEL -%d\n", (*labeler));
+        *labeler = (*labeler) + 3;
+
+        return_none();
+    } else if (strcmp(function_name, "strval") == 0) {
+        run_expression(call_start->rightSibling->rightSibling);
+        printf("POPS GF@RBX\nTYPE GF@RAX GF@RBX\nPUSHS GF@RBX\n");
+        printf("JUMPIFEQ -%d GF@RAX string\n", *labeler);
+        printf("JUMPIFEQ -%d GF@RAX nil\n", (*labeler) + 1);
+        printf("EXIT 53\n");
+        printf("LABEL -%d\nPOPS GF@RBX\nPUSHS string@\n", (*labeler) + 1);
+        printf("LABEL -%d\n", (*labeler));
+        *labeler = (*labeler) + 2;
+
+        return_none();
+    } else if (strcmp(function_name, "strlen") == 0) {
+        run_expression(call_start->rightSibling->rightSibling);
+        printf("POPS GF@RAX\nSTRLEN GF@RAX GF@RAX\nPUSHS GF@RAX\n");
+    } else if (strcmp(function_name, "substring") == 0) {
+
+    } else if (strcmp(function_name, "ord") == 0) {
+
+    } else if (strcmp(function_name, "chr") == 0) {
+
     }
 
-    printf("CREATEFRAME\nPUSHFRAME\n");
-    if (is_non_terminal(call_start, ARGS) == false) {
-        return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-    }
-
+    // If we don't push arguments we're done
     if (call_start->leftChild == NULL) {
-        filter(call_start);
-        return_value(call_start, PT_Node_ptr);
+        return_none();
     }
 
     print_call_args(call_start->leftChild);
 
     printf("POPFRAME\n");
-    filter(call_start);
-    return_value(call_start, PT_Node_ptr);
+    return_none();
 }
 
 error(none) load_function_args(PT_Node_t* args, vec_context* context) {
-    filter(args);
     if (args == NULL) {
-        return_error(ERROR_GEN_UNSPECIFIED, none);
+        return_none();
     }
 
-    if (is_non_terminal(args, TYPE)) {
-        args = args->rightSibling;
-    }
-    filter(args);
-
-    if (is_terminal(args, identOfVar) == false) {
-        return_error(ERROR_GEN_UNSPECIFIED, none);
-    }
-
-    if (args->rightSibling == NULL) {
-        return_error(ERROR_GEN_UNSPECIFIED, none);
-    }
-
-    if (args->rightSibling->leftChild != NULL) {
-        load_function_args(args->rightSibling->leftChild, context);
-    }
-
+    args = args->rightSibling;
     const char* var_name = extract_data(args, string);
+    skip_to_next_nonTerminal(args, PARAMS_NEXT);
+
+    load_function_args(args->leftChild, context);
 
     vec_context_insert_sorted(context, (char_ptr)var_name);
     printf("DEFVAR %s\nPOPS %s\n", var_name, var_name);
     return_none();
 }
 
-error(PT_Node_ptr) define_function(PT_Node_t *function_node, int* label_indexer) {
+error(none) define_function(PT_Node_t *function_node, int* label_indexer) {
     PT_Node_ptr current = function_node->rightSibling;
-    if (current == NULL)  {
-        return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-    }
-
-    // Defining a function without an identifier is not allowed
-    if (is_terminal(current, identOfFunct) == false) {
-        return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-    }
-
     const char* function_name = extract_data(current, string);
 
     // context keeps track of which variable have already been defined
     vec_context context = new_vec_context();
 
-    // Get access to <BODY> by ignoring <TYPE> all the other trash
-    filter(current);
-
     printf("JUMP %s.end\n", function_name);
     printf("LABEL %s\n", function_name);
 
-    filter(current);
-    if (is_non_terminal(current, ARGS) == false) {
-        return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-    }
+    // Skip to function parameters
+    skip_to_next_nonTerminal(current, PARAMS);
+    load_function_args(current->leftChild, &context);
 
-    if (current->leftChild != NULL) {
-        error(none) result = load_function_args(current->leftChild, &context);
-        if (is_error(result)) {
-            forward_error(result, PT_Node_ptr);
-        }
-    }
-
-    // Find <BODY> node
-    filter(current);
-    if (is_non_terminal(current, TYPE)) {
-        current = current->rightSibling;
-    }
-    filter(current);
-
-    if (is_non_terminal(current, BODY) == false) {
-        return_error(ERROR_GEN_UNSPECIFIED, PT_Node_ptr);
-    }
+    skip_to_next_nonTerminal(current, BODY);
 
     if (current->leftChild != NULL) {
         print_body(current->leftChild, label_indexer, function_name, &context);
     }
-    filter(current);
 
     printf("LABEL %s.end\n", function_name);
     vec_context_destroy(&context);
-    return_value(current, PT_Node_ptr);
+    return_none();
 }
 
 error(none) generate_code_from_syntax_tree(tree_t* tree) {
@@ -607,17 +621,6 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
 
     // Main printer loop
     while (current != NULL) {
-        // We should always get a <PROG> non-terminal here
-        if(is_non_terminal(current, PROG) == false) {
-            vec_context_destroy(&context);
-            return_error(ERROR_GEN_UNSPECIFIED, none);
-        } 
-        
-        if (current->leftChild == NULL) {
-            vec_context_destroy(&context);
-            // A non-terminal should not be at the end of the program
-            return_error(ERROR_GEN_UNSPECIFIED, none);
-        }
 
         current = current->leftChild;
         PT_Data_t data = current->data;
@@ -628,8 +631,8 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
                 return_error(ERROR_GEN_UNSPECIFIED, none);
             }
 
-            // Expressions are in essence pure functions and as such if they're output is not saved executing them has
-            // no effect se we skip them
+            // Expressions are in essence pure functions and as such if their output is not saved therefore executing them
+            // has no effect se we skip them
             current = current->rightSibling;
             continue;
         }
@@ -638,70 +641,33 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
 
         switch (terminal->discriminant) {
             case functionT: {
-                error(PT_Node_ptr) continued = define_function(current, &label_indexer);
-                if (is_error(continued)) {
-                    vec_context_destroy(&context);
-                    forward_error(continued, none);
-                }
-                set_node_from_error(current, continued);
+                define_function(current, &label_indexer);
                 break;
             }
             case ifT: {
-                error(PT_Node_ptr) continued = print_if(current, &label_indexer, "", &context);
-                if (is_error(continued)) {
-                    vec_context_destroy(&context);
-                    forward_error(continued, none);
-                }
-                set_node_from_error(current, continued);
+                print_if(current, &label_indexer, "", &context);
                 break;
             }
             case returnT: {
-                filter(current);
-                if (is_non_terminal(current, RET_VAL) == false) {
-                    vec_context_destroy(&context);
-                    return_error(ERROR_GEN_UNSPECIFIED, none);
-                }
+                skip_to_next_nonTerminal(current, RET_VAL);
 
                 if (current->leftChild == NULL) {
-                    filter(current);
                     printf("EXIT int@0\n");
                 } else {
-                    if (is_non_terminal(current->leftChild, EXPR) == false) {
-                        vec_context_destroy(&context);
-                        return_error(ERROR_GEN_UNSPECIFIED, none);
-                    }
-
-                    error(none) result = run_expression(current->leftChild);
-                    if (is_error(result)) {
-                        vec_context_destroy(&context);
-                        forward_error(result, none);
-                    }
-
-                    // Expression results are kept on stack, so we need to save them in a temp that we can return;
+                    run_expression(current->leftChild);
+                    // Expression results are kept on stack, so we need to save them in rax so we have a variable to return
                     printf("POPS GF@RAX\nEXIT GF@RAX\n");
-                    filter(current);
-                }
 
+                }
                 break;
             }
 
             case whileT: {
-                error(PT_Node_ptr) continued = print_while(current, &label_indexer, "", &context);
-                if (is_error(continued)) {
-                    vec_context_destroy(&context);
-                    forward_error(continued, none);
-                }
-                set_node_from_error(current, continued);
+                print_while(current, &label_indexer, "", &context);
                 break;
             }
             case identOfFunct: {
-                error(PT_Node_ptr) continued = call_function(current);
-                if (is_error(continued)) {
-                    vec_context_destroy(&context);
-                    forward_error(continued, none);
-                }
-                set_node_from_error(current, continued);
-
+                call_function(current, &label_indexer);
                 // If the function returns a value it will be on the stack, we aren't saving the value, so we clear the stack
                 printf("CLEARS\n");
                 break;
@@ -715,29 +681,14 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
                     vec_context_insert_sorted(&context, (char_ptr)variable_name);
                 }
 
-                current = current->rightSibling;
-                if (is_terminal(current, assigment) == false) {
-                    vec_context_destroy(&context);
-                    return_error(ERROR_GEN_UNSPECIFIED, none);
+                skip_to_next_nonTerminal(current, RVAL);
+
+                if (is_non_terminal(current->leftChild, EXPR)) {
+                    run_expression(current->leftChild);
+
+                } else if (is_terminal(current->leftChild, identOfFunct)) {
+                    call_function(current->leftChild, &label_indexer);
                 }
-                filter(current);
-
-                if (is_non_terminal(current, EXPR)) {
-                    error(none) result = run_expression(current);
-                    if (is_error(result)) {
-                        vec_context_destroy(&context);
-                        forward_error(result, none);
-                    }
-
-                } else if (is_terminal(current, identOfFunct)) {
-                    error(PT_Node_ptr) continued = call_function(current);
-                    if (is_error(continued)) {
-                        vec_context_destroy(&context);
-                        forward_error(continued, none);
-                    }
-                    set_node_from_error(current, continued);
-                }
-
                 printf("POPS LF@%s\n", variable_name);
                 break;
             }
@@ -747,11 +698,13 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
                 // No other terminal type should be encountered here
                 return_error(ERROR_GEN_UNSPECIFIED, none);
         }
+
+        skip_to_next_nonTerminal(current, PROG);
     }
 
     end:
     vec_context_destroy(&context);
     // Cleanup the last stack frame and exit with default value
-    printf("POPFRAME\nEXIT int@0\n");
+    printf("POPFRAME\nEXIT int@0");
     return_none();
 }

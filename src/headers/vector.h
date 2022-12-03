@@ -1,7 +1,7 @@
 /****************************************************************
  * @name vector.h
  * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
- * @brief File contaning macros for vector implementation
+ * @brief File containing macros for vector implementation
  * @date 20.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language

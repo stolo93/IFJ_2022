@@ -1,7 +1,7 @@
 /****************************************************************
  * @name error.c
  * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
- * @brief File contaning enumerations for error handeling
+ * @brief File containing enumerations for error handling
  * @date 20.10.2022
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
