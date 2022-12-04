@@ -1,6 +1,7 @@
 /****************************************************************
- * @name codegen_context.c
+ * @name : codegen_context.c
  * @author : Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * @brief : A file containing functions a data structures needed to keep track variable lifetimes
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
@@ -18,6 +19,7 @@ error(vec_context) clone_context_vec(vec_context* src) {
         forward_error(result, vec_context);
     }
 
+    new.len__ = src->len__;
     memcpy(new.data, src->data, sizeof(char_ptr) * vec_context_len(src));
 
     return_value(new, vec_context);
