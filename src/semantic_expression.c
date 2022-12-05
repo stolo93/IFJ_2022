@@ -114,6 +114,198 @@ error( none ) addIntToRealNode( PT_Node_ptr node , bool side)
     return_none();
 }
 
+error( none ) addNullToIntNode (PT_Node_ptr node , bool side)
+{
+        if( node == NULL)
+    {
+        return_error( ERROR_SEM_NODE , none );
+    }
+    PT_Node_ptr tmp = NULL;
+    PT_Node_ptr new = NULL;
+    token_ptr newTerminal = ( token_ptr ) malloc( sizeof( token_t ));
+
+    if( newTerminal == NULL)
+    {
+        return_error( ERROR_MAL , none);
+    }
+    newTerminal->discriminant = nullToInt;
+    newTerminal->info.integer = 0;
+
+    PT_Data_t data = {.isTerminal = true , .type.terminal = newTerminal};
+    if( side == true)
+    {
+        tmp = node->rightSibling;
+        error( PT_Node_ptr ) newNode = PT_CreateNode( data );
+        if( is_error( newNode ))
+        {
+            forward_error( newNode , none );
+        }
+        new = newNode._value;
+        new->rightSibling = NULL;
+        new->leftChild = tmp;
+        node->rightSibling = new;
+
+    }
+    else
+    {
+       tmp = node->leftChild;
+        error( PT_Node_ptr ) newNode = PT_CreateNode( data );
+        if( is_error( newNode ))
+        {
+            forward_error( newNode , none );
+        }
+        new = newNode._value;
+        new->leftChild = tmp;
+        new->rightSibling = NULL;
+        node->leftChild = new; 
+    }
+    return_none();
+}
+
+error( none ) addNullToRealNode(PT_Node_ptr node , bool side)
+{
+        if( node == NULL)
+    {
+        return_error( ERROR_SEM_NODE , none );
+    }
+    PT_Node_ptr tmp = NULL;
+    PT_Node_ptr new = NULL;
+    token_ptr newTerminal = ( token_ptr ) malloc( sizeof( token_t ));
+
+    if( newTerminal == NULL)
+    {
+        return_error( ERROR_MAL , none);
+    }
+    newTerminal->discriminant = nullToReal;
+    newTerminal->info.integer = 0;
+
+    PT_Data_t data = {.isTerminal = true , .type.terminal = newTerminal};
+    if( side == true)
+    {
+        tmp = node->rightSibling;
+        error( PT_Node_ptr ) newNode = PT_CreateNode( data );
+        if( is_error( newNode ))
+        {
+            forward_error( newNode , none );
+        }
+        new = newNode._value;
+        new->rightSibling = NULL;
+        new->leftChild = tmp;
+        node->rightSibling = new;
+
+    }
+    else
+    {
+       tmp = node->leftChild;
+        error( PT_Node_ptr ) newNode = PT_CreateNode( data );
+        if( is_error( newNode ))
+        {
+            forward_error( newNode , none );
+        }
+        new = newNode._value;
+        new->leftChild = tmp;
+        new->rightSibling = NULL;
+        node->leftChild = new; 
+    }
+    return_none();
+}
+
+error( none ) addNullToBoolNode(PT_Node_ptr node , bool side)
+{
+        if( node == NULL)
+    {
+        return_error( ERROR_SEM_NODE , none );
+    }
+    PT_Node_ptr tmp = NULL;
+    PT_Node_ptr new = NULL;
+    token_ptr newTerminal = ( token_ptr ) malloc( sizeof( token_t ));
+
+    if( newTerminal == NULL)
+    {
+        return_error( ERROR_MAL , none);
+    }
+    newTerminal->discriminant = nullToBool;
+    newTerminal->info.integer = 0;
+
+    PT_Data_t data = {.isTerminal = true , .type.terminal = newTerminal};
+    if( side == true)
+    {
+        tmp = node->rightSibling;
+        error( PT_Node_ptr ) newNode = PT_CreateNode( data );
+        if( is_error( newNode ))
+        {
+            forward_error( newNode , none );
+        }
+        new = newNode._value;
+        new->rightSibling = NULL;
+        new->leftChild = tmp;
+        node->rightSibling = new;
+
+    }
+    else
+    {
+       tmp = node->leftChild;
+        error( PT_Node_ptr ) newNode = PT_CreateNode( data );
+        if( is_error( newNode ))
+        {
+            forward_error( newNode , none );
+        }
+        new = newNode._value;
+        new->leftChild = tmp;
+        new->rightSibling = NULL;
+        node->leftChild = new; 
+    }
+    return_none();
+}
+
+error( none ) addNullToStringNode(PT_Node_ptr node , bool side)
+{
+        if( node == NULL)
+    {
+        return_error( ERROR_SEM_NODE , none );
+    }
+    PT_Node_ptr tmp = NULL;
+    PT_Node_ptr new = NULL;
+    token_ptr newTerminal = ( token_ptr ) malloc( sizeof( token_t ));
+
+    if( newTerminal == NULL)
+    {
+        return_error( ERROR_MAL , none);
+    }
+    newTerminal->discriminant = nullToString;
+    newTerminal->info.integer = 0;
+
+    PT_Data_t data = {.isTerminal = true , .type.terminal = newTerminal};
+    if( side == true)
+    {
+        tmp = node->rightSibling;
+        error( PT_Node_ptr ) newNode = PT_CreateNode( data );
+        if( is_error( newNode ))
+        {
+            forward_error( newNode , none );
+        }
+        new = newNode._value;
+        new->rightSibling = NULL;
+        new->leftChild = tmp;
+        node->rightSibling = new;
+
+    }
+    else
+    {
+       tmp = node->leftChild;
+        error( PT_Node_ptr ) newNode = PT_CreateNode( data );
+        if( is_error( newNode ))
+        {
+            forward_error( newNode , none );
+        }
+        new = newNode._value;
+        new->leftChild = tmp;
+        new->rightSibling = NULL;
+        node->leftChild = new; 
+    }
+    return_none();
+}
+
 error( none ) operandConversion( PT_Node_ptr node , dType type1 , dType type2)
 {
     if( node == NULL)
@@ -156,6 +348,78 @@ error( none ) operandConversion( PT_Node_ptr node , dType type1 , dType type2)
         }
         return_none();
     }
+    else if(type1 == integerT && type2 == noType)
+    {
+        error( none ) success = addNullToIntNode( node , RIGHT );
+        if( is_error( success ))
+        {
+            forward_error( success , none);
+        }
+        return_none() ;
+    }
+    else if(type1 == noType && type2 == integerT)
+    {
+        error( none ) success = addNullToIntNode( node , LEFT );
+        if( is_error( success ))
+        {
+            forward_error( success , none);
+        }
+        return_none() ;
+    }
+    else if(type1 == floatingT && type2 == noType)
+    {
+        error( none ) success = addNullToRealNode( node , RIGHT );
+        if( is_error( success ))
+        {
+            forward_error( success , none);
+        }
+        return_none() ;
+    }
+    else if(type1 == noType && type2 == floatingT)
+    {
+        error( none ) success = addNullToRealNode( node , LEFT );
+        if( is_error( success ))
+        {
+            forward_error( success , none);
+        }
+        return_none() ;
+    }
+    else if(type1 == boolT && type2 == noType)
+    {
+        error( none ) success = addNullToBoolNode( node , RIGHT );
+        if( is_error( success ))
+        {
+            forward_error( success , none);
+        }
+        return_none() ;
+    }
+    else if(type1 == noType && type2 == boolT)
+    {
+        error( none ) success = addNullToBoolNode( node , LEFT );
+        if( is_error( success ))
+        {
+            forward_error( success , none);
+        }
+        return_none() ;
+    }
+    else if(type1 == stringT && type2 == noType)
+    {
+        error( none ) success = addNullToStringNode( node , RIGHT );
+        if( is_error( success ))
+        {
+            forward_error( success , none);
+        }
+        return_none() ;
+    }
+    else if(type1 == noType && type2 == stringT)
+    {
+        error( none ) success = addNullToStringNode( node , LEFT );
+        if( is_error( success ))
+        {
+            forward_error( success , none);
+        }
+        return_none() ;
+    }
     return_none();
 }
 
@@ -167,7 +431,6 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
     }
     dType type1 = notDefined;
     dType type2 = notDefined;
-
 
     //if both ptrs are null that means I found identOfvar ot var
     if(node->leftChild == NULL && node->rightSibling == NULL)
@@ -238,6 +501,19 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
         else if( type1 == floatingT || type2 == floatingT )
         {
             //one of operands is float so conversion must happen
+            error( none ) success = operandConversion( node , type1 , type2 );
+            if( is_error( success ))
+            {
+                forward_error( success , dType);
+            }
+            else
+            {
+                return_value( floatingT , dType );
+            }
+        }
+        else if(( type1 == integerT || type1 == noType ) && ( type2 == integerT || type2 == noType))
+        {
+            //one of operands is null so conversion must happen
             error( none ) success = operandConversion( node , type1 , type2 );
             if( is_error( success ))
             {
