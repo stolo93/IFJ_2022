@@ -1698,6 +1698,7 @@ error( _Bool ) SA_Expr ( PT_Node_t** token_node, bool cond_expr )
 	// {
 	// 	PT_PrintTokenType(postfix_expr.data[i]->discriminant);
 	// }
+	// putchar('\n');
 
 
 	if ( Correct )
@@ -1713,6 +1714,9 @@ error( _Bool ) SA_Expr ( PT_Node_t** token_node, bool cond_expr )
 
 		*token_node = expr_tree._value;
 	}
+
+	// PT_PrintExprTreeAsPostfix(*token_node);
+	// putchar('\n');
 
 	vec_token_ptr_destroy(&aux_postfix);
 	vec_token_ptr_destroy(&postfix_expr);
