@@ -103,17 +103,19 @@ error( PT_Node_ptr ) PT_FromPostFix( vec_token_ptr * token_stack )
 
         if ( isInTokens(cur_node->data.type.terminal->discriminant, operators) )
         {
-            // Insert first child of the operand
-            tmp_node = vec_pnode_pop_front(&aux_vector);
+            // Insert the second child of the operand from the end of the postfix stack
+            tmp_node = vec_pnode_pop_back(&aux_vector);
+            if ( is_error(tmp_node) ) { vec_pnode_destroy(&aux_vector); forward_error(tmp_node, PT_Node_ptr);}
+
+            cur_node->rightSibling = tmp_node._value;
+
+
+            // Insert first child of the operand from the end of the postfix stack
+            tmp_node = vec_pnode_pop_back(&aux_vector);
             if ( is_error(tmp_node) ) { vec_pnode_destroy(&aux_vector); forward_error(tmp_node, PT_Node_ptr);}
 
             cur_node->leftChild = tmp_node._value;
 
-            // Insert the second child of the operand
-            tmp_node = vec_pnode_pop_front(&aux_vector);
-            if ( is_error(tmp_node) ) { vec_pnode_destroy(&aux_vector); forward_error(tmp_node, PT_Node_ptr);}
-
-            cur_node->rightSibling = tmp_node._value;
         }
 
         vec_pnode_push_back(&aux_vector, cur_node);
@@ -168,6 +170,18 @@ error( none ) PT_DeleteNode ( PT_Node_t  ** node )
     *node = NULL;
 
     return_none();
+}
+
+void PT_PrintExprTreeAsPostfix ( PT_Node_t * root )
+{
+    if ( root == NULL ){
+        return;
+    }
+
+    PT_PrintExprTreeAsPostfix( root->leftChild );
+    PT_PrintExprTreeAsPostfix( root->rightSibling );
+
+    PT_PrintTokenType(root->data.type.terminal->discriminant);
 }
 
 void PT_PrintTokenType ( tokenType discriminant )

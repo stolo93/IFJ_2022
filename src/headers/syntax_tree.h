@@ -96,9 +96,16 @@ error( PT_Node_ptr ) PT_FromPostFix( vec_token_ptr * token_stack );
 void PT_PrintTerminals ( PT_Node_t * node );
 
 /**
+ * @brief Print binary tree @p root as a expression in postfix notation
+ *
+ * @param root
+ */
+void PT_PrintExprTreeAsPostfix ( PT_Node_t * root );
+
+/**
  * @brief Print token discriminant
  *
- * @param discriminant 
+ * @param discriminant
  */
 void PT_PrintTokenType ( tokenType discriminant );
 
