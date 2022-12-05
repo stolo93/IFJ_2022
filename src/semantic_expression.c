@@ -474,7 +474,7 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
     }
     else if( disc == plusSign || disc == minusSign || disc == multiply || disc == division)
     {
-        if( type1 == stringT || type2 == stringT )
+        if( type1 == stringT || type2 == stringT || type1 == stringTNull || type2 == stringTNull )
         {
             return_error( ERROR_SEM_TYPE , dType ); //no conversion for string
         }
@@ -533,6 +533,39 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
             if( type2 != notDefined )
             {
                 return_value(type2 , dType );
+            }
+        }
+    }
+    else if( disc == lessOper || disc == moreOper || disc == lessOrEqOper || disc == moreOrEqOper)
+    {
+        if( type1 == type2 )
+        {
+            return_value( type1 , dType );
+        }
+        else if( type1 == floatingT || type2 == floatingT )
+        {
+            //one of operands is float so conversion must happen
+            error( none ) success = operandConversion( node , type1 , type2 );
+            if( is_error( success ))
+            {
+                forward_error( success , dType);
+            }
+            else
+            {
+                return_value( floatingT , dType );
+            }
+        }
+        else if(( type1 == integerT || type1 == noType ) && ( type2 == integerT || type2 == noType))
+        {
+            //one of operands is null so conversion must happen
+            error( none ) success = operandConversion( node , type1 , type2 );
+            if( is_error( success ))
+            {
+                forward_error( success , dType);
+            }
+            else
+            {
+                return_value( floatingT , dType );
             }
         }
     }

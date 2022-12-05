@@ -93,7 +93,7 @@ error( _Bool ) checkVariable(PT_Node_ptr node);
  * @param functionContext context provided for when called in function definition
  *
  */
-error(_Bool) checkIfBlock(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext);
+error(_Bool) checkIfBlock(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext, bool ifContext);
 
 /**
  * @brief Function checks for semantic errors in while statement
@@ -133,7 +133,7 @@ error(_Bool) checkReturnSatement(PT_Node_ptr node, htab_pair_t_ptr functionRecor
  * @param functionContext provided for when called in function definition
  *
  */
-error(_Bool) checkBodyNonTerminal(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext);
+error(_Bool) checkBodyNonTerminal(PT_Node_ptr node, int* returnStatementCounter, htab_pair_t_ptr functionContext, bool ifContext);
 
 /**
  * @brief Function gets symTable containing all function definitions
@@ -169,6 +169,15 @@ error(PT_Node_ptr) findProgNode(PT_Node_t * node);
  *
  */
 error(PT_Node_ptr) findLastNodeOnRow(PT_Node_t * node);
+
+/**
+ * @brief Function checks if dType is nullable
+ * 
+ * @param type type for checking
+ * @return true type is nullable
+ * @return false type is not nullable
+ */
+bool isTypeNullable(dType type);
 
 /**
  * @brief Function gets dType of provided node
