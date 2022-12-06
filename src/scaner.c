@@ -305,6 +305,7 @@ error(token_ptr) getToken( )
     bool exp = true;
     bool sign = true ;
     bool err = false;
+    bool escpBSlhs = false;
     static bool firstCall = true;
     int character = 0;
     unsigned int counter = 1 ;
@@ -522,7 +523,20 @@ error(token_ptr) getToken( )
                             return_value( newToken , token_ptr );
 
             case string :
-                            if ( ( character == '$' && info [ counter - 1 ] != '\\' ) || character < ' ' )
+                            if( escpBSlhs == true ) //in escape sequence we want to read almost everything without consequence
+                            {
+                                if( character == EOF  || character < ' ')
+                                {
+                                    free ( info ) ;
+                                    free ( newToken );
+                                    return_error( ERROR_LEX_INVSTR , token_ptr );
+                                }
+                                info[counter] = (char)character;
+                                counter++;
+                                escpBSlhs = false;
+                                break;
+                            }
+                            if ( ( character == '$' && info [ counter - 1 ] != '\\' ) || character < ' ' || character == EOF)
                             {
                                 // '$' can only be in escape sequence
                                 free ( info ) ;
@@ -530,7 +544,7 @@ error(token_ptr) getToken( )
                                 return_error( ERROR_LEX_INVSTR , token_ptr );
                             }
 
-                            if ( character == '"' && info[ counter - 1] != '\\')
+                            if ( character == '"' )
                             {
                                 info [ counter ] = (char)character;
                                 counter++;
@@ -545,6 +559,10 @@ error(token_ptr) getToken( )
                                 return_value( newToken , token_ptr ) ;
                             }
 
+                            if( character == '\\' )
+                            {
+                                escpBSlhs = true;
+                            }
                             info [ counter ] = (char)character;
 
                             counter++;
