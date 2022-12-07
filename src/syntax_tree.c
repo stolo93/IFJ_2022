@@ -294,6 +294,30 @@ void PT_PrintTokenType ( tokenType discriminant )
     case prolog:
         name = "prolog";
         break;
+    case intToReal:
+        name = "intToReal";
+        break;
+    case intToBool:
+        name = "intToBool";
+        break;
+    case floatToBool:
+        name = "floatToBool";
+        break;
+    case stringToBool:
+        name = "stringToBool";
+        break;
+    case nullToInt:
+        name = "nullToInt";
+        break;
+    case nullToReal:
+        name = "nullToReal";
+        break;
+    case nullToBool:
+        name = "nullToBool";
+        break;
+    case nullToString:
+        name = "nullToString";
+        break;
     default:
         return;
         break;

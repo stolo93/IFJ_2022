@@ -206,17 +206,12 @@ error(_Bool) checkProgTreeNode(PT_Node_ptr node, htab_pair_t_ptr functionContext
 
             case ifT:
                 {
-                    //error(htab_t_ptr) symtableErrorObj = htab_init(DEFAULT_SYMTABLE_SIZE);
-                    //get_value(htab_t_ptr, ifSymtable, symtableErrorObj, _Bool);
-                    //vec_htab_t_ptr_push_front(&symtable_vector, ifSymtable);
-
                     errorObj = checkIfBlock(node->leftChild, NULL, functionContext, false);
                     if(is_error(errorObj))
                     {
                         forward_error(errorObj, _Bool);
                     }
 
-                    //vec_htab_t_ptr_pop_front(&symtable_vector);
                     break;
                 }
 
@@ -374,17 +369,12 @@ error(_Bool) checkFunctionBody(PT_Node_ptr node, htab_pair_t_ptr functionRecord)
 
             case whileT:
                 {
-                    error(htab_t_ptr) symtableErrorObj = htab_init(DEFAULT_SYMTABLE_SIZE);
-                    get_value(htab_t_ptr, whileSymtable, symtableErrorObj, _Bool);
-                    vec_htab_t_ptr_push_front(&symtable_vector, whileSymtable);
-
                     errorObj = checkWhileBlock(currentNode->leftChild, &returnStatementCounter, functionRecord);
                     if(is_error(errorObj))
                     {
                         forward_error(errorObj, _Bool);
                     }
 
-                    vec_htab_t_ptr_pop_front(&symtable_vector);
                     break;
                 }
 
