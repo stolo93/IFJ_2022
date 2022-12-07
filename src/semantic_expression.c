@@ -476,6 +476,10 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
         {
             return_value(stringT, dType);
         }
+        else if (type1 == stringTNull || type2 == stringTNull)
+        {
+            return_value(stringTNull, dType);
+        }
     }
     else if( disc == plusSign || disc == minusSign || disc == multiply || disc == division)
     {
