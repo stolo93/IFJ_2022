@@ -1,5 +1,5 @@
 /****************************************************************
- * @name htab.c
+ * @name symtable.c
  * @author Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
  * @brief File contaning functions for hash table which used as symbol table in semantic analysis
  * @date 28.10.2022
