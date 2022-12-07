@@ -655,7 +655,6 @@ error(_Bool) checkVariable(PT_Node_ptr node)
         {
             error( dType) errorObj = checkExpression(rvalNode->leftChild->leftChild, false);
             get_value(dType, checkExpressionReturnValue, errorObj, _Bool);
-
             variableRecord->diff.var.dataType = checkExpressionReturnValue;
         }
     }
