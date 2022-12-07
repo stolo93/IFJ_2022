@@ -545,7 +545,7 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
     {
         if( type1 == type2 )
         {
-            return_value( type1 , dType );
+            return_value( boolT , dType );
         }
         else if( type1 == floatingT || type2 == floatingT )
         {
@@ -557,7 +557,7 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
             }
             else
             {
-                return_value( floatingT , dType );
+                return_value( boolT , dType );
             }
         }
         else if(( type1 == integerT || type1 == noType ) && ( type2 == integerT || type2 == noType))
@@ -570,8 +570,12 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
             }
             else
             {
-                return_value( floatingT , dType );
+                return_value( boolT , dType );
             }
+        }
+        else
+        {
+            return_value( boolT , dType );
         }
     }
     else
