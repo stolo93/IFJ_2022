@@ -14,30 +14,82 @@
 
 //Grammar rules
 
+/**
+ * @brief Grammar rules <PROLOG> ->
+ *
+ */
 error( _Bool ) SA_Prolog ( PT_Node_t* token_node );
 
+/**
+ * @brief Grammar rules <PROG> ->
+ *
+ */
 error( _Bool ) SA_Prog ( PT_Node_t** token_node );
 
+/**
+ * @brief Grammar rules <BODY> ->
+ *
+ */
 error( _Bool ) SA_Body ( PT_Node_t** token_node );
 
+/**
+ * @brief Grammar rules <STATEMENT> ->
+ *
+ */
 error( _Bool ) SA_Statement ( PT_Node_t** token_node);
 
+/**
+ * @brief Grammar rules <RVAL> ->
+ *
+ */
 error( _Bool ) SA_RVAL (PT_Node_t ** token_node);
 
+/**
+ * @brief Grammar rules <RET_VAL> ->
+ *
+ */
 error( _Bool ) SA_RetVal ( PT_Node_t** token_node );
 
+/**
+ * @brief Grammar rules <ARGS> ->
+ *
+ */
 error( _Bool ) SA_Args ( PT_Node_t** token_node );
 
+/**
+ * @brief Grammar rules <ARGS_NEXT> ->
+ *
+ */
 error( _Bool ) SA_ArgsNext ( PT_Node_t** token_node );
 
+/**
+ * @brief Grammar rules <ARG_TYPE> ->
+ *
+ */
 error( _Bool ) SA_ARG_Type ( PT_Node_t** token_node );
 
+/**
+ * @brief Grammar rules <PARAMS> ->
+ *
+ */
 error( _Bool ) SA_Params ( PT_Node_t** token_node );
 
+/**
+ * @brief Grammar rules <PARAMS_NEXT> ->
+ *
+ */
 error( _Bool ) SA_ParamsNext ( PT_Node_t** token_node );
 
+/**
+ * @brief Grammar rules <TYPE> ->
+ *
+ */
 error( _Bool ) SA_Type ( PT_Node_t* token_node );
 
+/**
+ * @brief Grammar rules <TERM> ->
+ *
+ */
 error( _Bool ) SA_Term ( PT_Node_t* token_node );
 
 /**

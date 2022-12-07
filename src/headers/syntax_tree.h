@@ -58,57 +58,54 @@ DEFINE_VEC_PROTOTYPES(PT_Node_ptr, pnode);
 
 
 /**
- * @brief Create new node with data @p data
+ * @brief Create node in program tree
  *
- * @return Pointer to an initialized node
- * @return NULL in case of malloc error
  */
 error( PT_Node_ptr ) PT_CreateNode ( PT_Data_t data );
 
 
 /**
- * @brief Insert a right-most sibling of node @p node ,
- * @p node should not be the root of a tree
+ * @brief Create and insert the rightmost sibling of @p node containing @p data
  *
  */
 error( PT_Node_ptr ) PT_AddSibling ( PT_Node_ptr node, PT_Data_t data );
 
 
 /**
- * @brief Insert right-most child of a node @p node
+ * @brief Create and insert the rightmost child of @p node containing @p data
  *
  */
 error( PT_Node_ptr ) PT_AddChild ( PT_Node_ptr node, PT_Data_t data );
 
 /**
- * @brief Create AST representing an expression in postfix notation
+ * @brief Build program tree from  expression tokens in stored @p token_stack
  *
  */
 error( PT_Node_ptr ) PT_FromPostFix( vec_token_ptr * token_stack );
 
 /**
- * @brief Print all terminals which are under @p node
+ * @brief Print all terminals which are either children or siblings of @p node
  *
  * @param node
  */
 void PT_PrintTerminals ( PT_Node_t * node );
 
 /**
- * @brief Print binary tree @p root as a expression in postfix notation
+ * @brief Print expression tree @p root in postfix notation
  *
  * @param root
  */
 void PT_PrintExprTreeAsPostfix ( PT_Node_t * root );
 
 /**
- * @brief Print token discriminant
+ * @brief Print type of token base on @p discriminant
  *
  * @param discriminant
  */
 void PT_PrintTokenType ( tokenType discriminant );
 
 /**
- * @brief Deletes given node and everything underneath it
+ * @brief Delete node and all children and sibling nodes of @p node
  *
  */
 error( none ) PT_DeleteNode ( PT_Node_t  ** node );
