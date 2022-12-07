@@ -43,6 +43,7 @@ error(_Bool) sendProgTree(PT_Node_ptr root)
         vec_htab_t_ptr_destroy(&symtable_vector);
         forward_error(errorObj, _Bool);
     }
+    htab_free(symtable);
     vec_htab_t_ptr_destroy(&symtable_vector);
 
     return_value(true, bool);
@@ -167,7 +168,7 @@ error(_Bool) checkProgTreeNode(PT_Node_ptr node, htab_pair_t_ptr functionContext
                     {
                         forward_error(errorObj, _Bool);
                     }
-
+                    htab_free(funSymtable);
                     vec_htab_t_ptr_pop_front(&symtable_vector);
                     break;
                 }
