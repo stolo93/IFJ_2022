@@ -463,13 +463,22 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
     tokenType disc = node->data.type.terminal->discriminant;
     if(  disc == concatenation )
     {
-        if( (type1 != stringT || type2 != stringT) && checkForTypeCompatibility(type1, type2) == false )
+        if( (type1 == integerT || type2 == integerT) || (type1 == floatingT || type2 == floatingT) || (type1 == boolT || type2 == boolT))
         {
             return_error( ERROR_SEM_TYPE , dType ); //you can only concatenate two strings
         }
         else if(type1 == stringT || type2 == stringT)
         {
             return_value(stringT, dType);
+        }
+        else if (type1 == noType || type2 == noType)
+        {
+            error( none ) success = operandConversion( node , type1 , type2 );
+            if( is_error( success ))
+            {
+                forward_error( success , dType);
+            }
+            return_value( stringT , dType);
         }
     }
     else if( disc == plusSign || disc == minusSign || disc == multiply || disc == division)
