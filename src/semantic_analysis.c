@@ -364,7 +364,7 @@ error(_Bool) checkFunctionBody(PT_Node_ptr node, htab_pair_t_ptr functionRecord)
         {
             case ifT:
                 {
-                    errorObj = checkIfBlock(currentNode->leftChild, &returnStatementCounter, functionRecord, true);
+                    errorObj = checkIfBlock(currentNode->leftChild, &returnStatementCounter, functionRecord, false);
                     if(is_error(errorObj))
                     {
                         forward_error(errorObj, _Bool);
@@ -827,111 +827,91 @@ error(_Bool) checkBodyNonTerminal(PT_Node_ptr node, int* returnStatementCounter,
 
     do  //go through statement list
     {
-        if(currentNode->data.isTerminal == true)
+        if(currentNode->data.isTerminal == false)
         {
-            switch (currentNode->leftChild->data.type.terminal->discriminant)
+            if(currentNode->data.type.nonTerminal == STATEMENT && currentNode->leftChild->data.isTerminal == true)
             {
-                case ifT:
-                    {
-                        error(_Bool) errorObj = checkIfBlock(currentNode->leftChild, returnStatementCounter, functionContext, ifContext);
-                        if(is_error(errorObj))
+                switch (currentNode->leftChild->data.type.terminal->discriminant)
+                {
+                    case ifT:
                         {
-                            forward_error(errorObj, _Bool);
-                        }
-                        break;
-                    }
-
-                case whileT:
-                    {
-                        error(_Bool)  errorObj = checkWhileBlock(currentNode->leftChild, returnStatementCounter, functionContext);
-                        if(is_error(errorObj))
-                        {
-                            forward_error(errorObj, _Bool);
-                        }
-
-                        break;
-                    }
-
-                case identOfFunct:
-                    {
-                        error(_Bool)  errorObj = checkFunctionCall(currentNode->leftChild);
-                        if(is_error(errorObj))
-                        {
-                            forward_error(errorObj, _Bool);
-                        }
-                        break;
-                    }
-
-                case identOfVar:
-                    {
-                        error(_Bool)  errorObj = checkVariable(currentNode->leftChild);
-                        if(is_error(errorObj))
-                        {
-                            forward_error(errorObj, _Bool);
-                        }
-                        break;
-                    }
-
-                case returnT:
-                    {
-                        if(functionContext == NULL || ifContext == true)
-                        {
+                            error(_Bool) errorObj = checkIfBlock(currentNode->leftChild, returnStatementCounter, functionContext, ifContext);
+                            if(is_error(errorObj))
+                            {
+                                forward_error(errorObj, _Bool);
+                            }
                             break;
                         }
-                        error(_Bool)  errorObj = checkReturnSatement(currentNode->leftChild, functionContext);
-                        if(is_error(errorObj))
-                        {
-                            forward_error(errorObj, _Bool);
-                        }
-                        if(returnStatementCounter != NULL)
-                        {
-                            (*returnStatementCounter)++;
-                        }
-                        break;
-                    }
 
-                default:
-                    break;
+                    case whileT:
+                        {
+                            error(_Bool)  errorObj = checkWhileBlock(currentNode->leftChild, returnStatementCounter, functionContext);
+                            if(is_error(errorObj))
+                            {
+                                forward_error(errorObj, _Bool);
+                            }
+
+                            break;
+                        }
+
+                    case identOfFunct:
+                        {
+                            error(_Bool)  errorObj = checkFunctionCall(currentNode->leftChild);
+                            if(is_error(errorObj))
+                            {
+                                forward_error(errorObj, _Bool);
+                            }
+                            break;
+                        }
+
+                    case identOfVar:
+                        {
+                            error(_Bool)  errorObj = checkVariable(currentNode->leftChild);
+                            if(is_error(errorObj))
+                            {
+                                forward_error(errorObj, _Bool);
+                            }
+                            break;
+                        }
+
+                    case returnT:
+                        {
+                            if(functionContext == NULL || ifContext == true)
+                            {
+                                break;
+                            }
+                            error(_Bool)  errorObj = checkReturnSatement(currentNode->leftChild, functionContext);
+                            if(is_error(errorObj))
+                            {
+                                forward_error(errorObj, _Bool);
+                            }
+                            if(returnStatementCounter != NULL)
+                            {
+                                (*returnStatementCounter)++;
+                            }
+                            break;
+                        }
+
+                    default:
+                        break;
+                }
             }
-        }
-        else if(currentNode->data.isTerminal == false)
-        {
-            switch(currentNode->data.type.nonTerminal)
+            else if(currentNode->data.type.nonTerminal == STATEMENT && currentNode->leftChild->data.isTerminal == false)
             {
-                case STATEMENT:
-                    if(currentNode->leftChild->data.isTerminal && currentNode->leftChild->data.type.terminal->discriminant == identOfVar)
+                if(currentNode->leftChild->data.type.nonTerminal == EXPR)
+                {
+                    error( dType) errorObj = checkExpression(currentNode->leftChild->leftChild, false);
+                    if(is_error(errorObj))
                     {
-                        error(_Bool)  errorObj = checkVariable(currentNode->leftChild);
-                        if(is_error(errorObj))
-                        {
-                            forward_error(errorObj, _Bool);
-                        }
+                        forward_error(errorObj, _Bool);
                     }
-                    if(currentNode->leftChild->data.isTerminal && currentNode->leftChild->data.type.terminal->discriminant == returnT)
-                    {
-                        if(functionContext == NULL || ifContext == true)
-                        {
-                            break;
-                        }
-                        error(_Bool)  errorObj = checkReturnSatement(currentNode->leftChild, functionContext);
-                        if(is_error(errorObj))
-                        {
-                            forward_error(errorObj, _Bool);
-                        }
-                        if(returnStatementCounter != NULL)
-                        {
-                            (*returnStatementCounter)++;
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
+                }
             }
         }
 
         error(PT_Node_ptr) lastNodeErrorObj = findLastNodeOnRow(currentNode);
         get_value(PT_Node_ptr, lastNodeOnRow, lastNodeErrorObj, _Bool);
+
         if(lastNodeOnRow->leftChild == NULL)
         {
             return_value(true, _Bool);
