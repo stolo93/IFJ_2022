@@ -1,7 +1,7 @@
 /****************************************************************
  * @name : codegen_context.c
  * @author : Adam Bezák <xbezak02@stud.fit.vutbr.cz>
- * @brief : A file containing functions a data structures needed to keep track variable lifetimes
+ * @brief : A file containing functions and data structures needed to keep track variable lifetimes
  * Subject : IFJ
  * Project : Compiler for a given subset of the php language
 ****************************************************************/
