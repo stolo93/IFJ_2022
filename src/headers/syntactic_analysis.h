@@ -1,12 +1,11 @@
-/**
- * @file syntactic_analysis.h
- * @author Samuel Stolarik (xstola03@stud.fit.vutbr.cz)
+/****************************************************************
+ * @name syntactic_analysis.h
+ * @author Samuel Stolarik <xstola03@stud.fit.vutbr.cz>
  * @brief Header file for syntax analyser
- *
  * @date 2022-11-02
- *
- */
-
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #ifndef SYNTACTIC_H
 #define SYNTACTIC_H
 

@@ -1,11 +1,11 @@
-/**
- * @file prog_tree.c
- * @author Samuel Stolarik (xstola03@stud.fit.vutbr.cz)
- * @brief Implementation of tree for storing program contents
- * @date 2022-10-21
- *
- */
-
+/****************************************************************
+ * @name syntax_tree.c
+ * @author Samuel Stolárik <xstola03@stud.fit.vutbr.cz>
+ * @brief File contaning declarations of functions needed for AST implementation
+ * @date 21.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #include "./headers/IFJ_2022.h"
 #include "./headers/syntax_tree.h"
 #include "./headers/syntactic_analysis.h"

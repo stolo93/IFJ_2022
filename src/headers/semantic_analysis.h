@@ -1,12 +1,11 @@
-/**
- * @file semantic_analysis.h
- * @author Vojtěch Novotný (xnovot1t@stud.fit.vutbr.cz)
- *
- * @brief Implementation of semantic analysis for IFJ22 language
- *
- * @date 2022-10-22
- *
- */
+/****************************************************************
+ * @name semantic_analysis.c
+ * @author  Vojtěch Novotný <xnovot1t@stud.fit.vutbr.cz>
+ * @brief File containing function declarations for semantic analysis
+ * @date 22.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 
 #ifndef __SEM_ANALYSIS__
 #define __SEM_ANALYSIS__

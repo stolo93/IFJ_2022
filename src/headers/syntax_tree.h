@@ -1,13 +1,11 @@
-/**
- * @file prog_tree.h
- * @author Samuel Stolarik (xstola03@stud.fit.vutbr.cz)
- *
- * @brief //TODO
- *
- * @date 2022-10-21
- *
- */
-
+/****************************************************************
+ * @name syntax_tree.h
+ * @author Samuel Stolárik <xstola03@stud.fit.vutbr.cz>
+ * @brief File contaning definitions of functions needed for AST implementation
+ * @date 21.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #ifndef _SYNTAX_TREE_H__
 #define _SYNTAX_TREE_H__
 

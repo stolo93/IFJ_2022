@@ -1,3 +1,14 @@
+/****************************************************************
+ * @name main.c
+ * @author  Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @author  Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * @author  Samuel Stolárik <xstola03@stud.fit.vutbr.cz>
+ * @author  Vojtěch Novotný <xnovot1t@stud.fit.vutbr.cz>
+ * @brief File containing main function which runs the compiler
+ * @date 25.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #include <stdio.h>
 #include "./headers/IFJ_2022.h"
 #include "./headers/error_infrastructure.h"
@@ -12,9 +23,12 @@ error( interner ) init;
 interner* interner_ptr;
 vec_token_ptr returnedTokens;
 
-
-// All code that would go into main goes here
-// Please change the name to a better one
+/**
+ * @brief All code that would go into main goes here
+ * @param argc number of program arguments
+ * @param argv array of program arguments
+ *
+ */
 error(none) real_main(int argc, char** argv) {
     (void) argc;
     (void) argv;

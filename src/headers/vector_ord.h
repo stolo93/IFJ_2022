@@ -1,3 +1,11 @@
+/****************************************************************
+ * @name vector_ord.h
+ * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * @brief File contaning macros for vector_ord implementation
+ * @date 20.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #ifndef IFJ_2022_VECTOR_ORD_H
 #define IFJ_2022_VECTOR_ORD_H
 
