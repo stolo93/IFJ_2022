@@ -330,10 +330,6 @@ error( none ) operandConversion( PT_Node_ptr node , dType type1 , dType type2)
         }
         return_none();
     }
-    else if( ( type1 == stringT && type2 != stringT ) || ( type2 == stringT && type1 != stringT))
-    {
-        return_error( ERROR_SEM_TYPE , none); //string can't be converted to any data type
-    }
     else if( type1 == integerT && type2 == integerT)
     {
         error( none ) success = addIntToRealNode( node , LEFT );
@@ -467,10 +463,6 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
         {
             return_error( ERROR_SEM_TYPE , dType ); //you can only concatenate two strings
         }
-        else if(type1 == stringT || type2 == stringT)
-        {
-            return_value(stringT, dType);
-        }
         else if (type1 == noType || type2 == noType)
         {
             error( none ) success = operandConversion( node , type1 , type2 );
@@ -479,6 +471,10 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
                 forward_error( success , dType);
             }
             return_value( stringT , dType);
+        }
+        else if(type1 == stringT || type2 == stringT)
+        {
+            return_value(stringT, dType);
         }
     }
     else if( disc == plusSign || disc == minusSign || disc == multiply || disc == division)
