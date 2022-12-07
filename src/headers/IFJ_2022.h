@@ -1,3 +1,14 @@
+/****************************************************************
+ * @name IFJ_2022.h
+ * @author  Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @author  Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * @author  Samuel Stolárik <xstola03@stud.fit.vutbr.cz>
+ * @author  Vojtěch Novotný <xnovot1t@stud.fit.vutbr.cz>
+ * @brief File containing general definitions needed in project
+ * @date 25.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #ifndef IFJ_2022_IFJ_2022_H
 #define IFJ_2022_IFJ_2022_H
 

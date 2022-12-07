@@ -1,12 +1,11 @@
-/**
- * @file semantic_analysis.c
- * @author Vojtěch Novotný (xnovot1t@stud.fit.vutbr.cz)
- *
- * @brief Implementation of semantic analysis for IFJ22 language
- *
- * @date 2022-10-22
- *
- */
+/****************************************************************
+ * @name semantic_analysis.c
+ * @author  Vojtěch Novotný <xnovot1t@stud.fit.vutbr.cz>
+ * @brief File containing function definitions for semantic analysis
+ * @date 22.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 
 #include "./headers/semantic_analysis.h"
 
@@ -17,17 +16,6 @@ extern error( dType ) checkExpressionIfWhile( PT_Node_ptr node );
 
 DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(htab_t_ptr, htab_t_ptr);
 vec_htab_t_ptr symtable_vector;
-
-//Checks:
-/* Undefined function - OK */
-/* Redefined function - OK */
-/* Invalid function call argument count - OK */
-/* Invalid function call argument type - OK */
-/* Invalid function return value type - OK */
-/* Usage of undefined variable - OK */
-/* Invalid return value expression count */
-/* Type compatibility in expression error */
-/* Other semantic errors */
 
 error(_Bool) sendProgTree(PT_Node_ptr root)
 {

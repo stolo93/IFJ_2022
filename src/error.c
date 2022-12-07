@@ -1,3 +1,11 @@
+/****************************************************************
+ * @name error.c
+ * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * @brief File contaning enumerations for error handeling
+ * @date 20.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #include "headers/error.h"
 
 #define s(token) return #token;

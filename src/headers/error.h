@@ -1,3 +1,11 @@
+/****************************************************************
+ * @name error.h
+ * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * @brief File contaning definitions for error handeling
+ * @date 20.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #ifndef IFJ_2022_ERROR_H
 #define IFJ_2022_ERROR_H
 

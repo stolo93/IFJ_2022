@@ -1,3 +1,12 @@
+/****************************************************************
+ * @name semantic_expression.c
+ * @author  Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
+ * @author  Vojtěch Novotný <xnovot1t@stud.fit.vutbr.cz>
+ * @brief File containing functions for expression checking in semantic analysis
+ * @date 25.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
 #include "headers/syntax_tree.h"
 #include "headers/error.h"
 #include "headers/IFJ_2022.h"
@@ -10,19 +19,6 @@
 #define RIGHT 1
 
 extern vec_htab_t_ptr symtable_vector;
-
-/*
-  getting down to operands DONE
-  extracting oprands dType DONE
-  checking left and right child DONE
-  checking if one child is float DONE
-  adding conversion node DONE
-  concatenation check DONE
-  for normal operation if operand istring retuern error DONE
-  if it is division return float DONE
-  relation operations TODO
-
-  */
 
 error( dType ) getTerminalDType( PT_Node_ptr node)
 {

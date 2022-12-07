@@ -1,12 +1,11 @@
-/**
+/****************************************************************
  * @file syntactic_analysis.c
- * @author Samuel Stolarik
+ * @author Samuel Stolarik <xstola03@stud.fit.vutbr.cz>
  * @brief Implementation of syntax analyser with LL1 grammar
- *
  * @date 2022-11-02
- *
- */
-
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+ ****************************************************************/
 #include "./headers/IFJ_2022.h"
 #include "./headers/syntactic_analysis.h"
 #include "./headers/scaner.h"
