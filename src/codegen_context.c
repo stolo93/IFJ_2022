@@ -11,6 +11,11 @@
 DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR(char_ptr, context);
 DEFINE_VEC_ORD_FUNCTIONS(char_ptr, context, SIMPLE_CMP);
 
+/**
+ * Creates a new context_vec containing a copy of all the data in the src vec
+ * @param src The vec to copy data from
+ * @return Either an allocation error or a copy of the input vec
+ */
 error(vec_context) clone_context_vec(vec_context* src) {
     vec_context new = new_vec_context();
 
