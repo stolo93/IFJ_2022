@@ -20,7 +20,7 @@
 
 DEFINE_VEC_FUNCTIONS_NO_DESTRUCTOR( structFuncParam , structFuncParam );
 
-/** Function which creates new intem for hash table identified by key
+/** Function which creates new item for hash table identified by key
  *
  *  @param key identifier of entry
  *  @param type type of symbol which is being created
