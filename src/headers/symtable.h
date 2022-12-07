@@ -1,5 +1,5 @@
 /****************************************************************
- * @name htab.h
+ * @name symtable.h
  * @author Jozef Michal Bukas <xbukas00@stud.fit.vutbr.cz>
  * @brief File containing headers for hash table 
  * @date 28.10.2022
