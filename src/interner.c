@@ -1,3 +1,12 @@
+/****************************************************************
+ * @name interner.c
+ * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * @brief File containing definitions for the interner
+ * @date 20.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
+
 #define __STDC_WANT_LIB_EXT1__ 1
 
 #include <stdlib.h>
