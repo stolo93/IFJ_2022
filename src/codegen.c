@@ -549,14 +549,14 @@ error(vec_context) scan_body_for_args(PT_Node_t* body_node, vec_context* context
 }
 
 /**
- *
- * @param body_node
- * @param label_indexer
- * @param label_prefix
- * @param context
- * @param returns_void
- * @param is_function_body
- * @return
+ * Prints a body assuming its variables are accessible to the outside
+ * @param body_node The body node to start printing from
+ * @param label_indexer The value to use for labels
+ * @param label_prefix The prefix to us in labels
+ * @param context The context to add new variable definitions into
+ * @param returns_void Changes the resulting code if the function returns nothing
+ * @param is_function_body Add special handling for return statements
+ * @return An error if the function reaches an invalid state
  */
 error(none) print_body_without_new_context(PT_Node_t* body_node, int* label_indexer, const char* label_prefix ,vec_context* context, bool returns_void, bool is_function_body) {
     if (body_node == NULL) {
@@ -672,6 +672,16 @@ error(none) print_body_without_new_context(PT_Node_t* body_node, int* label_inde
     return_none();
 }
 
+/**
+ * Prints a body assuming its variables are inaccessible from the outside
+ * @param body_node The body node to start printing from
+ * @param label_indexer The value to use for labels
+ * @param label_prefix The prefix to us in labels
+ * @param context The context to add new variable definitions into
+ * @param returns_void Changes the resulting code if the function returns nothing
+ * @param is_function_body Add special handling for return statements
+ * @return An error if the function reaches an invalid state
+ */
 error(none) print_body(PT_Node_t* body_node, int* label_indexer, const char* label_prefix ,vec_context* outer_context, bool returns_void, bool is_function_body) {
     get_value(vec_context, context , clone_context_vec(outer_context), none);
 
@@ -683,7 +693,15 @@ error(none) print_body(PT_Node_t* body_node, int* label_indexer, const char* lab
     return result;
 }
 
-
+/**
+ * Generates code for an if statement
+ * @param if_start The if node the start generating from
+* @param label_indexer The value to use for labels
+ * @param label_prefix The prefix to us in labels
+ * @param context The context to add new variable definitions into
+ * @param returns_void Special handling for void functions
+ * @return An error if the function reaches an invalid state
+ */
 error(none) print_if(PT_Node_t* if_start, int* label_indexer, const char* label_prefix, vec_context* context, bool returns_void) {
     skip_to_next_nonTerminal(if_start, EXPR);
     error(none) result = run_expression(if_start, label_indexer, label_prefix);
@@ -744,6 +762,15 @@ error(none) print_if(PT_Node_t* if_start, int* label_indexer, const char* label_
     return_none();
 }
 
+/**
+ * Generates code for a while loop
+ * @param while_start The node to start generating from
+* @param label_indexer The value to use for labels
+ * @param label_prefix The prefix to us in labels
+ * @param context The context to add new variable definitions into
+ * @param returns_void Special handling for void functions
+ * @return An error if the function reaches an invalid state
+ */
 error(none) print_while(PT_Node_t* while_start, int* label_indexer, const char* label_prefix, vec_context* context, bool returns_void) {
     skip_to_next_nonTerminal(while_start, EXPR)
 
@@ -792,6 +819,11 @@ error(none) print_while(PT_Node_t* while_start, int* label_indexer, const char* 
     return_none();
 }
 
+/**
+ * Generates code for pushing arguments to the stack for a function call
+ * @param args The arguments to push to the stack
+ * @return An error if the function reaches a invalid state
+ */
 error(none) print_call_args(PT_Node_t * args) {
     while (args != NULL) {
         if (is_non_terminal(args->leftChild, TERM)) {
@@ -828,6 +860,11 @@ error(none) print_call_args(PT_Node_t * args) {
     return_none();
 }
 
+/**
+ * Handles calling the variadic write function
+ * @param write_args_start The array of arguments given to the write funciton
+ * @return An error if the function reaches an invalid state
+ */
 error(none) call_write_on_args(PT_Node_t* write_args_start) {
     if (write_args_start == NULL) {
         return_none();
@@ -863,6 +900,13 @@ error(none) call_write_on_args(PT_Node_t* write_args_start) {
     return call_write_on_args(write_args_start->rightSibling->leftChild);
 }
 
+/**
+ * Generates code for seting up the stack and calling a function
+ * @param call_start The node to the function call start
+ * @param label_indexer The value to use for labels
+ * @param label_prefix The prefix to us in labels
+ * @return An error if the function reaches an invalid state
+ */
 error(none) call_function(PT_Node_t *call_start, int* labeler, const char* label_prefix) {
     // Setting up and clearing a stack is the job of the caller
     const char* function_name = extract_data(call_start, string);
@@ -942,6 +986,12 @@ error(none) call_function(PT_Node_t *call_start, int* labeler, const char* label
     return_none();
 }
 
+/**
+ * Loads function arguments from the stack at the start of a function
+ * @param args The list of arguments to load
+ * @param context The context to write the new vaiables into
+ * @return An error if the function reaches an invalid state
+ */
 error(none) load_function_args(PT_Node_t* args, vec_context* context) {
     if (args == NULL) {
         return_none();
@@ -991,6 +1041,11 @@ error(none) define_function(PT_Node_t *function_node, int* label_indexer) {
     return_none();
 }
 
+/**
+ * Generates code from a provided syntax tree
+ * @param tree The syntax tree of the program to generate code for
+ * @return Any error that may happen during codegen
+ */
 error(none) generate_code_from_syntax_tree(tree_t* tree) {
     PT_Node_t* current = *tree;
     // Check for prolog and skip it if we get it
@@ -1052,6 +1107,7 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
                 }
 
                 print_if(current, &label_indexer, "", &context, false);
+                vec_context_destroy(&new_vars);
                 break;
             }
             case returnT: {
@@ -1069,6 +1125,7 @@ error(none) generate_code_from_syntax_tree(tree_t* tree) {
                     printf("DEFVAR LF@%s\n", new_vars.data[i]);
                 }
                 print_while(current, &label_indexer, "", &context, false);
+                vec_context_destroy(&new_vars);
                 break;
             }
             case identOfFunct: {
