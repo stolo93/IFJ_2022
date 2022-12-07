@@ -20,6 +20,11 @@
 
 #define skip_to_next_nonTerminal(node_ptr, nonTerminal) while (is_non_terminal((node_ptr), (nonTerminal)) == false) { node_ptr = (node_ptr)->rightSibling;}
 
+/**
+ * Parses and prints hex and octal literals in the given substring
+ * @param substring
+ * @return The number of characters parsed
+ */
 size_t print_special_case(const char* substring) {
     if (isdigit(substring[0])) {
         // octals
@@ -65,6 +70,10 @@ size_t print_special_case(const char* substring) {
     return 0;
 }
 
+/**
+ * Prints a php string in a way compatible with the interpreter
+ * @param string String to print
+ */
 void print_normalized_string(const char* string) {
     size_t i = 0;
     if (string[i] == '\"') {
@@ -124,6 +133,9 @@ void print_normalized_string(const char* string) {
     }
 }
 
+/**
+ * Defines the builtin substring function
+ */
 void define_substring() {
     printf("jump -substring-end\n");
     printf("label substring\n");
@@ -175,6 +187,9 @@ void define_substring() {
     printf("LABEL -substring-end\n");
 }
 
+/**
+ * Defines the builtin ord function
+ */
 void define_ord() {
     printf("jump -ord-end\n");
     printf("label ord\n");
@@ -192,11 +207,20 @@ void define_ord() {
     printf("label -ord-end\n");
 }
 
+/**
+ * Defines the inbuilt functions
+ */
 void define_inbuilt_functions() {
     define_substring();
     define_ord();
 }
 
+/**
+ * Recursively prints an expression tree
+ * @param expression_tree The tree to print
+ * @param label_indexer The value to use for labels
+ * @param label_prefix The prefix to us in labels
+ */
 void recurse_expression(PT_Node_t* expression_tree, int* label_indexer, const char* label_prefix) {
     if (expression_tree == NULL) {
         return;
@@ -296,6 +320,13 @@ void recurse_expression(PT_Node_t* expression_tree, int* label_indexer, const ch
     }
 }
 
+/**
+ * Navigates the tree to the first expression symbol and recursively parses it and the rest of the expression
+ * @param expression_start The start of the expression tree
+ * @param label_indexer The value to use for labels
+ * @param label_prefix The prefix to us in labels
+ * @return An error if the function reaches an invalid state
+ */
 error(none) run_expression(PT_Node_t *expression_start, int* label_indexer, const char* label_prefix) {
     if (expression_start == NULL) {
         return_none();
@@ -406,6 +437,12 @@ error(none) print_while(PT_Node_t* while_start, int* label_indexer, const char* 
 error(none) call_function(PT_Node_t *call_start, int* labeler, const char* label_prefix);
 error(vec_context) scan_body_for_args(PT_Node_t* body_node, vec_context* context);
 
+/**
+ * Recursively parses an if statement and identifies all the variables defined in it
+ * @param if_node The if node to start scanning from
+ * @param context The context to add all the new variable definitions into
+ * @return A vector containing the identifiers of all the variables defined in the tree
+ */
 error(vec_context) scan_if_for_args(PT_Node_t * if_node, vec_context* context) {
     skip_to_next_nonTerminal(if_node, BODY);
     PT_Node_t* body1 = if_node;
@@ -428,15 +465,29 @@ error(vec_context) scan_if_for_args(PT_Node_t * if_node, vec_context* context) {
         vec_context_insert_sorted(&new_vars, body2_vars.data[i]);
     }
 
+    vec_context_destroy(&body1_vars);
+    vec_context_destroy(&body2_vars);
     return_value(new_vars, vec_context);
 }
 
+/**
+ * Recursively parses a while statement and identifies all the variables defined in it
+ * @param if_node The while node to start scanning from
+ * @param context The context to add all the new variable definitions into
+ * @return A vector containing the identifiers of all the variables defined in the tree
+ */
 error(vec_context) scan_while_for_args(PT_Node_t* while_node, vec_context* context) {
     skip_to_next_nonTerminal(while_node, BODY);
 
     return scan_body_for_args(while_node->leftChild, context);
 }
 
+/**
+ * Recursively parses a body node and identifies all the variables defined in it
+ * @param body_node The body node to start scanning in
+ * @param context The context to add all the new variable definitions into
+ * @return A vector containing the identifiers of all the variables defined in the tree
+ */
 error(vec_context) scan_body_for_args(PT_Node_t* body_node, vec_context* context) {
     vec_context new_variables = new_vec_context();
     if (body_node == NULL) {
@@ -497,6 +548,16 @@ error(vec_context) scan_body_for_args(PT_Node_t* body_node, vec_context* context
     return_value(new_variables, vec_context);
 }
 
+/**
+ *
+ * @param body_node
+ * @param label_indexer
+ * @param label_prefix
+ * @param context
+ * @param returns_void
+ * @param is_function_body
+ * @return
+ */
 error(none) print_body_without_new_context(PT_Node_t* body_node, int* label_indexer, const char* label_prefix ,vec_context* context, bool returns_void, bool is_function_body) {
     if (body_node == NULL) {
         // Void functions contain implicit returns

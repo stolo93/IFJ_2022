@@ -150,6 +150,7 @@ size_t vec_ ## suffix ## _binary_search(const vec_ ## suffix*vec, typeof(type) i
 typeof(type*) vec_ ## suffix ## _find_sorted(const vec_ ## suffix*vec, typeof(type) item) { \
     if (vec->len__ == 0) {return NULL;}                                                \
     size_t location = vec_ ## suffix ## _binary_search(vec, item);                     \
+    if (location >= vec->len__) {return NULL;}                                         \
                                                                                        \
     if (ORD_FUNCTION(vec->data[location], item) == EQUAL_VEC) {                        \
         return vec->data + location;                                                   \
