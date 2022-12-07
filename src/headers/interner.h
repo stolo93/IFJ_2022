@@ -1,3 +1,12 @@
+/****************************************************************
+ * @name interner.h
+ * @author Adam Bezák <xbezak02@stud.fit.vutbr.cz>
+ * @brief File containing definitions for the interner
+ * @date 20.10.2022
+ * Subject : IFJ
+ * Project : Compiler for a given subset of the php language
+****************************************************************/
+
 #ifndef IFJ_2022_INTERNER_H
 #define IFJ_2022_INTERNER_H
 
