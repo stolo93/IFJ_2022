@@ -463,6 +463,20 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
         {
             return_error( ERROR_SEM_TYPE , dType ); //you can only concatenate two strings
         }
+        else if(type1 == noType && type2 == noType)
+        {
+            error( none ) success = addNullToStringNode( node , LEFT );
+            if( is_error( success ))
+            {
+                forward_error( success , dType);
+            }
+            success = addNullToStringNode( node , RIGHT );
+            if( is_error( success ))
+            {
+                forward_error( success , dType);
+            }
+            return_value(stringT, dType);
+        }
         else if (type1 == noType || type2 == noType)
         {
             error( none ) success = operandConversion( node , type1 , type2 );
@@ -491,6 +505,20 @@ error( dType ) checkExpression(PT_Node_ptr node , bool mode)
         if( type1 == boolT || type2 == boolT )
         {
             return_error( ERROR_SEM_TYPE , dType ); //bool can't be inside expression it can be only as final d type
+        }
+        if(type1 == noType && type2 == noType)
+        {
+            error( none ) success = addNullToRealNode( node , LEFT );
+            if( is_error( success ))
+            {
+                forward_error( success , dType);
+            }
+            success = addNullToRealNode( node , RIGHT );
+            if( is_error( success ))
+            {
+                forward_error( success , dType);
+            }
+            return_value(floatingT, dType);
         }
         //division allways returns float
         if( disc == division)
